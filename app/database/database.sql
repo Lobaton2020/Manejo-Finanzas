@@ -198,7 +198,7 @@ insert into porcents values (1,1,"Para mi",1,now()),
                             (2,1,"Ahorro",1,now()),
                             (3,1,"Ayudar en casa",1,now()),
                             (4,1,"Gastos en general",1,now());
-                     
+						
 select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
                                                     left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
                                                     left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = 1
