@@ -4,7 +4,7 @@
     <div class="topbar-left">
         <a href="<?php echo route("main") ?>" class="logo">
             <span class="logo-light">
-                <img width="40" src="<?php echo URL_PROJECT ?>assets/img/logo.png"" alt=""> Mis Finanzas
+                <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png"" alt=""> Mis Finanzas
             </span>
             <span class=" logo-sm">
                 <i class="mdi mdi-camera-control"></i>

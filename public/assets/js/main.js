@@ -1,3 +1,12 @@
+window.URL_PROJECT = "http://localhost/Manejo_Finanzas/";
+window.options = function(object) {
+    return {
+        "method": "POST",
+        "body": convertFormdata(object)
+    };
+};
+
+
 const convertFormdata = (object) => {
     let formData = new FormData();
     for (let property in object) {
@@ -15,14 +24,6 @@ const renderMessage = (type, value) => {
     string += '</button>';
     string += '</div>';
     return string;
-};
-
-window.URL_PROJECT = "http://localhost/Manejo_Finanzas/public/";
-window.options = function(object) {
-    return {
-        "method": "POST",
-        "body": convertFormdata(object)
-    };
 };
 
 const questionRedirection = () => {

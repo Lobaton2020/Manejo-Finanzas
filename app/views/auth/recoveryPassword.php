@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="text-center m-t-0 m-b-15">
                 <a href=" <?php echo route("main") ?>" class="">
-                    <img width="40" src="<?php echo URL_PROJECT ?>assets/img/logo.png"" alt=""> <h5 class=" d-inline">Mis Finanzas</h5></a>
+                    <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png"" alt=""> <h5 class=" d-inline">Mis Finanzas</h5></a>
             </div>
             <hr class="mt-n1 mb-n1">
             <h5 class="font-18 text-center">Restablecer contraseña</h5>

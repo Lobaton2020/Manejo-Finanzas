@@ -8,6 +8,7 @@ class Router
 
     public function __construct()
     {
+        session_start();
         $this->params = $this->getUrl();
         $this->controller = $this->getController();
         $this->method = $this->getMethod();

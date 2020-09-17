@@ -187,6 +187,16 @@ class Orm extends Base
             dd($e->getMessage());
         }
     }
+    public function query_complete($sql)
+    {
+        try {
+            $this->querye($sql);
+            $this->execute();
+            return new JSON($this->fetchAll());
+        } catch (Exception $e) {
+            dd($e->getMessage());
+        }
+    }
     /**
      * @param Array $where - Asociative
      * @param Array $limit : Only delete one register

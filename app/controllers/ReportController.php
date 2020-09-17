@@ -2,10 +2,8 @@
 
 class ReportController extends Controller
 {
-    private $user;
-    private $inflow_porcent;
+
     private $outflow;
-    private $inflow;
     private $porcent; // simil to deposit
 
     public function __construct()
@@ -13,39 +11,16 @@ class ReportController extends Controller
         parent::__construct();
         countVisits($this->model("countVisit"), $this->id);
         $this->authentication();
-        $this->user = $this->model("user");
-        $this->rol_b = $this->model("rol");
-        $this->token = $this->model("tokenRegister");
-        $this->docuemnt_type = $this->model("documentType");
-        $this->notification = $this->model("notification");
-        $this->loggin = $this->model("loggin");
-        $this->count_visit = $this->model("countVisit");
-        $this->notification_type = $this->model("notificationType");
-        $this->inflow_porcent = $this->model("inflowPorcent");
         $this->outflow = $this->model("outflow");
-        $this->inflow = $this->model("inflow");
         $this->porcent = $this->model("porcent");
     }
+
     public function moneyTotalbyDeposit()
     {
-        $porcents = $this->porcent->select(["id_porcent", "name", "status", "create_at"], ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array();
-        $ids_porcent = $this->getIdsPorcent($porcents, "id_porcent");
-        if (count($ids_porcent) == 0) {
-            return [];
-        }
-        $inflow_porcents = $this->inflow_porcent->in(["id_porcent[in]" => $ids_porcent])->array();
-        foreach ($inflow_porcents as $inflow_porcent) {
-            $inflow = $this->inflow->get("*", ["id_inflow[=]" => $inflow_porcent->id_inflow])->array();
-            $inflow_porcent->subtotal = ((intval($inflow->total) * intval($inflow_porcent->porcent))  / 100);
-
-            if (in_array($inflow_porcent->id_porcent, $ids_porcent)) {
-                foreach ($porcents as $porcent) {
-                    if ($inflow_porcent->id_porcent == $porcent->id_porcent) {
-                        $porcent->total += intval($inflow_porcent->subtotal);
-                    }
-                }
-            }
-        }
+        $porcents = $this->porcent->query_complete("select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
+        left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
+        left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = 1
+        group by p.id_porcent ORDER BY ip.id_porcent ASC")->array();
         return $porcents;
     }
 

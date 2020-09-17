@@ -7,10 +7,6 @@ define("DBPASWORD", "12345");
 define("DBDRIVER", "mysql");
 define("DBCHARSET", "utf8");
 
-// define("DBHOST", "sql113.epizy.com");
-// define("DBNAME", "epiz_26764125_finanzas");
-// define("DBUSER", "epiz_26764125");
-// define("DBPASWORD", "QPrAPUzxyPK");
 // datos del servidor
 define("SEPARATOR", "\\");
 define("DOMAIN", $_SERVER["HTTP_HOST"]);

@@ -12,7 +12,7 @@ class Authentication
 
     protected function __construct()
     {
-        $this->sessionStart();
+
         $this->initCredentials();
     }
     protected function initCredentials()
@@ -29,10 +29,7 @@ class Authentication
             }
         }
     }
-    protected function sessionStart()
-    {
-        session_start();
-    }
+
     protected function checkSession()
     {
         return $this->checkSession;

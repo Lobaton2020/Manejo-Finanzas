@@ -198,5 +198,10 @@ insert into porcents values (1,1,"Para mi",1,now()),
                             (2,1,"Ahorro",1,now()),
                             (3,1,"Ayudar en casa",1,now()),
                             (4,1,"Gastos en general",1,now());
+                     
+select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
+                                                    left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
+                                                    left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = 1
+                                                    group by p.id_porcent ORDER BY ip.id_porcent ASC;
                             -- password:12345
 insert into users values(1,1,1,"2001202","Andres Lobaton","andrespipe021028@gmail.com","$2y$10$ElyCcmqbM0N79j5qBzkJkeHe42q4/6grB3LV8YAWZzPA/ErGa/XDy",null,null,null,null,null,1,"2020-09-17 02:37:12","2020-09-17 02:37:12");
