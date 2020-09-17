@@ -199,4 +199,4 @@ insert into porcents values (1,1,"Para mi",1,now()),
                             (3,1,"Ayudar en casa",1,now()),
                             (4,1,"Gastos en general",1,now());
                             -- password:12345
-insert into users values(1,1,1,"2001202","Andres Lobaton","demo@gmail.com","$2y$10$/2Vp/1v1XW0hAlqoLWv4kORePYkn6sujAYRU.trY0RCgCoBjhdAkO",null,null,null,null,null,1,"2001-12-12 00:56:12","2001-12-12 00:56:12");
+insert into users values(1,1,1,"2001202","Andres Lobaton","andrespipe021028@gmail.com","$2y$10$ElyCcmqbM0N79j5qBzkJkeHe42q4/6grB3LV8YAWZzPA/ErGa/XDy",null,null,null,null,null,1,"2020-09-17 02:37:12","2020-09-17 02:37:12");

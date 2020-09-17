@@ -79,23 +79,21 @@
                                             </p>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-                        </div>
-                    </div> <!-- end col -->
+                        </div> <!-- end col -->
 
 
-                </div> <!-- end row -->
+                    </div> <!-- end row -->
+                </div>
             </div>
-        </div>
 
+
+        </div>
+        <!-- container-fluid -->
 
     </div>
-    <!-- container-fluid -->
-
-</div>
-<?php include_document("layouts.footerbar") ?>
+    <?php include_document("layouts.footerbar") ?>
 
 </div>
 

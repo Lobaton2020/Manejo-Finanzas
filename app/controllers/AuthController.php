@@ -161,7 +161,7 @@ class AuthController extends Controller
                             "name_user" => ucwords($user->complete_name),
                             "name_company" => "Tus Finanzas",
                             "url_link" => $url_link,
-                            "name_link" => substr($url_link, 0, 80) . "..."
+                            "name_link" => $url_link
                         ];
                         $content = structure_html_send_email($config);
 

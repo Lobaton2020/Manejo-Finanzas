@@ -21,14 +21,14 @@ class Router
     {
         $controller = isset($this->params[$index]) ? $this->params[$index] . "Controller" : null;
         if (isset($controller)) {
-            if (file_exists("../app/controllers/" . ucwords($controller) . ".php")) {
+            if (file_exists("./app/controllers/" . ucwords($controller) . ".php")) {
                 $this->controller = ucwords($controller);
                 unset($this->params[$index]);
             } else {
-                dd("../app/controllers/" . ucwords($controller) . ".php <b>Controller Not Found</b>");
+                dd("./app/controllers/" . ucwords($controller) . ".php <b>Controller Not Found</b>");
             }
         }
-        require_once "../app/controllers/" . $this->controller . ".php";
+        require_once "./app/controllers/" . $this->controller . ".php";
         return new $this->controller;
     }
     public function getMethod($index = 1)

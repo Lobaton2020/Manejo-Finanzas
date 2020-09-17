@@ -1,5 +1,5 @@
 <div class="topbar">
-    <?php $self = new Controller(); ?>
+    <?php $self = $_SESSION["credentials"]; ?>
     <!-- LOGO -->
     <div class="topbar-left">
         <a href="<?php echo route("main") ?>" class="logo">
@@ -67,11 +67,11 @@
             <li class="dropdown notification-list list-inline-item">
                 <div class="dropdown notification-list nav-pro-img">
                     <a class="dropdown-toggle nav-link arrow-none nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <span class="pr-2"><?php echo $self->getName() ?></span><img src="https://icon-library.com/images/default-user-icon/default-user-icon-4.jpg" alt="user" class="rounded-circle">
+                        <span class="pr-2"><?php echo $self["name"] ?></span><img src="https://icon-library.com/images/default-user-icon/default-user-icon-4.jpg" alt="user" class="rounded-circle">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                         <!-- item-->
-                        <a class="dropdown-item " href="#"><b class="text-primary"><?php echo $self->getRol()["name"] ?></b></a>
+                        <a class="dropdown-item " href="#"><b class="text-primary"><?php echo $self["rol"]["name"] ?></b></a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="<?php echo route("user/profile") ?>"><i class="mdi mdi-account-circle"></i> Mi Perfil</a>
                         <!-- <a class="dropdown-item d-block" href="#"><i class="mdi mdi-settings"></i> Ajustes</a> -->

@@ -5,7 +5,7 @@ class Controller extends Authentication
     public function __construct()
     {
         // prevent de error repeat session_start() for use in 'views/layouts/..'
-        @parent::__construct();
+        parent::__construct();
     }
     protected function authentication($type = "PRIMARY")
     {

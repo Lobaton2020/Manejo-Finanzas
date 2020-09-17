@@ -38,7 +38,7 @@
                 <li>
                     <a href="<?php echo route("category") ?>" class=""><i class="size-icon mdi mdi-border-all"></i><span>Categorias de egresos<span class="float-right menu-arrow"> </span></a>
                 </li>
-                <?php if ($self->getRol()["name"] == "Administrador") : ?>
+                <?php if ($self["rol"]["name"] == "Administrador") : ?>
                     <li>
                         <a href="javascript:void(0);" class="waves-effect"><i class="size-icon mdi mdi-flash-auto"></i><span> Administracion <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                         <ul class="submenu">
