@@ -1,0 +1,17 @@
+.size-icon {
+    font-size: 20px;
+    display: block;
+}
+
+.size-check {
+    /* width: 30px; */
+    font-size: 50px;
+}
+
+.size-text {
+    font-size: 13px;
+}
+
+.text-decoration-underline {
+    text-decoration: underline;
+}

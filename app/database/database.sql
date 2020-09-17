@@ -1,0 +1,202 @@
+drop database if exists finances;
+create database finances;
+use finances;
+
+create table documenttypes(
+    id_document_type  int not null auto_increment,
+    abrev varchar(10),
+    name varchar(100),
+    primary key(id_document_type)
+);
+
+create table rols(
+    id_rol int not null auto_increment,
+    name varchar(100),
+    primary key(id_rol)
+);
+
+create table users(
+    id_user int not null auto_increment,
+    id_rol  int not null,
+    id_document_type  int not null,
+    number_document varchar(100) not null,
+    complete_name varchar(100) not null,
+    email varchar(200) not null,
+    password varchar(1000) not null,
+    image varchar(500) null,
+    email_verify_date datetime null,
+    recovery_pass_token varchar(200) null,
+    remember_token varchar(200) null,
+    born_date date null,
+    status  boolean not null,
+    update_at datetime not null,
+    create_at datetime not null,
+    primary key (id_user),
+    foreign key(id_document_type) references documenttypes (id_document_type),
+    foreign key(id_rol) references rols (id_rol)
+);
+
+create table tokenregisters(
+    id_token_register int not null auto_increment,
+    id_rol int not null,
+    id_user int not null,
+    description varchar(200) null,
+    token varchar(200) not null,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key(id_token_register),
+    foreign key(id_user) references users (id_user)
+);
+
+create table countvisits(
+    id_count_visit int not null auto_increment,
+    id_user int not null,
+    count bigint not null,
+    update_at datetime not null,
+    create_at datetime not null,
+    primary key(id_count_visit)
+);
+
+create table loggins(
+    id_login int not null auto_increment,
+    id_user int not null,
+    browser varchar(300) not null,
+    server varchar(100)not null,
+    create_at datetime not null,
+    primary key(id_login),
+    foreign key(id_user) references users (id_user)
+);
+
+create table notificationtypes(
+key_notification_type varchar(100) not null,
+name varchar(200) not null,
+primary key(key_notification_type)
+);
+
+create table notifications(
+    id_notification int not null auto_increment,
+    id_user int not null,
+    key_notification_type varchar(100) not null,
+    readed boolean not null,
+    create_at datetime not null,
+    primary key(id_notification),
+    foreign key(id_user) references users (id_user),
+    foreign key(key_notification_type) references notificationtypes (key_notification_type)
+);
+
+create table porcents(
+    id_porcent int not null auto_increment,
+    id_user int null ,
+    name varchar(100) not null,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key (id_porcent)
+);
+
+create table inflowtypes(
+    id_inflow_type int not null auto_increment,
+    id_user int null ,
+    name varchar(200) not null ,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key (id_inflow_type)
+
+);
+create table outflowtypes(
+    id_outflow_type int not null auto_increment,
+    id_user int null ,
+    name varchar(200) not null ,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key (id_outflow_type)
+
+);
+
+create table inflows (
+    id_inflow int not null auto_increment,
+    id_user int not null ,
+    id_inflow_type int not null,
+    total float not null,
+    description mediumtext null,
+    set_date  date not null ,
+    status  boolean not null,
+    update_at datetime not null,
+    create_at datetime not null,
+    primary key (id_inflow),
+    foreign key(id_user) references users (id_user),
+    foreign key(id_inflow_type) references inflowtypes (id_inflow_type)
+);
+
+create table categories(
+    id_category int not null auto_increment,
+    id_outflow_type  int not null ,
+    id_user int null ,
+    name varchar(200) not null ,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key (id_category)
+);
+
+create table outflows (
+    id_outflow int not null auto_increment,
+    id_outflow_type int not null,
+    id_user int not null,
+    id_category int  null,
+    id_porcent int not null,
+    amount  float not null,
+    description mediumtext null,
+    set_date  date not null ,
+    status  boolean not null,
+    update_at datetime not null,
+    create_at datetime not null,
+    primary key (id_outflow),
+    foreign key(id_category) references categories (id_category),
+    foreign key(id_user) references users (id_user),
+    foreign key(id_outflow_type) references outflowtypes (id_outflow_type)
+);
+
+create table inflow_porcent (
+    id_inflow_porcent int not null auto_increment,
+    id_inflow int not null,
+    id_porcent int not null,
+    porcent int  null,
+    status  boolean not null,
+    create_at datetime not null,
+    primary key (id_inflow_porcent),
+    foreign key(id_inflow) references inflows (id_inflow),
+    foreign key(id_porcent) references porcents (id_porcent)
+);
+insert into rols values (1,"Administrador"),
+                        (2,"Usuario");
+ insert into notificationtypes values ("register"," se ha registrado por medio de un token"),
+                                      ("recoverypassword"," esta recuperando la contraseña"),
+                                      ("ingres"," ha hecho un ingreso"),
+                                      ("egress"," ha hecho un egreso"),
+                                      ("deposit"," ha creado un deposito"),
+                                      ("category"," ha creado una categoria de egreso"),
+                                      ("token"," ha creado un token de registro");
+                                      
+
+insert into documenttypes values(1,"T.I","Tarjeta de identídad"),
+                                (2,"C.C","Cédula de ciudadanía");
+
+insert into outflowtypes values (1,1,"Inversion",1,now()),
+                                (2,1,"Gasto",1,now());
+
+insert into inflowtypes values  (1,1,"Salario",1,now()),
+                                (2,1,"Jovenes en accion",1,now());
+
+insert into categories values (1,1,1,"Finca raiz",1,now()),
+                              (2,1,1,"Ganado",1,now()),
+                              (3,1,1,"Casa",1,now()),
+                              (4,2,1,"Arriendo",1,now()),
+                              (5,2,1,"Servicios",1,now()),
+                              (6,2,1,"Mercado",1,now()),
+                              (7,2,1,"Deudas",1,now());
+
+insert into porcents values (1,1,"Para mi",1,now()),
+                            (2,1,"Ahorro",1,now()),
+                            (3,1,"Ayudar en casa",1,now()),
+                            (4,1,"Gastos en general",1,now());
+                            -- password:12345
+insert into users values(1,1,1,"2001202","Andres Lobaton","demo@gmail.com","$2y$10$/2Vp/1v1XW0hAlqoLWv4kORePYkn6sujAYRU.trY0RCgCoBjhdAkO",null,null,null,null,null,1,"2001-12-12 00:56:12","2001-12-12 00:56:12");
