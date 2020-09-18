@@ -1,8 +1,3 @@
-window.addEventListener("DOMContentLoaded", () => {
-    renderStatisticMoneyDisponiblebyDeposits();
-    renderStatisticMoneySpendbyDeposits();
-});
-
 const renderStatisticMoneyDisponiblebyDeposits = async() => {
     try {
         let element = document.getElementById("money-deposit-disponible");
@@ -56,3 +51,8 @@ const renderStatisticMoneySpendbyDeposits = async() => {
         console.error(err)
     }
 };
+window.addEventListener("DOMContentLoaded", () => {
+    renderStatisticMoneyDisponiblebyDeposits();
+    renderStatisticMoneySpendbyDeposits();
+
+});

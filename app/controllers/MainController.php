@@ -26,9 +26,7 @@ class MainController extends Controller
         $inflows = $this->inflow->select(["id_inflow"], ["id_user[=]" => $this->id])->array();
         $number_ingres = $this->inflow->count(["id_user[=]" => $this->id])->array();
         $number_egres = $this->outflow->count(["id_user[=]" => $this->id])->array();
-        foreach ($inflows as $inflow) {
-            $sum_egress += intval($this->outflow->sum("amount", ["id_user[=]" => $inflow->id_inflow])->array());
-        }
+        $sum_egress += intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
         $sum_entrys = intval($this->inflow->sum("total", ["id_user[=]" => $this->id])->array());
         $data = [
             "allentry" => [

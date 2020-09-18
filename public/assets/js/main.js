@@ -114,13 +114,15 @@ const fixedSidebar = () => {
             localStorage.setItem("fixed-sidebar", "true")
         }
     })
+    if (window.innerWidth > 500) {
 
-    if (localStorage.getItem("fixed-sidebar")) {
-        document.body.classList.add("enlarged")
+        if (localStorage.getItem("fixed-sidebar")) {
+            document.body.classList.add("enlarged")
 
-    } else {
-        if (document.body.classList.contains("enlarged")) {
-            document.body.classList.remove("enlarged")
+        } else {
+            if (document.body.classList.contains("enlarged")) {
+                document.body.classList.remove("enlarged")
+            }
         }
     }
 

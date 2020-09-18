@@ -93,7 +93,7 @@ function make_table($head, $fillable, $data, $extra = null)
     ];
     $reditection = $reditections["delete"];
     $attributes = [
-        "id" => "datatable-buttons",
+        "id" => "datatable",
         "class" => "table table-striped table-bordered dt-responsive nowrap",
         "style" => "border-collapse: collapse; border-spacing: 0; width: 100%;"
     ];
@@ -101,7 +101,8 @@ function make_table($head, $fillable, $data, $extra = null)
     foreach ($attributes as $key => $value) {
         $attr .= "{$key}=\"{$value}\" ";
     }
-    $string = "<table {$attr}>";
+    $string  = '<div class="table-responsive">';
+    $string .= "<table {$attr}>";
     $string .= "<thead>";
     for ($i = 0; $i < 1; $i++) {
         $string .= "<tr>";
@@ -188,6 +189,7 @@ function make_table($head, $fillable, $data, $extra = null)
     }
     $string .= "</tbody>";
     $string .= "</table>";
+    $string .= "</div>";
     return $string;
 }
 
@@ -270,7 +272,7 @@ function structure_html_send_email($data)
     $content .= '  <p>Hola <b>' . $data->name_user . '.</b></p>';
     $content .= "  <p>Usted solicitó un restablecimiento de contraseña para su cuenta en {$data->name_company}.</p>";
     $content .= '<h4>Click en el siguiente link:</h4>';
-    $content .= "<a href='{$data->url_link}'>{$data->name_link}</a>";
+    $content .= "<a href='{$data->url_link}'>>{$data->name_link}</a>";
     $content .= '   ';
     $content .= '     <div class="container-fluid nav navbar navbar-default fixed-bottom  bg-primary ">';
     $content .= '         <div class="container text-light">';

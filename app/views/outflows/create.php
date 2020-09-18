@@ -115,10 +115,7 @@
                                         <button type="submit" class="btn btn-success waves-effect waves-light">
                                             Enviar datos
                                         </button>
-                                        <button type="reset" class="btn btn-secondary waves-effect m-l-5">
-                                            Resetear
-                                        </button>
-                                        <a href="<?php echo route("outflow") ?>" class="btn btn-info waves-effect m-l-5 float-right">
+                                        <a href="<?php echo route("outflow") ?>" class="btn btn-secondary waves-effect m-l-5 float-right">
                                             Regresar
                                         </a>
                                     </div>
