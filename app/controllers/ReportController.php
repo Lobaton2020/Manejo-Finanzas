@@ -20,8 +20,9 @@ class ReportController extends Controller
         $this->id = intval($this->id);
         $porcents = $this->porcent->query_complete("select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
                                                     left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
-                                                    left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = {$this->id} and status = 1
+                                                    left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = {$this->id} and p.status = 1
                                                     group by p.id_porcent ORDER BY ip.id_porcent ASC")->array();
+													
         return $porcents;
     }
     public function moneyEgressbyDeposit()

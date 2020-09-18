@@ -13,6 +13,7 @@ class MainController extends Controller
         $this->outflow = $this->model("outflow");
     }
 
+   
     public function index()
     {
         if (!isset($_COOKIE["firstvisit"])) {
@@ -22,11 +23,11 @@ class MainController extends Controller
             setcookie("show-cookie", "ok", time() - 4);
         }
 
-        $sum_egress = 0;
         $number_ingres = $this->inflow->count(["id_user[=]" => $this->id])->array();
         $number_egres = $this->outflow->count(["id_user[=]" => $this->id])->array();
-        $sum_egress += intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
+        $sum_egress = intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
         $sum_entrys = intval($this->inflow->sum("total", ["id_user[=]" => $this->id])->array());
+        $number_disponible = $sum_entrys - $sum_egress;
         $data = [
             "allentry" => [
                 "title" => "Total Ingresos",
@@ -37,12 +38,12 @@ class MainController extends Controller
                 "amount" => number_price($sum_egress, true)
             ],
             "allinvestment" => [
-                "title" => "Numero Ingresos",
-                "amount" => $number_ingres
+                "title" => "Total disponible",
+                "amount" => number_price($number_disponible, true)
             ],
             "allspends" => [
-                "title" => "Numero Egresos",
-                "amount" => $number_egres
+                "title" => "Numero: <br> Ingresos / Egresos",
+                "amount" => $number_ingres . " / " .$number_egres
             ],
         ];
         return view("main.index", $data);
