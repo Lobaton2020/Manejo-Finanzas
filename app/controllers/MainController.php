@@ -23,7 +23,6 @@ class MainController extends Controller
         }
 
         $sum_egress = 0;
-        $inflows = $this->inflow->select(["id_inflow"], ["id_user[=]" => $this->id])->array();
         $number_ingres = $this->inflow->count(["id_user[=]" => $this->id])->array();
         $number_egres = $this->outflow->count(["id_user[=]" => $this->id])->array();
         $sum_egress += intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
