@@ -30,6 +30,7 @@ function renderJumbotron($data, $title, $path = null)
  * $extra[use]
  * $extra[btn-delete]
  * $extra[param-extra]
+ * $extra[btn_delete_delete]
  * $extra[id]
  */
 function make_table($head, $fillable, $data, $extra = null)
@@ -132,7 +133,14 @@ function make_table($head, $fillable, $data, $extra = null)
                     $string .= "<td>" . format_datetime($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
                 case "set_date":
-                    $string .= "<td>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                    if (isset($extra["verify-date-before"])) {
+                        $fecha_actual = strtotime(date("d-m-Y H:i:00", time()));
+                        $fecha_entrada = strtotime("{$data[$i]->{$fillable[$k]}} 00:00:00");
+                        $bg_expire = $fecha_actual > $fecha_entrada ? "alert-danger" : "alert-success";
+                        $string .= "<td class=' alert {$bg_expire}'>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                    } else {
+                        $string .= "<td>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                    }
                     break;
                 case "total":
                 case  "amount":

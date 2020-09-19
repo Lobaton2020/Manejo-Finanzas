@@ -48,6 +48,18 @@ create table tokenregisters(
     foreign key(id_user) references users (id_user)
 );
 
+create table moneyloans(
+    id_money_loan int not null auto_increment,
+    id_user int not null,
+    description varchar(200) null,
+    total float not null,
+    set_date date not null, -- fecha de devolucion
+    status  boolean null,
+    create_at datetime not null,
+    primary key(id_money_loan),
+    foreign key(id_user) references users (id_user)
+);
+
 create table countvisits(
     id_count_visit int not null auto_increment,
     id_user int not null,
