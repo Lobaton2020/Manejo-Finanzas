@@ -37,7 +37,7 @@ const saveInflow = (e) => {
 
 };
 
-const savePorcent = async(e) => {
+const savePorcent = async (e) => {
     e.preventDefault();
     let message = document.querySelector("#show-message"),
         template = document.querySelector("#template-porcent"),
@@ -79,4 +79,4 @@ const savePorcent = async(e) => {
     }
 };
 
-window.addEventListener("DOMContentLoaded", () => {})
+window.addEventListener("DOMContentLoaded", () => { })

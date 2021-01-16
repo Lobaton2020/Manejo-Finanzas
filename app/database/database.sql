@@ -60,6 +60,17 @@ create table moneyloans(
     foreign key(id_user) references users (id_user)
 );
 
+create table notes(
+    id_note int not null auto_increment,
+    id_user int not null,
+    description text null,
+    total float not null,
+    status  boolean null,
+    create_at datetime not null,
+    primary key(id_note),
+    foreign key(id_user) references users (id_user)
+);
+
 create table countvisits(
     id_count_visit int not null auto_increment,
     id_user int not null,
@@ -187,7 +198,7 @@ insert into rols values (1,"Administrador"),
                                       ("deposit"," ha creado un deposito"),
                                       ("category"," ha creado una categoria de egreso"),
                                       ("token"," ha creado un token de registro");
-                                      
+
 
 insert into documenttypes values(1,"T.I","Tarjeta de identídad"),
                                 (2,"C.C","Cédula de ciudadanía");
@@ -210,7 +221,7 @@ insert into porcents values (1,1,"Para mi",1,now()),
                             (2,1,"Ahorro",1,now()),
                             (3,1,"Ayudar en casa",1,now()),
                             (4,1,"Gastos en general",1,now());
-						
+
 select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
                                                     left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
                                                     left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = 1

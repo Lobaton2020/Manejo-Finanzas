@@ -1,5 +1,5 @@
 window.URL_PROJECT = "http://localhost/Manejo_Finanzas/";
-window.options = function(object) {
+window.options = function (object) {
     return {
         "method": "POST",
         "body": convertFormdata(object)
@@ -78,7 +78,7 @@ const preventSendForm = () => {
 
 
 
-const saveTypeMove = async(e) => {
+const saveTypeMove = async (e) => {
     e.preventDefault();
     let message = document.querySelector("#show-message");
     if (e.target.name.value.length > 0 && e.target.id_type_move.value.length > 0) {
@@ -128,7 +128,6 @@ const fixedSidebar = () => {
 
 };
 const showMessageFirstVisit = () => {
-    console.log(document.cookie.indexOf("show-cookie"))
     if (parseInt(document.cookie.indexOf("show-cookie")) > 0) {
         $("#first-visit").modal("show");
     }

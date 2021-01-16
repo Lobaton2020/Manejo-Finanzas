@@ -39,6 +39,9 @@
                     <a href="<?php echo route("category") ?>" class=""><i class="size-icon mdi mdi-border-all"></i><span>Categorias de egresos<span class="float-right menu-arrow"> </span></a>
                 </li>
                 <li>
+                    <a href="<?php echo route("note") ?>" class=""><i class="size-icon mdi mdi-book"></i><span>Notas<span class="float-right menu-arrow"> </span></a>
+                </li>
+                <li>
                     <a href="<?php echo route("moneyLoan") ?>" class=""><i class="size-icon mdi mdi-block-helper"></i><span>Prestamos<span class="float-right menu-arrow"> </span></a>
                 </li>
                 <?php if ($self["rol"]["name"] == "Administrador") : ?>
