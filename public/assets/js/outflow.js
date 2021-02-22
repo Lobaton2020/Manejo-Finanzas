@@ -1,4 +1,4 @@
-const renderCategories = async(e) => {
+const renderCategories = async (e) => {
     let template = document.querySelector("#template"),
         parent = document.querySelector("#elements"),
         spaceEmpty = document.querySelector("#empty"),
@@ -46,7 +46,7 @@ const saveOutflow = (e) => {
     }
 };
 
-const saveCategory = async(e) => {
+const saveCategory = async (e) => {
     e.preventDefault();
     let typeOutflow = document.querySelector("#inflow_type"),
         message = document.querySelector("#show-message"),
@@ -102,7 +102,7 @@ const saveCategory = async(e) => {
 
 };
 
-const saveCategoryEgress = async(e) => {
+const saveCategoryEgress = async (e) => {
     e.preventDefault();
     let typeOutflow = document.querySelector("#inflow_type"),
         message = document.querySelector("#show-message"),
@@ -146,7 +146,3 @@ const saveCategoryEgress = async(e) => {
         console.log(err)
     }
 };
-
-window.addEventListener("DOMContentLoaded", () => {
-
-});

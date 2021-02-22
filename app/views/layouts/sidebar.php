@@ -10,25 +10,12 @@
                         <i class="icon-accelerator"></i><span class="badge badge-danger badge-pill float-right">&nbsp;</span> <span> Pagina principal </span>
                     </a>
                 </li>
-
-                <!-- <li>
-                    <a href="javascript:void(0);" class="waves-effect"><i class="icon-mail-open"></i><span> Mis finanzas <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
-                    <ul class="submenu">
-                        <li><a href="<?php echo route("finance/salary") ?>">Mi sueldo</a></li>
-                        <li><a href="<?php echo route("finance/spend") ?>">Mis gastos</a></li>
-                        <li><a href="<?php echo route("finance/status") ?>">Estado de finanzas</a></li>
-                        <li><a href="<?php echo route("finance/inversion") ?>">Inversiones</a></li>
-                    </ul>
-                </li> -->
                 <li>
                     <a href="<?php echo route("inflow") ?>" class=""><i class=" size-icon mdi mdi-trending-up "></i><span>Ingresos<span class="float-right menu-arrow"> </span></a>
                 </li>
                 <li>
                     <a href="<?php echo route("outflow") ?>" class=""><i class=" size-icon mdi mdi-trending-down"></i><span>Egresos<span class="float-right menu-arrow"> </span></a>
                 </li>
-                <!-- <li>
-                    <a href="<?php echo route("investment") ?>" class=""><i class=" size-icon mdi  mdi-windows"></i><span>Inversion<span class="float-right menu-arrow"> </span></a>
-                </li> -->
                 <li>
                     <a href="<?php echo route("porcent") ?>" class=""><i class="size-icon mdi mdi-view-compact"></i><span>Depositos<span class="float-right menu-arrow"> </span></a>
                 </li>
@@ -45,6 +32,9 @@
                     <a href="<?php echo route("moneyLoan") ?>" class=""><i class="size-icon mdi mdi-block-helper"></i><span>Prestamos<span class="float-right menu-arrow"> </span></a>
                 </li>
                 <?php if ($self["rol"]["name"] == "Administrador") : ?>
+                    <li>
+                        <a href="<?php echo route("query") ?>" class=""><i class="size-icon mdi mdi mdi-database-edit"></i><span>SQL<span class="float-right menu-arrow"> </span></a>
+                    </li>
                     <li>
                         <a href="javascript:void(0);" class="waves-effect"><i class="size-icon mdi mdi-flash-auto"></i><span> Administracion <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                         <ul class="submenu">

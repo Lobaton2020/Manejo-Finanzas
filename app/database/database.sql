@@ -189,6 +189,17 @@ create table inflow_porcent (
     foreign key(id_inflow) references inflows (id_inflow),
     foreign key(id_porcent) references porcents (id_porcent)
 );
+
+create table queries(
+    id_query int not null auto_increment,
+    id_user int not null,
+    description text,
+    query text,
+    create_at datetime not null,
+    primary key (id_query),
+    foreign key(id_user) references users (id_user)
+);
+
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
  insert into notificationtypes values ("register"," se ha registrado por medio de un token"),
@@ -228,3 +239,8 @@ select p.*,sum(i.total * (ip.porcent / 100)) as total  from porcents as p
                                                     group by p.id_porcent ORDER BY ip.id_porcent ASC;
                             -- password:12345
 insert into users values(1,1,1,"2001202","Andres Lobaton","andrespipe021028@gmail.com","$2y$10$ElyCcmqbM0N79j5qBzkJkeHe42q4/6grB3LV8YAWZzPA/ErGa/XDy",null,null,null,null,null,1,"2020-09-17 02:37:12","2020-09-17 02:37:12");
+
+INSERT INTO queries VALUES
+(1,1, 'Consulta de total de salidas de dinero por categorias', 'select cat.name,sum(amount) as total from outflows as outf inner join categories as cat on cat.id_category = outf.id_category where outf.id_user = 1 GROUP by outf.id_category', '2021-01-16 18:56:36'),
+(2,1, 'Consultar el total de ingresos por tipo de ingresos', 'select it.name,sum(total) as total from inflows as inf inner join inflowtypes as it on inf.id_inflow_type = it.id_inflow_type where inf.id_user = 1 GROUP by inf.id_inflow_type', '2021-01-16 19:03:54'),
+(3,1, 'Consultar el total de ingresos por tipo de ingresos, y por fecha delimitada (inicio-fin)', 'select it.name,sum(total) as total from inflows as inf \r\ninner join inflowtypes as it on inf.id_inflow_type = it.id_inflow_type \r\nwhere inf.id_user = 1 and (inf.create_at BETWEEN \"2020-10-01\" AND now())\r\nGROUP by inf.id_inflow_type', '2021-01-16 19:10:05');

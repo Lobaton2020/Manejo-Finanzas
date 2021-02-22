@@ -5,7 +5,7 @@
  File: Datatable js
  */
 
-$(document).ready(function() {
+const InitDataTables = () => {
     $('#datatable').DataTable();
 
     //Buttons examples
@@ -16,4 +16,8 @@ $(document).ready(function() {
 
     table.buttons().container()
         .appendTo('#datatable-buttons_wrapper .col-md-6:eq(0)');
-} );
+};
+
+$(document).ready(function () {
+    InitDataTables()
+});

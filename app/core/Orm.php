@@ -13,7 +13,7 @@ class Orm extends Base
     }
 
     /**
-     * @param Array (Numeric) or String $select 
+     * @param Array (Numeric) or String $select
      * @param Array $where - Asociative
      * ej:select("*", ["iduser[>]" => 20])
      */
@@ -43,7 +43,7 @@ class Orm extends Base
         }
     }
     /**
-     * @param Array (Numeric) or String $select 
+     * @param Array (Numeric) or String $select
      * @param Array $where - Asociative
      * ej:select("*", ["iduser[>]" => 20])
      * Only return a register
@@ -259,8 +259,8 @@ class Orm extends Base
     /**
      *  @param Array  $cond [column,value]
      *  @param Array $columns [column1,column2] -- Only two options
-     *  @param String $string  [value] 
-     *  @param Int $limit [limit] 
+     *  @param String $string  [value]
+     *  @param Int $limit [limit]
      */
     public function selectByCondLikeLimit($where, $columns, $string, $limit = 20)
     {
@@ -279,9 +279,9 @@ class Orm extends Base
         }
     }
     /**
-     *   @param  Array $columns [column1,column2] 
-     *   @param  String $string [value] 
-     *   @param  Int $limit [limit] 
+     *   @param  Array $columns [column1,column2]
+     *   @param  String $string [value]
+     *   @param  Int $limit [limit]
      */
     public function selectByLikeLimit($columns, $string, $limit = 20)
     {
@@ -333,8 +333,8 @@ class Orm extends Base
         }
     }
     /**
-     *   @param  String $column 
-     *   @param  Array $where [value] 
+     *   @param  String $column
+     *   @param  Array $where [value]
      */
     public function max($column, $where)
     {
@@ -356,8 +356,8 @@ class Orm extends Base
         }
     }
     /**
-     *   @param  String $column 
-     *   @param  Array $where [value] 
+     *   @param  String $column
+     *   @param  Array $where [value]
      */
     public function min($column, $where)
     {
@@ -379,8 +379,8 @@ class Orm extends Base
         }
     }
     /**
-     *   @param  String $column 
-     *   @param  Array $where [value] 
+     *   @param  String $column
+     *   @param  Array $where [value]
      */
     public function sum($column, $where)
     {
@@ -443,8 +443,8 @@ class Orm extends Base
     }
 
     /**
-     *   @param  String $column 
-     *   @param  Array $where [value] 
+     *   @param  String $column
+     *   @param  Array $where [value]
      */
     public function avg($column, $where)
     {
@@ -483,6 +483,20 @@ class Orm extends Base
     public function id()
     {
         return $this->id;
+    }
+
+    /**
+     *   @param  String $query
+     */
+    public function query($query)
+    {
+        try {
+            $this->querye($query);
+            $this->execute();
+            return new JSON($this->fetchAll());
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 
 

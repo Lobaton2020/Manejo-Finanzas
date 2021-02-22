@@ -1,4 +1,4 @@
-window.URL_PROJECT = "http://localhost/Manejo_Finanzas/";
+window.URL_PROJECT = "http://finanzas.me/";
 window.options = function (object) {
     return {
         "method": "POST",

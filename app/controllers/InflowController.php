@@ -47,7 +47,7 @@ class InflowController extends Controller
 
     public function store()
     {
-        execute_post(function ($request) {
+        return execute_post(function ($request) {
             $sum = 0;
             $insert_porcents = true;
             $id_inflow = null;
