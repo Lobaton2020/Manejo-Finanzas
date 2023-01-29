@@ -20,7 +20,7 @@ class OutflowController extends Controller
     }
     private function get_amounts_disponible()
     {
-        require_once URL_APP . "controllers\\ReportController.php";
+        require_once URL_APP . "controllers/ReportController.php";
         $report = new ReportController();
         return toArray($report->moneyDisponiblebyDeposit())->data;
     }
