@@ -1,11 +1,18 @@
 <?php
-// constates de la base de datos
-define("DBHOST", "localhost");
-define("DBNAME", "finances");
-define("DBUSER", "root");
-define("DBPASWORD", "12345");
-define("DBDRIVER", "mysql");
-define("DBCHARSET", "utf8");
+$env = file_get_contents("./../../.env");
+foreach (explode("\n", $env) as $dotenven) {
+    if (strlen($dotenven) > 3) {
+        $key = explode("=", $dotenven)[0];
+        $value = explode("=", $dotenven)[1];
+        $_ENV[$key] = $value;
+    }
+}
+define("DBHOST", trim($_ENV["DB_HOST"]));
+define("DBNAME", trim($_ENV["DB_NAME"]));
+define("DBUSER", trim($_ENV["DB_USER"]));
+define("DBPASWORD", trim($_ENV["DB_PASWORD"]));
+define("DBDRIVER",  trim($_ENV["DB_DRIVER"]));
+define("DBCHARSET", trim($_ENV["DB_CHARSET"]));
 
 // datos del servidor
 define("SEPARATOR", "/");
