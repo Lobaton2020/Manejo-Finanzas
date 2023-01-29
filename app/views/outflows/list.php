@@ -32,8 +32,8 @@
                             <?php echo renderMessage("error") ?>
                             <?php echo renderJumbotron($outflows, "No se ha encontrado egresos", "outflow/create") ?>
                             <?php
-                            $head = ["#", "Tipo Egreso", "Categoria", "Deposito", "Monto", "Descripcion", "Fecha"];
-                            $fillable = ["id_outflow", "outfow_type", "category", "porcent", "amount", "description", "set_date"];
+                            $head = ["#","ID", "Tipo Egreso", "Categoria", "Deposito", "Monto", "Descripcion", "Fecha"];
+                            $fillable = ["id_outflow","id_outflow", "outfow_type", "category", "porcent", "amount", "description", "set_date"];
                             echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "none"]);
                             ?>
                         </div>
