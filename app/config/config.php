@@ -1,5 +1,5 @@
 <?php
-$env = scandir("./.env");
+$env = file_get_contents("./.env");
 if(!$env){
     exit("ENVIROMENT FILE NOT FOUND");
 }
