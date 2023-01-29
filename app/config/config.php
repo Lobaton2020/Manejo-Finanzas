@@ -21,5 +21,5 @@ define("DBCHARSET", trim($_ENV["DB_CHARSET"]));
 define("SEPARATOR", "/");
 define("DOMAIN", $_SERVER["HTTP_HOST"]);
 define("URL_APP",  dirname(dirname(__FILE__)) . SEPARATOR);
-define("URL_PROJECT",  $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . str_replace(basename($_SERVER["PHP_SELF"]), "", $_SERVER["PHP_SELF"]));
-define("URL_ASSETS",  $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . str_replace(basename($_SERVER["PHP_SELF"]), "", $_SERVER["PHP_SELF"]) . SEPARATOR . "public" . SEPARATOR);
+define("URL_PROJECT",  $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"]. SEPARATOR);
+define("URL_ASSETS",  $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . SEPARATOR . "public" . SEPARATOR);
