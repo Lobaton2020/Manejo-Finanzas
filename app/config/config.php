@@ -1,5 +1,8 @@
 <?php
-$env = file_get_contents("./../../.env");
+$env = scandir("./.env");
+if(!$env){
+    exit("ENVIROMENT FILE NOT FOUND");
+}
 foreach (explode("\n", $env) as $dotenven) {
     if (strlen($dotenven) > 3) {
         $key = explode("=", $dotenven)[0];
