@@ -81,7 +81,7 @@
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
-                                                <input type="date" class="form-control" name="set_date" required="" placeholder="Pon la fecha">
+                                                <input type="date" value=<?= date('Y-m-d') ?> class="form-control" name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
 
@@ -93,20 +93,21 @@
                                         </div>
                                         <div id="empty">
 
-                                            <h5 class="text-center mt-3">Ohh!</h5>
+                                            <h5 class="text-center my-0">Ohh!</h5>
                                             <p class="text-muted text-center ">
                                                 Selecciona un tipo de salida de dinero!
                                             </p>
 
                                         </div>
-                                        <div id="elements" class="mt-4"></div>
+                                        <div id="elements" class="mt-4 vertical-scroll"></div>
                                         <template id="template">
-                                            <div class="form-group row ">
-                                                <label for="" class="name col-sm-10 col-form-label"></label>
-                                                <div class="col-md-2">
-                                                    <input type="radio" name="id_category" required class="value">
+                                            <div class="form-group row my-0">
+                                                <label for="id_category" class="name col-sm-10 col-form-label"></label>
+                                                <div class="col-md-2 mt-center">
+                                                    <input type="radio" name="id_category" id="id_category" required class="value">
                                                 </div>
                                             </div>
+                                            <hr style='margin:-1px 0 -1px 0'/>
                                         </template>
                                     </div>
                                 </div>

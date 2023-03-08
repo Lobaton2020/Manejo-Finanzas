@@ -21,7 +21,9 @@ const renderCategories = async (e) => {
             let { id_category, name } = data;
             clon = template.content.cloneNode(true);
             clon.querySelector(".name").textContent = name;
+            clon.querySelector(".name").setAttribute('for', id_category)
             clon.querySelector(".value").setAttribute("value", id_category)
+            clon.querySelector(".value").setAttribute("id", id_category)
             parent.appendChild(clon);
         })
     } else {

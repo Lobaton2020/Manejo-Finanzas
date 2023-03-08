@@ -488,7 +488,8 @@ class Orm extends Base
     /**
      *   @param  String $query
      */
-    public function query($query)
+    public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs)
+
     {
         try {
             $this->querye($query);

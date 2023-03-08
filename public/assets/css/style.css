@@ -15,3 +15,14 @@
 .text-decoration-underline {
     text-decoration: underline;
 }
+
+.mt-center{
+    display: flex;
+    align-items: center;
+}
+
+.vertical-scroll{
+ height: 30rem;
+ overflow-y: scroll;
+ overflow-x:hidden;
+}

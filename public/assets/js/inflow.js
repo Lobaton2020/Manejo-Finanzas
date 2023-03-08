@@ -11,16 +11,13 @@ const formatPrice = (e) => {
 const saveInflow = (e) => {
     e.preventDefault();
     let porcents = document.querySelectorAll(".porcents"),
-        sum = 0,
-        numsNegative = false;
+        sum = 0;
     [...porcents].forEach((elem) => {
-        if (parseInt(elem.value) >= 0) {
-            sum += parseInt(elem.value);
-        } else {
-            numsNegative = true;
+        if (parseFloat(elem.value) >= 0) {
+            sum += parseFloat(elem.value);
         }
     });
-    if (numsNegative) {
+    if (sum < 100) {
         Swal.fire("Numeros negativos!", "Los porcentajes deben ser mayor o igual 0", "error");
         return;
     }
@@ -79,4 +76,12 @@ const savePorcent = async (e) => {
     }
 };
 
+const handleKeyUp = (e) => {
+    const percent = parseFloat(e.target.value)
+    const total = document.querySelector("#total").value
+    const number = percent * parseInt(total) / 100
+    const currency = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(number);
+    console.log({ currency })
+    e.target.parentNode.parentNode.querySelector("#money_deposit").textContent = currency
+};
 window.addEventListener("DOMContentLoaded", () => { })

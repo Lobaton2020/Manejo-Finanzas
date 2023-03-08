@@ -39,7 +39,7 @@
                                                 </select>
                                             </div>
                                             <?php endif; ?>
-                                        
+
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-6">
@@ -61,7 +61,7 @@
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
-                                                <input type="date" class="form-control" name="set_date" required="" placeholder="Pon la fecha">
+                                                <input type="date" class="form-control" value=<?= date('Y-m-d') ?> name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
 
@@ -81,9 +81,15 @@
                                         </div>
                                         <div id="elements">
                                             <?php foreach ($porcents as $porcent) : ?>
-                                                <div class="form-group">
-                                                    <label for="total"><?php echo $porcent->name ?> <span class="text-danger">*</span></label>
-                                                    <input type="number" name="porcents[<?php echo $porcent->id_porcent ?>]" class="porcents form-control" required="" parsley-type="email" placeholder="ej: <?php echo rand(1, 60) ?>">
+                                                <div class="row">
+                                                    <div class="form-group col-6">
+                                                        <label for="total"><?php echo $porcent->name ?> <span class="text-danger">*</span></label>
+                                                        <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]" class="porcents form-control" required="" parsley-type="email" placeholder="ej: <?php echo rand(1, 60) ?>">
+                                                    </div>
+                                                    <div class="form-group col-6">
+                                                    <label for="total">&nbsp;</label>
+                                                        <div id="money_deposit" name="" class="porcents form-control" disabled ></div>
+                                                    </div>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -142,7 +148,7 @@
                                     </div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->
                             </div><!-- /.modal -->
-       
+
 
         </div> <!-- end col -->
     </div> <!-- end row -->
