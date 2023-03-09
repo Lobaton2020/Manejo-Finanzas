@@ -6,7 +6,9 @@
  */
 
 const InitDataTables = () => {
-    $('#datatable').DataTable();
+    $('#datatable').DataTable({
+        order: [[0, 'DESC']]
+    });
 
     //Buttons examples
     var table = $('#datatable-buttons').DataTable({

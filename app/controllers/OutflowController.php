@@ -46,6 +46,7 @@ class OutflowController extends Controller
             $outflow->porcent = $this->porcent->get("*", ["id_porcent[=]" => $outflow->id_porcent, "id_user[=]" => $this->id, "AND"])->array()->name;
             $outflow->category = $this->category->get("*", ["id_category[=]" => $outflow->id_category, "id_user[=]" => $this->id, "AND"])->array()->name;
             $outflow->description = empty($outflow->description) ? "No aplica" : $outflow->description;
+            $outflow->is_in_budget = boolval($outflow->is_in_budget) ? "Si" : "No";
         }
         return view("outflows.list", ["outflows" => $outflows]);
     }
@@ -65,7 +66,7 @@ class OutflowController extends Controller
     public function store()
     {
         execute_post(function ($request) {
-            if (arrayEmpty(["id_outflow_type", "id_category", "id_porcent", "amount", "set_date"], $request)) {
+            if (arrayEmpty(["id_outflow_type", "id_category", "id_porcent", "amount", "set_date", "is_in_budget"], $request)) {
                 return redirect("outflow/create")->with("error", "Debes llenar todos los campos requeridos.");
             }
             if (!$this->is_amount_disponible($request->id_porcent, $request->amount)) {
@@ -80,6 +81,7 @@ class OutflowController extends Controller
                 "amount" => $request->amount,
                 "set_date" => $request->set_date,
                 "status" => 1,
+                "is_in_budget" => intval($request->is_in_budget),
                 "update_at" => getCurrentDatetime(),
                 "create_at" => getCurrentDatetime()
             ];

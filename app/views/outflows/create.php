@@ -84,6 +84,13 @@
                                                 <input type="date" value=<?= date('Y-m-d') ?> class="form-control" name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label>Esta en el presupuesto? <span class="text-danger">*</span></label>
+                                            <select class="form-control" name="is_in_budget" id="is_in_budget" required>
+                                                <option value="1" selected>Si</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        </div>
 
                                     </div>
                                     <div class="col-md-4">
