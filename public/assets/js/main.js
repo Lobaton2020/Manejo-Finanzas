@@ -140,7 +140,7 @@ const handleEditBudget = ()=>{
 }
 
 function formatCurrency(e) {
-    const value = parseFloat($("#edit-budget").find("input").val());
+    const value = parseFloat($("#edit-budget").find("input").val() || 0);
     const formattedValue = value.toLocaleString('en-US', {
       style: 'currency',
       currency: 'USD',

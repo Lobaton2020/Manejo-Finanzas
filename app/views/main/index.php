@@ -179,7 +179,7 @@
                     <div class="form-group">
                         <label>Actualizar presupuesto: <span class="text-danger">*</span></label>
                         <div>
-                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"]?>" required="" placeholder="Agrega el nombre"><br/>
+                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"]?>" required="" placeholder="Añade un valor"><br/>
                             <span class="form-control"  id="formattedMoney"></span>
                         </div>
                     </div>
