@@ -35,10 +35,10 @@ class Controller extends Authentication
             exit();
         }
     }
-    public function model($model)
+    public function model($model, $isView = false): Orm
     {
         $model = ucwords($model);
-        $modelPath =  URL_APP . "models" . SEPARATOR . $model . ".php";
+        $modelPath =  URL_APP . "models" . SEPARATOR . $model . ($isView ? ".view" : "") . ".php";
         if (file_exists($modelPath)) {
             require_once $modelPath;
             if (class_exists($model)) {

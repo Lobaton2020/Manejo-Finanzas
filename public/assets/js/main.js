@@ -25,6 +25,8 @@ const renderMessage = (type, value) => {
     string += '</div>';
     return string;
 };
+const renderErrorMessage = (msg)=> renderMessage('error',msg)
+const renderSuccessMessage = (msg)=> renderMessage('success',msg)
 
 const questionRedirection = () => {
     let res = document.querySelectorAll(".question"),
@@ -132,9 +134,41 @@ const showMessageFirstVisit = () => {
         $("#first-visit").modal("show");
     }
 };
+
+const handleEditBudget = ()=>{
+    $("#edit-budget").modal("show");
+}
+
+function formatCurrency(e) {
+    const value = parseFloat($("#edit-budget").find("input").val());
+    const formattedValue = value.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    });
+    document.getElementById('formattedMoney').innerHTML = formattedValue;
+}
+const updateBudget = async(e)=>{
+    let message = document.querySelector("#show-message");
+    message.innerHTML = ''
+    e.preventDefault();
+    if (!e.target.total.value.length > 0) {
+        return message.innerHTML = renderErrorMessage( "Debes llenar todos los campos   ");
+    }
+
+    result = await fetch(`${URL_PROJECT}main/set_budget`, options({ budget: e.target.total.value }));
+    result = await result.json();
+    if (result.status == 201) {
+        setTimeout(() => { location.reload() }, 2000);
+       return message.innerHTML = renderSuccessMessage("Presupuesto actualizado. Recargando en 2s");
+    }
+    return message.innerHTML = renderErrorMessage( "Opps! Algo fue mal");
+
+}
 // Call of functions
 window.addEventListener("DOMContentLoaded", () => {
     questionRedirection();
     fixedSidebar();
     showMessageFirstVisit();
+    formatCurrency()
 });

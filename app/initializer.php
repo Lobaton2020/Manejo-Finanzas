@@ -17,7 +17,7 @@ require_once "helpers/maker_html.php";
 require_once "helpers/countVisits.php";
 
 date_default_timezone_set('America/Bogota');
-
+setlocale(LC_TIME, 'es_ES.utf8');
 spl_autoload_register(function ($basename) {
     require "core/" . $basename . ".php";
 });

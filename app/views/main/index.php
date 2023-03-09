@@ -77,21 +77,19 @@
                 <div class="col-sm-6 col-xl-3">
                     <div class="card">
                         <div class="card-heading p-4">
-                            <div class="mini-stat-icon float-right">
+                            <div onclick="handleEditBudget(event)" class="mini-stat-icon float-right">
                                 <i class="mdi mdi-buffer bg-danger text-white"></i>
                             </div>
                             <div>
-                                <h5 class="font-16"><?php echo $allspends["title"] ?></h5>
+                                <h5 class="font-16">Presupuesto <?php echo strftime("%B"); ?></h5>
                             </div>
-                            <h5 class="mt-4"><?php echo $allspends["amount"] ?></h5>
-                            <!-- <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress mt-4" style="height: 4px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100"  data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] ." - ". $budget["percent"] ?>%"></div>
                             </div>
-                            <p class="text-muted mt-2 mb-0">Previous period<span class="float-right">82%</span></p> -->
+                            <p class="text-muted mt-2 mb-0"><?php echo $budget["remain"] ?><span class="float-right"><?php echo $budget["budget"] ?></span></p>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <!-- END ROW -->
@@ -161,6 +159,35 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- Modal edit budget -->
+<div id="edit-budget" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title mt-0" id="myModalLabel">Editar presupuesto del mes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="show-message"></div>
+                <form id="form-item" onsubmit="updateBudget(event)" action="">
+                    <div class="form-group">
+                        <label>Actualizar presupuesto: <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"]?>" required="" placeholder="Agrega el nombre"><br/>
+                            <span class="form-control"  id="formattedMoney"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
+                <button type="submit" form="form-item" class="btn btn-primary waves-effect waves-light">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

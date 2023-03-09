@@ -200,6 +200,39 @@ create table queries(
     foreign key(id_user) references users (id_user)
 );
 
+create table budget(
+    id_budget int not null auto_increment,
+    id_user int not null,
+    total float not null,
+    description text,
+    created_at datetime not null default now(),
+    primary key (id_budget),
+    foreign key(id_user) references users (id_user)
+);
+
+ALTER TABLE outflows
+ADD is_in_budget boolean not null default false;
+
+create or replace view view_budget as
+	select budget.id_budget,
+	    sum(outflows.amount) as total,
+		budget.total as budget,
+		budget.total - sum(outflows.amount) as remain,
+		floor(100 * sum(outflows.amount) / budget.total) as percent,
+		convert(CONCAT(year(outflows.set_date),'-', month(outflows.set_date),'-','01'),DATE) as date
+		from outflows
+			inner join users on users.id_user = outflows.id_user
+			right join budget on budget.id_user = users.id_user
+				AND EXTRACT(YEAR FROM budget.created_at) = EXTRACT(YEAR FROM outflows.set_date)
+				AND EXTRACT(MONTH FROM budget.created_at) = EXTRACT(MONTH FROM outflows.set_date)
+			where outflows.is_in_budget = true
+		group by users.id_user,
+				 month(outflows.set_date),
+				 year(outflows.set_date),
+				 month(budget.created_at),
+				 year( budget.created_at);
+
+
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
  insert into notificationtypes values ("register"," se ha registrado por medio de un token"),
