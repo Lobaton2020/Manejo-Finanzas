@@ -81,10 +81,10 @@
                                 <i class="mdi mdi-buffer bg-danger text-white"></i>
                             </div>
                             <div>
-                                <h5 class="font-16">Presupuesto <?php echo strftime("%B"); ?></h5>
+                                <h5 class="font-16">Presupuesto <?php echo ucwords(strftime("%B")); ?></h5>
                             </div>
                             <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100"  data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] ." - ". $budget["percent"] ?>%"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] . " - " . $budget["percent"] ?>%"></div>
                             </div>
                             <p class="text-muted mt-2 mb-0"><?php echo $budget["remain"] ?><span class="float-right"><?php echo $budget["budget"] ?></span></p>
                         </div>
@@ -167,8 +167,8 @@
 <div id="edit-budget" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title mt-0" id="myModalLabel">Editar presupuesto del mes</h5>
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myModalLabel">Editar presupuesto del mes</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -179,8 +179,8 @@
                     <div class="form-group">
                         <label>Actualizar presupuesto: <span class="text-danger">*</span></label>
                         <div>
-                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"]?>" required="" placeholder="Añade un valor"><br/>
-                            <span class="form-control"  id="formattedMoney"></span>
+                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"] ?>" required="" placeholder="Añade un valor"><br />
+                            <span class="form-control" id="formattedMoney"></span>
                         </div>
                     </div>
                 </form>
