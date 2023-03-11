@@ -51,10 +51,10 @@
                                         </div>
                                         <div class="form-group">
                                             <div>
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">
+                                                <button type="submit" class="btn btn-success waves-effect waves-light float-right">
                                                     Enviar datos
                                                 </button>
-                                                <a href="<?php echo route("note") ?>" class="btn btn-info waves-effect m-l-5 float-right">
+                                                <a href="<?php echo route("note") ?>" class="btn btn-secondary waves-effect m-l-5">
                                                     Regresar
                                                 </a>
                                             </div>

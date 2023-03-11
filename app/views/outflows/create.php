@@ -28,7 +28,8 @@
                                         <?php if (empty($outflow_types)) : ?>
                                             <p class="border rounded-pill p-2 pl-4">
                                                 No tienes tipos de movimientos de egresos agregados o activos.
-                                                <a href="<?php echo route("moveType/create") ?>" style="text-decoration:underline">Añadir </a></p>
+                                                <a href="<?php echo route("moveType/create") ?>" style="text-decoration:underline">Añadir </a>
+                                            </p>
                                             <div id="not-send-form"></div>
                                         <?php else : ?>
                                             <div id=""></div>
@@ -46,7 +47,8 @@
                                         <?php if (empty($porcents)) : ?>
                                             <p class="border borcer-rounded rounded-pill p-2 pl-4">
                                                 No existen depositos o los tienes inativos.
-                                                <a href="<?php echo route("moveType/create") ?>" style="text-decoration:underline">Añadir </a></p>
+                                                <a href="<?php echo route("moveType/create") ?>" style="text-decoration:underline">Añadir </a>
+                                            </p>
                                             <div id="not-send-form"></div>
                                         <?php else : ?>
                                             <div id="input-required-hide"></div>
@@ -114,16 +116,16 @@
                                                     <input type="radio" name="id_category" id="id_category" required class="value">
                                                 </div>
                                             </div>
-                                            <hr style='margin:-1px 0 -1px 0'/>
+                                            <hr style='margin:-1px 0 -1px 0' />
                                         </template>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group mt-2">
                                     <div>
-                                        <button type="submit" class="btn btn-success waves-effect waves-light">
+                                        <button type="submit" class="btn btn-success waves-effect waves-light float-right">
                                             Enviar datos
                                         </button>
-                                        <a href="<?php echo route("outflow") ?>" class="btn btn-secondary waves-effect m-l-5 float-right">
+                                        <a href="<?php echo route("outflow") ?>" class="btn btn-secondary waves-effect m-l-5">
                                             Regresar
                                         </a>
                                     </div>

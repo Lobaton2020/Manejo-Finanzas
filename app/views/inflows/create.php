@@ -25,20 +25,20 @@
                             <form onsubmit="saveInflow(event)" action="<?php echo route("inflow/store") ?>" method="POST">
                                 <div class="row">
                                     <div class="col-md-8">
-                                    <?php if (empty($inflow_types)) : ?>
-                                       <p class="border borcer-rounded rounded-pill p-2 pl-4">No tienes tipos de moviemiento de ingreso agregados o activos. <a href="<?php echo route("moveType/create")?>" style="text-decoration:underline">Añadir </a></p>
-                                       <div id="not-send-form"></div>
-                                       <?php else : ?>
-                                        <div class="form-group">
-                                            <label for="inflow_type">Tipo de entrada del dinero <span class="text-danger">*</span></label>
-                                            <select class="form-control " name="id_inflow_type" id="inflow_type" required>
-                                                <option value="">--Seleccione--</option>
-                                                <?php foreach ($inflow_types  as $inflow_type) : ?>
-                                                    <option value="<?php echo $inflow_type->id_inflow_type ?>"><?php echo $inflow_type->name ?></option>
+                                        <?php if (empty($inflow_types)) : ?>
+                                            <p class="border borcer-rounded rounded-pill p-2 pl-4">No tienes tipos de moviemiento de ingreso agregados o activos. <a href="<?php echo route("moveType/create") ?>" style="text-decoration:underline">Añadir </a></p>
+                                            <div id="not-send-form"></div>
+                                        <?php else : ?>
+                                            <div class="form-group">
+                                                <label for="inflow_type">Tipo de entrada del dinero <span class="text-danger">*</span></label>
+                                                <select class="form-control " name="id_inflow_type" id="inflow_type" required>
+                                                    <option value="">--Seleccione--</option>
+                                                    <?php foreach ($inflow_types  as $inflow_type) : ?>
+                                                        <option value="<?php echo $inflow_type->id_inflow_type ?>"><?php echo $inflow_type->name ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
-                                            <?php endif; ?>
+                                        <?php endif; ?>
 
                                         <div class="form-group">
                                             <div class="row">
@@ -67,17 +67,17 @@
 
                                     </div>
                                     <div class="col-md-4">
-                                       <h6>Depositos:</h6>
+                                        <h6>Depositos:</h6>
                                         <div class="text-right">
                                             <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal"><i class="mdi mdi-plus "></i> Nuevo deposito </button>
                                         </div>
                                         <div id="empty">
-                                        <?php if(empty($porcents)):?>
-                                            <h5 class="text-center mt-3">Opps!</h5>
-                                            <p class="text-muted text-center ">
-                                                No tienes nada <br> Añade un deposito
+                                            <?php if (empty($porcents)) : ?>
+                                                <h5 class="text-center mt-3">Opps!</h5>
+                                                <p class="text-muted text-center ">
+                                                    No tienes nada <br> Añade un deposito
                                                 </p>
-                                        <?endif;?>
+                                            <? endif; ?>
                                         </div>
                                         <div id="elements">
                                             <?php foreach ($porcents as $porcent) : ?>
@@ -87,18 +87,18 @@
                                                         <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]" class="porcents form-control" required="" parsley-type="email" placeholder="ej: <?php echo rand(1, 60) ?>">
                                                     </div>
                                                     <div class="form-group col-6">
-                                                    <label for="total">&nbsp;</label>
-                                                        <div id="money_deposit" name="" class="porcents form-control" disabled ></div>
+                                                        <label for="total">&nbsp;</label>
+                                                        <div id="money_deposit" name="" class="porcents form-control" disabled></div>
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
                                         <h6>A tener en cuenta:</h6>
 
-                                            <ul>
-                                                <li>Escribe el porcentaje de dinero para organizarte!</li>
-                                                <li>La suma de los porcentajes debe ser 100.</li>
-                                            </ul>
+                                        <ul>
+                                            <li>Escribe el porcentaje de dinero para organizarte!</li>
+                                            <li>La suma de los porcentajes debe ser 100.</li>
+                                        </ul>
                                         <template id="template-porcent">
                                             <div class="form-group">
                                                 <label for="total" class="name"><span class="text-danger">*</span></label>
@@ -109,10 +109,10 @@
                                 </div>
                                 <div class="form-group">
                                     <div>
-                                        <button type="submit" class="btn btn-success waves-effect waves-light">
+                                        <button type="submit" class="btn btn-success waves-effect waves-light float-right">
                                             Enviar datos
                                         </button>
-                                        <a href="<?php echo route("inflow") ?>" class="btn btn-secondary waves-effect m-l-5 float-right">
+                                        <a href="<?php echo route("inflow") ?>" class="btn btn-secondary waves-effect m-l-5">
                                             Regresar
                                         </a>
                                     </div>
@@ -150,16 +150,16 @@
                             </div><!-- /.modal -->
 
 
-        </div> <!-- end col -->
-    </div> <!-- end row -->
-</div>
-</div>
+                        </div> <!-- end col -->
+                    </div> <!-- end row -->
+                </div>
+            </div>
 
 
-</div>
-<!-- container-fluid -->
+        </div>
+        <!-- container-fluid -->
 
-</div>
-<?php include_document("layouts.footerbar") ?>
+    </div>
+    <?php include_document("layouts.footerbar") ?>
 
 </div>
