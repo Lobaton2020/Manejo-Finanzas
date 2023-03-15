@@ -83,8 +83,8 @@
                             <div>
                                 <h5 class="font-16">Presupuesto <?php echo ucwords(strftime("%B")); ?></h5>
                             </div>
-                            <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] . " - " . $budget["percent"] ?>%"></div>
+                            <div class="progress mt-4" style="height: 4px;" data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] . " - " . $budget["percent"] ?>%">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <p class="text-muted mt-2 mb-0"><?php echo $budget["remain"] ?><span class="float-right"><?php echo $budget["budget"] ?></span></p>
                         </div>

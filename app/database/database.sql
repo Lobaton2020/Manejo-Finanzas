@@ -214,21 +214,22 @@ ALTER TABLE outflows
 ADD is_in_budget boolean not null default false;
 
 create or replace view view_budget as
-    SELECT id_budget, id_user, budget, total, IFNULL(budget - total, 0) as remain, date
+    SELECT id_budget, id_user, budget, total_a as total, IFNULL(budget - total_a, 0) as remain, IFNULL( floor(100 * total_a / budget),0) as percent, date
     FROM (
         SELECT budget.id_budget,
             budget.id_user,
             budget.total as budget,
             convert(CONCAT(year(budget.created_at),'-', month(budget.created_at),'-','01'),DATE) as date,
-            (SELECT IFNULL(budget.total - SUM(outflows.amount),0) FROM outflows
+            (SELECT IFNULL(SUM(outflows.amount),0) FROM outflows
                 WHERE id_user = budget.id_user
                     AND EXTRACT(YEAR FROM budget.created_at) = EXTRACT(YEAR FROM outflows.set_date)
                     AND EXTRACT(MONTH FROM budget.created_at) = EXTRACT(MONTH FROM outflows.set_date)
-                    AND outflows.is_in_budget = true) as total
+                    AND outflows.is_in_budget = true) as total_a
         FROM budget
         INNER JOIN users ON budget.id_user = users.id_user
         ORDER BY created_at DESC
     ) AS t
+
 
 
 insert into rols values (1,"Administrador"),
