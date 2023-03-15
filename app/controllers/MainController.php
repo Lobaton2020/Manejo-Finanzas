@@ -61,10 +61,10 @@ class MainController extends Controller
             if (arrayEmpty(["budget"], $request)) {
                 return httpResponse(401, "bad_request", "the budget doesn't come")->json();
             }
-            $budgetViewCurrentMonth = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user" => $this->id, "AND"])->array();
+            $budgetViewCurrentMonth = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
             $data = ["total" => $request->budget];
             if ($budgetViewCurrentMonth) {
-                if ($this->budget->update($data, ["id_budget[=]" => $budgetViewCurrentMonth->id_budget, "id_user" => $this->id, "AND"])->array()) {
+                if ($this->budget->update($data, ["id_budget[=]" => $budgetViewCurrentMonth->id_budget, "id_user[=]" => $this->id, "AND"])->array()) {
                     return httpResponse(201, "created", "successfuly created")->json();
                 }
                 return  httpResponse(500, "error", "Error to save record")->json();
