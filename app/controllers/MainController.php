@@ -31,7 +31,7 @@ class MainController extends Controller
         $number_egres = $this->outflow->count(["id_user[=]" => $this->id])->array();
         $sum_egress = intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
         $sum_entrys = intval($this->inflow->sum("total", ["id_user[=]" => $this->id])->array());
-        $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01')])->array();
+        $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
         $number_disponible = $sum_entrys - $sum_egress;
         $data = [
             "allentry" => [

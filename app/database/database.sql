@@ -214,23 +214,21 @@ ALTER TABLE outflows
 ADD is_in_budget boolean not null default false;
 
 create or replace view view_budget as
-	select budget.id_budget,
-	    sum(outflows.amount) as total,
-		budget.total as budget,
-		budget.total - sum(outflows.amount) as remain,
-		floor(100 * sum(outflows.amount) / budget.total) as percent,
-		convert(CONCAT(year(outflows.set_date),'-', month(outflows.set_date),'-','01'),DATE) as date
-		from outflows
-			inner join users on users.id_user = outflows.id_user
-			right join budget on budget.id_user = users.id_user
-				AND EXTRACT(YEAR FROM budget.created_at) = EXTRACT(YEAR FROM outflows.set_date)
-				AND EXTRACT(MONTH FROM budget.created_at) = EXTRACT(MONTH FROM outflows.set_date)
-			where outflows.is_in_budget = true
-		group by users.id_user,
-				 month(outflows.set_date),
-				 year(outflows.set_date),
-				 month(budget.created_at),
-				 year( budget.created_at);
+    SELECT id_budget, id_user, budget, total, IFNULL(budget - total, 0) as remain, date
+    FROM (
+        SELECT budget.id_budget,
+            budget.id_user,
+            budget.total as budget,
+            convert(CONCAT(year(budget.created_at),'-', month(budget.created_at),'-','01'),DATE) as date,
+            (SELECT IFNULL(budget.total - SUM(outflows.amount),0) FROM outflows
+                WHERE id_user = budget.id_user
+                    AND EXTRACT(YEAR FROM budget.created_at) = EXTRACT(YEAR FROM outflows.set_date)
+                    AND EXTRACT(MONTH FROM budget.created_at) = EXTRACT(MONTH FROM outflows.set_date)
+                    AND outflows.is_in_budget = true) as total
+        FROM budget
+        INNER JOIN users ON budget.id_user = users.id_user
+        ORDER BY created_at DESC
+    ) AS t
 
 
 insert into rols values (1,"Administrador"),
