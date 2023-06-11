@@ -51,8 +51,26 @@ const renderStatisticMoneySpendbyDeposits = async() => {
         console.error(err)
     }
 };
+const defaultActionAmounts = () => {
+    try {
+        let clicked = false;
+        const eyeButton = document.querySelector("#eyeButton")
+        eyeButton.addEventListener("click", () => {
+            if (clicked) {
+                return location.reload()
+            }
+            document.querySelectorAll(".show_hide__ammount").forEach(element => {
+                element.innerHTML = element.getAttribute("amount")
+            });
+            clicked = true
+            eyeButton.innerHTML = `<i class='fa fa-eye-slash'></i>`
+        })
+    } catch (error) {
+        console.error("NO SE PUEDE MOSTRAR PLATA", { error })
+    }
+}
 window.addEventListener("DOMContentLoaded", () => {
     renderStatisticMoneyDisponiblebyDeposits();
     renderStatisticMoneySpendbyDeposits();
-
+    defaultActionAmounts();
 });

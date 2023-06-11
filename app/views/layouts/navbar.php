@@ -62,6 +62,7 @@
                         View all <i class="fi-arrow-right"></i>
                     </a>
                 </div>
+                <button id="eyeButton" class="dropdown-item"><i class="fa fa-eye"></i></button>
             </li>
 
             <li class="dropdown notification-list list-inline-item">

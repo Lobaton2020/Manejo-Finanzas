@@ -1,28 +1,28 @@
 .size-icon {
-    font-size: 20px;
-    display: block;
+  font-size: 20px;
+  display: block;
 }
 
 .size-check {
-    /* width: 30px; */
-    font-size: 50px;
+  /* width: 30px; */
+  font-size: 50px;
 }
 
 .size-text {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .text-decoration-underline {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-.mt-center{
-    display: flex;
-    align-items: center;
+.mt-center {
+  display: flex;
+  align-items: center;
 }
 
-.vertical-scroll{
- height: 30rem;
- overflow-y: scroll;
- overflow-x:hidden;
+.vertical-scroll {
+  height: 30rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

@@ -29,7 +29,7 @@
                             <div>
                                 <h5 class="font-16"><?php echo $allentry["title"] ?></h5>
                             </div>
-                            <h5 class="mt-4"><?php echo $allentry["amount"] ?></h5>
+                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allentry["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
                             <!-- <div class="progress mt-4" style="height: 4px;">
                                 <div class="progress-bar bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                             </div> -->
@@ -47,7 +47,7 @@
                             <div>
                                 <h5 class="font-16"><?php echo $allegress["title"] ?></h5>
                             </div>
-                            <h5 class="mt-4"><?php echo $allegress["amount"] ?></h5>
+                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allegress["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
                             <!-- <div class="progress mt-4" style="height: 4px;">
                                 <div class="progress-bar bg-success" role="progressbar" style="width: 88%" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
@@ -65,7 +65,7 @@
                             <div>
                                 <h5 class="font-16"><?php echo $allinvestment["title"] ?></h5>
                             </div>
-                            <h5 class="mt-4"><?php echo $allinvestment["amount"] ?></h5>
+                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allinvestment["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
                             <!-- <div class="progress mt-4" style="height: 4px;">
                                 <div class="progress-bar bg-warning" role="progressbar" style="width: 68%" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
