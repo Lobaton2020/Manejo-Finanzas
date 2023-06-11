@@ -53,15 +53,20 @@ const renderStatisticMoneySpendbyDeposits = async() => {
 };
 const defaultActionAmounts = () => {
     try {
-        let clicked = false;
+        let clicked = false;// default don't show nothing
         const eyeButton = document.querySelector("#eyeButton")
         eyeButton.addEventListener("click", () => {
-            if (clicked) {
-                return location.reload()
-            }
             document.querySelectorAll(".show_hide__ammount").forEach(element => {
-                element.innerHTML = element.getAttribute("amount")
+            if (clicked) {
+                return element.innerHTML = `$ -'---.--- <small class='text-muted'>COP</small>`
+            }
+                return element.innerHTML = element.getAttribute("amount")
             });
+            if (clicked) {
+                clicked = false;
+                eyeButton.innerHTML = `<i class='fa fa-eye'></i>`
+                return;
+            }
             clicked = true
             eyeButton.innerHTML = `<i class='fa fa-eye-slash'></i>`
         })
