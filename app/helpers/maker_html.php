@@ -42,6 +42,7 @@ function make_table($head, $fillable, $data, $extra = null)
         return;
     }
 
+    $html = "";
     $path_redirect = null;
     $actions = true;
     $show_id = true;
@@ -67,8 +68,22 @@ function make_table($head, $fillable, $data, $extra = null)
                     $btn_delete = false;
                     $actions = false;
                     break;
+                case "custom":
+                    $btn_edit = false;
+                    $btn_delete = false;
+                    $btn_delete_delete = false;
+                    $actions = true;
+                    break;
+                case "btn_delete_delete":
+                    $btn_edit = false;
+                    $btn_delete = false;
+                    $btn_delete_delete = true;
+                    $actions = true;
                 default;
             }
+        }
+        if (isset($extra["html"])) {
+            $html = $extra["html"];
         }
         if (isset($extra["redirect"])) {
             $path_redirect = route($extra["redirect"]);
@@ -130,6 +145,8 @@ function make_table($head, $fillable, $data, $extra = null)
             switch ($fillable[$k]) {
                 case "create_at":
                 case "update_at":
+                case "updated_at":
+                case "created_at":
                     $string .= "<td>" . format_datetime($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
                 case "set_date":
@@ -144,6 +161,7 @@ function make_table($head, $fillable, $data, $extra = null)
                     break;
                 case "total":
                 case  "amount":
+                case "total_amount":
                     $string .= "<td>" . number_price($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
                 case "status":
@@ -180,6 +198,13 @@ function make_table($head, $fillable, $data, $extra = null)
             $string .= "          <i class='mdi mdi-settings' style='font-size:20px'></i>";
             $string .= "       </a>";
             $string .= "    <div class='dropdown-menu' aria-labelledby='detail-{$data[$i]->{$fillable[0]}}' x-placement='bottom-start' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);'>";
+            if ($html) {
+                $replacers = [];
+                foreach ($extra["html-replace"] ?? [] as $item) {
+                    $replacers[":" . $item] = $data[$i]->{$item};
+                }
+                $string .= strtr($extra["html"], $replacers);
+            }
             if ($btn_edit) {
                 $string .= "      <a class='dropdown-item' href='{$path_redirect}/{$reditections["edit"]}/{$data[$i]->{$fillable[0]}}{$param_extra}'>Editar</a>";
             }
@@ -202,7 +227,7 @@ function make_table($head, $fillable, $data, $extra = null)
 }
 
 
-function wrapper_html($data, $card_body)
+function wrapper_html($data, $card_body, $is_modal = false)
 {
     /**
      * $data[title]
@@ -237,9 +262,16 @@ function wrapper_html($data, $card_body)
     $string .=                            "<h4 class='mt-0  mb-3 header-title '>{$data->title}</h4>";
     $string .=                        '</div>';
     if (isset($data->active_button)) {
-        $string .=                        '<div class="float-right">';
-        $string .=                            "<a href='{$data->active_button["path"]} ' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
-        $string .=                        '</div>';
+        if ($is_modal) {
+
+            $string .= '<div class="float-right">';
+            $string .= "<a data-target='#myModal' href='#' type='button' data-toggle='modal' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
+            $string .= '</div>';
+        } else {
+            $string .= '<div class="float-right">';
+            $string .= "<a  href='{$data->active_button["path"]}' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
+            $string .= '</div>';
+        }
     }
     $string .=                    '</div>';
     $string .=                    '<div class="card-body">';

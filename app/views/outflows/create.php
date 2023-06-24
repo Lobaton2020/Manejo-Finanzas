@@ -22,7 +22,7 @@
                         <div class="card-body">
                             <h4 class="mt-0 header-title text-center">Crear salida de dinero</h4>
                             <?php echo renderMessage("error") ?>
-                            <form onsubmit="saveOutflow(event)" action="<?php echo route("outflow/store") ?>" method="POST">
+                            <form onsubmit="saveOutflow(event)" action="<?php echo route("{$controller_uri}") ?>" method="POST">
                                 <div class="row">
                                     <div class="col-md-8">
                                         <?php if (empty($outflow_types)) : ?>
@@ -80,12 +80,14 @@
                                                 <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="1"></textarea>
                                             </div>
                                         </div>
+                                        <? if (!$is_budget): ?>
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
                                                 <input type="date" value=<?= date('Y-m-d') ?> class="form-control" name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
+                                        <? endif; ?>
                                         <div class="form-group">
                                             <label>Esta en el presupuesto? <span class="text-danger">*</span></label>
                                             <select class="form-control" name="is_in_budget" id="is_in_budget" required>

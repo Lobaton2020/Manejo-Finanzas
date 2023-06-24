@@ -34,7 +34,7 @@
                             <?php
                             $head = ["#","ID", "Tipo Egreso", "Categoria", "Deposito", "Monto", "Descripcion","Esta en presupuesto", "Fecha"];
                             $fillable = ["id_outflow","id_outflow", "outfow_type", "category", "porcent", "amount", "description","is_in_budget", "set_date"];
-                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "none"]);
+                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "btn_delete_delete", "btn_delete_delete" => "delete"]);
                             ?>
                         </div>
                     </div>

@@ -28,3 +28,11 @@ function is_correct($string)
         return $string;
     }
 }
+
+function valid_date_or_today($date)
+{
+    if (isset($date)) {
+        return $date;
+    }
+    return getCurrentDatetime();
+}

@@ -231,6 +231,47 @@ create or replace view view_budget as
     ) AS t
 
 
+create table temporal_budgets(
+    id_temporal_budget int not null auto_increment,
+    id_user int not null,
+    name varchar(255),
+    description text null,
+    created_at datetime not null default now(),
+    primary key (id_temporal_budget),
+    foreign key(id_user) references users (id_user)
+);
+
+create table temporal_budgets_outflow (
+    id_temporal_budget_outflow int not null auto_increment,
+    id_temporal_budget int not null,
+    id_outflow_type int not null,
+    id_user int not null,
+    id_category int null,
+    id_porcent int not null,
+    amount float not null,
+    description mediumtext null,
+    status boolean not null,
+    is_in_budget boolean not null default false,
+    update_at datetime not null,
+    create_at datetime not null,
+    primary key (id_temporal_budget_outflow),
+    foreign key(id_category) references categories (id_category),
+    foreign key(id_user) references users (id_user),
+    foreign key(id_outflow_type) references outflowtypes (id_outflow_type),
+    foreign key(id_temporal_budget) references temporal_budgets (id_temporal_budget)
+);
+
+CREATE
+OR REPLACE view view_temporal_budgets AS
+SELECT
+    tb.*,
+    COALESCE(SUM(otb.amount), 0) AS total_amount
+FROM
+    temporal_budgets tb
+    LEFT JOIN temporal_budgets_outflow otb ON tb.id_temporal_budget = otb.id_temporal_budget
+    and otb.status = 1
+GROUP BY
+    tb.id_temporal_budget;
 
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
@@ -240,7 +281,12 @@ insert into rols values (1,"Administrador"),
                                       ("egress"," ha hecho un egreso"),
                                       ("deposit"," ha creado un deposito"),
                                       ("category"," ha creado una categoria de egreso"),
-                                      ("token"," ha creado un token de registro");
+("token", " ha creado un token de registro"),
+(
+    "budget-item",
+    " ha creado un elemeento de notificacion"
+),
+("budget", " ha creado un presupuesto");
 
 
 insert into documenttypes values(1,"T.I","Tarjeta de identídad"),
