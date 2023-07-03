@@ -4,7 +4,7 @@ $head = ["#", "ID", "Presupuesto", "Tipo Egreso", "Categoria", "Deposito", "Mont
 $fillable = ["id_temporal_budget_outflow", "id_temporal_budget_outflow", "temporal_budget_name", "outfow_type", "category", "porcent", "amount", "description", "status", "is_in_budget"];
 
 $configTable = [
-    "html" => '<form method="POST" action="' . route("budget/execOne/:id_temporal_budget_outflow/{$id_temporal_budget}") . '" id="form_save_:id_temporal_budget_outflow" />
+    "html" => '<form method="POST" action="' . route("budget/execOne/:id_temporal_budget_outflow/{$id_temporal_budget}") . '" id="form_save_:id_temporal_budget_outflow" ></form>
                 <button class="dropdown-item" role="button" type="submit" form="form_save_:id_temporal_budget_outflow"> Prosupuestar </button>
                 ',
     "html-replace" => ['id_temporal_budget_outflow'],
