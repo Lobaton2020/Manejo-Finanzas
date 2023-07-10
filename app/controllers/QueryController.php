@@ -27,6 +27,26 @@ class QueryController extends Controller
         $data = $this->model->select("*", ["id_user[=]" => $this->id])->array();
         return httpResponse($data)->json();
     }
+    public function update($id)
+    {
+        return execute_post(function ($request) use ($id) {
+            if (arrayEmpty(["querySql", "descriptionQuerySql"], $request)) {
+                return redirect("query")->with("error", "Parametros invalidos");
+            }
+            $data = [
+                "description" => is_correct($request->descriptionQuerySql),
+                "query" => $request->querySql
+            ];
+            $where = ["id_query[=]" => $id, "id_user[=]" => $this->id, "AND"];
+            if ($this->model->update($data, $where)->array()) {
+                $msg = "Consulta SQL \"" . $request->descriptionQuerySql . "\" actualizada con exito";
+                return redirect("query")->with("success", $msg);
+            } else {
+                return redirect("query")->with("error", "No se pudo actualizar la consulta SQL");
+            }
+        });
+    }
+
     public function store()
     {
         return execute_post(function ($request) {

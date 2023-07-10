@@ -9,8 +9,8 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-right">
                             <li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Notas</a></li>
-                            <li class="breadcrumb-item active">Editar nota</li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Queries</a></li>
+                            <li class="breadcrumb-item active">Ejecutar consulta</li>
                         </ol>
                     </div>
                 </div>
@@ -121,7 +121,8 @@
                         <p class="card-text">
                             <small class="text-muted date"></small>
                             <a href="#" class="float-right btn btn-success add-query-form">Usarla</a>
-                            <a href="#" class="float-right btn btn-danger delete-query-form mr-2" onclick="return confirm('¿Estas Seguro?')"><i class="mdi mdi-delete"></i></a>
+                            <a href="#" class="float-right btn btn-secondary edit-query-form ml-2 mr-2">Editar</a>
+                            <a href="#" class="float-right btn btn-danger delete-query-form" onclick="return confirm('¿Estas Seguro?')"><i class="mdi mdi-delete"></i></a>
                         </p>
                     </div>
                 </template>

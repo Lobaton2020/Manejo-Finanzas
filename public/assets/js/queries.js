@@ -28,7 +28,35 @@ const handlerShowQuerForm = (e) => {
     document.querySelector("#field-sql").value = query
     document.querySelector("#description-query").textContent = description
 };
+const formatDateTime = (dateString) => {
+    const fecha = new Date(dateString);
+    const opciones = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short'
+    }
+    return new Intl.DateTimeFormat('es-ES', opciones).format(fecha);
+}
+const handlerEditQuerForm = (id, description, query) => {
+    try {
+        document.querySelector('[data-target="#add-querie-sql"]').click()
+        document.querySelector('#show-queries > div > div > div.modal-header > button > span').click()
+        document.querySelector('#myModalLabel').textContent = "Actualizar Consulta SQL"
+        document.querySelector('[name="descriptionQuerySql"]').value = description
+        document.querySelector('[name="querySql"]').value = query
+        const form = document.querySelector('#form-item')
+        form.removeAttribute("onsubmit")
+        form.setAttribute("action", URL_PROJECT + "query/update/" + id)
+        form.setAttribute("method", "POST")
 
+    } catch (err) {
+        console.error("ERROR_EDIT", err);
+    }
+}
 const handlerShowQueries = async () => {
     $("#show-queries").modal("show")
     let container = document.querySelector("#show-data-result"),
@@ -45,9 +73,10 @@ const handlerShowQueries = async () => {
             clon = template.content.cloneNode(true)
             clon.querySelector(".description").textContent = description
             clon.querySelector(".query").textContent = query
-            clon.querySelector(".date").textContent = create_at
+            clon.querySelector(".date").textContent = formatDateTime(create_at)
             clon.querySelector(".delete-query-form").href = `${URL_PROJECT}query/delete/${id_query}`
             clon.querySelector(".add-query-form").addEventListener("click", handlerShowQuerForm)
+            clon.querySelector(".edit-query-form").addEventListener("click", (e) => handlerEditQuerForm(id_query, description, query))
             fragment.appendChild(clon)
         });
         container.innerHTML = ""
