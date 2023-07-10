@@ -30,8 +30,8 @@ $fillable = [
 
 $configTable = [
     "use" => "custom",
-    "html" => ' <a class="dropdown-item"  href="' . route("investment/edit/:id_investment") . '" "> Editar </a>
-                <a class="dropdown-item"  href="' . route("investment/hide/:id_investment") . '"> Quitar </a>
+    "html" => ' <a class="dropdown-item "  href="' . route("investment/edit/:id_investment") . '" "> Editar </a>
+                <a class="dropdown-item question"  href="' . route("investment/hide/:id_investment") . '"> Quitar </a>
                 ',
     "html-replace" => ["id_investment", 'name'],
     "redirect" => "investment",

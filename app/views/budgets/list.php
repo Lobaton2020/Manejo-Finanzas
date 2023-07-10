@@ -5,10 +5,10 @@ $fillable = ["id_temporal_budget", "id_temporal_budget", "name", "total_amount",
 $configTable = [
     "use" => "custom",
     "html" => '<form method="POST" action="' . route("budget/execList/:id_temporal_budget") . '" id="form_save_:id_temporal_budget" />
-                <button class="dropdown-item" role="button" type="submit" form="form_save_:id_temporal_budget"> Ejecutar presupuesto </button>
+                <button class="dropdown-item " onsubmit="questionSend(event)" role="button" type="submit" form="form_save_:id_temporal_budget"> Ejecutar presupuesto </button>
                 <a class="dropdown-item"  href="' . route("budget/list_outflows/:id_temporal_budget") . '"> Listar presupuesto </a>
                 <a id="edit-modal-budget__me" onclick="editTemporalBudget(event)" data-name=":name" data-id=":id_temporal_budget" data-target="#myModal" href="#" type="button" data-toggle="modal" class="dropdown-item" "> Editar </a>
-                <a class="dropdown-item"  href="' . route("budget/delete/:id_temporal_budget") . '"> Eliminar </a>
+                <a class="dropdown-item question"  href="' . route("budget/delete/:id_temporal_budget") . '"> Eliminar </a>
                 ',
     "html-replace" => ["id_temporal_budget", 'name'],
     "redirect" => "budget"
