@@ -1,4 +1,4 @@
-window.URL_PROJECT = "";
+window.URL_PROJECT = "/";
 window.options = function (object) {
     return {
         "method": "POST",

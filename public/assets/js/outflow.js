@@ -4,7 +4,7 @@ const renderCategories = async (e) => {
         spaceEmpty = document.querySelector("#empty"),
         clon, result;
 
-    result = await fetch(`${URL_PROJECT}/category/select/${e.target.value}`);
+    result = await fetch(`${URL_PROJECT}category/select/${e.target.value}`);
     result = await result.json();
     console.log(result);
     if (result.status == 200) {
@@ -70,7 +70,7 @@ const saveCategory = async (e) => {
             result = await fetch(`${URL_PROJECT}category/store`, options(data));
             result = await result.json();
             if (result.status == 200) {
-                message.innerHTML = renderMessage("success", "Porcentaje agregado correctamente");
+                message.innerHTML = renderMessage("success", "Categoria agregada correctamente");
                 e.target.reset();
 
                 try {
