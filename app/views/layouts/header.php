@@ -12,6 +12,7 @@
     <!-- Data tables -->
     <link href="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link rel='stylesheet' href='<?php echo URL_ASSETS ?>assets/template/css/font-awesome.min.css'>
     <!--Morris Chart CSS -->
     <link href="<?php echo URL_PROJECT ?>assets/template/plugins/RWD-Table-Patterns/dist/css/rwd-table.min.css" rel="stylesheet" type="text/css" media="screen">
     <link rel="stylesheet" href="<?php echo URL_ASSETS ?>assets/template/plugins/morris/morris.css">

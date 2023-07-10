@@ -1,7 +1,10 @@
 <?php
-$env = file_get_contents("./.env");
+$env = @file_get_contents("./.env");
 if(!$env){
-    exit("ENVIROMENT FILE NOT FOUND");
+    $env = file_get_contents("../../.env");
+    if (!$env) {
+        exit("ENVIROMENT FILE NOT FOUND");
+    }
 }
 foreach (explode("\n", $env) as $dotenven) {
     if (strlen($dotenven) > 3) {

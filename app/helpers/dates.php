@@ -24,3 +24,12 @@ function format_datetime($datetime, $abrev = true)
     $datetime = explode(" ", $datetime);
     return format_date($datetime[0], $abrev) . " - " . format_time($datetime[1]);
 }
+
+function date_diff_in_months($date1, $date2)
+{
+    $fecha1 = new DateTime($date1);
+    $fecha2 = new DateTime($date2);
+    $intervalo = $fecha1->diff($fecha2);
+    $totalMeses = ($intervalo->y * 12) + $intervalo->m + ($intervalo->d / 30);
+    return number_format($totalMeses, 1);
+}

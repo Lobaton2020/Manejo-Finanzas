@@ -39,7 +39,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -67,7 +67,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -90,7 +90,7 @@ class Orm extends Base
             }
             return new JSON($response);
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -115,7 +115,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->rowCount());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     public function in($where = null)
@@ -127,7 +127,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -153,7 +153,7 @@ class Orm extends Base
             $this->id = $this->lastId();
             return new JSON(true);
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -170,21 +170,23 @@ class Orm extends Base
                 return false;
             }
             foreach ($data as $field => $value) {
-                $fieldDetail .= $field . "= :" . $field . ",";
+                $field_alias = $this->getValueAlias($field, $value)["alias"];
+                $fieldDetail .= $field . "= :" . $field_alias . ",";
             }
             $fieldDetail = substr($fieldDetail, 0, -1);
             $this->querye("UPDATE {$this->table} SET {$fieldDetail} {$where["string"]}");
             foreach ($data as $field => $value) {
-                $this->bind(":" . $field, $value);
+                $field_alias = $this->getValueAlias($field, $value);
+                $this->bind(":" . $field_alias["alias"], $field_alias["value"]);
             }
             if (!empty($where["string"])) {
-                foreach ($where["data"] as $data) {
-                    $this->bind(":" . $data["field"], $data["value"]);
+                foreach ($where["data"] as $datab) {
+                    $this->bind(":" . $datab["field"], $datab["value"]);
                 }
             }
             return new JSON($this->execute());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     public function query_complete($sql)
@@ -194,7 +196,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -220,7 +222,7 @@ class Orm extends Base
             }
             return new JSON($this->execute());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -252,7 +254,7 @@ class Orm extends Base
 
             return new JSON($this->execute());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -438,7 +440,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            dd($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -542,5 +544,17 @@ class Orm extends Base
             return ["data" => [], "string" => $string];
         }
         return null;
+    }
+    private function getValueAlias($field_name, $value)
+    {
+        $field_alias = [
+            "alias" => $field_name,
+            "value" => $value
+        ];
+        if (is_array($value) && isset($value["alias"])) {
+            $field_alias["alias"] = $value["alias"];
+            $field_alias["value"] = $value["value"];
+        }
+        return $field_alias;
     }
 }

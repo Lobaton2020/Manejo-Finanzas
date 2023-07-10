@@ -33,8 +33,11 @@
                 </li>
                 <li>
                     <a href="<?php echo route("budget") ?>" class=""><i class="size-icon fas fa-plane"></i><span>Presupuesto<span
-                                class="float-right menu-arrow">
-                            </span></a>
+                                class="float-right menu-arrow"> </span></a>
+                    </li>
+                    <li>
+                        <a href="<?php echo route("investment") ?>" class=""><i class="size-icon fas fa-bank"></i><span>Inversiones<span
+                                    class="float-right menu-arrow"> </span></a>
                 </li>
                 <?php if ($self["rol"]["name"] == "Administrador") : ?>
                     <li>

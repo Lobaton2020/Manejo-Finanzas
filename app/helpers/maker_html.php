@@ -1,4 +1,3 @@
-
 <?php
 
 function renderJumbotron($data, $title, $path = null)
@@ -98,7 +97,7 @@ function make_table($head, $fillable, $data, $extra = null)
             $param_extra = "/" . $extra["param-extra"];
         }
         if (isset($extra["btn_delete_delete"])) {
-            $btn_delete_delete =  $extra["btn_delete_delete"];
+            $btn_delete_delete = $extra["btn_delete_delete"];
         }
     }
     $reditections = [
@@ -108,16 +107,16 @@ function make_table($head, $fillable, $data, $extra = null)
         "enable" => "enable"
     ];
     $reditection = $reditections["delete"];
-    $attributes = [
+    $attributes = array_merge([
         "id" => "datatable",
         "class" => "table table-striped table-bordered dt-responsive nowrap",
         "style" => "border-collapse: collapse; border-spacing: 0; width: 100%;"
-    ];
+    ], isset($extra["properties"]) ? $extra["properties"] : []);
     $attr = "";
     foreach ($attributes as $key => $value) {
         $attr .= "{$key}=\"{$value}\" ";
     }
-    $string  = '<div class="table-responsive">';
+    $string = '<div class="table-responsive">';
     $string .= "<table {$attr}>";
     $string .= "<thead>";
     for ($i = 0; $i < 1; $i++) {
@@ -135,8 +134,8 @@ function make_table($head, $fillable, $data, $extra = null)
     }
     $string .= "</thead>";
     $string .= "<tbody>";
-    for ($i = 0; $i <  count($data); $i++) {
-        $data[$i] = (object)$data[$i];
+    for ($i = 0; $i < count($data); $i++) {
+        $data[$i] = (object) $data[$i];
         $string .= "<tr>";
         for ($k = 0; $k < count($head); $k++) {
             if ($show_id && $k == 0) {
@@ -150,19 +149,44 @@ function make_table($head, $fillable, $data, $extra = null)
                     $string .= "<td>" . format_datetime($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
                 case "set_date":
+                case "init_date":
+                case "end_date":
                     if (isset($extra["verify-date-before"])) {
                         $fecha_actual = strtotime(date("d-m-Y H:i:00", time()));
                         $fecha_entrada = strtotime("{$data[$i]->{$fillable[$k]}} 00:00:00");
                         $bg_expire = $fecha_actual > $fecha_entrada ? "alert-danger" : "alert-success";
                         $string .= "<td class=' alert {$bg_expire}'>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
                     } else {
-                        $string .= "<td>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                        if ($fillable[$k] == "end_date") {
+                            $x = date_diff_in_months($data[$i]->{$fillable[$k]}, $data[$i]->{$fillable[$k - 1]});
+                            $string .= "<td class='row'>
+                            <div class='col-12 ml-5'><small class ='badge text-secondary '> $x Meses </small></div>
+                            <div class='col-12'>" . format_date($data[$i]->{$fillable[$k]})
+                                . " </div></td>";
+                        } else {
+                            $string .= "<td>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                        }
+                    }
+                    break;
+                case "state":
+                    if (isset($extra["verify-state-color-before"])) {
+                        $string .= "<td class=' alert alert-{$extra["state_colors"][$data[$i]->{$fillable[$k]}]}'>" . $data[$i]->{$fillable[$k]} . "</td>";
+                    }
+                    break;
+                case "risk_level":
+                    if (isset($extra["verify-risk-color-before"])) {
+                        $string .= "<td><p class='badge  size-12 badge-{$extra["risk_color"][$data[$i]->{$fillable[$k]}]}'>" . $data[$i]->{$fillable[$k]} . "</p></td>";
                     }
                     break;
                 case "total":
-                case  "amount":
+                case "amount":
                 case "total_amount":
+                case "earn_amount":
+                case "real_retribution":
                     $string .= "<td>" . number_price($data[$i]->{$fillable[$k]}) . "</td>";
+                    break;
+                case "percent_annual_effective":
+                    $string .= "<td>" . number_percentage($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
                 case "status":
                     $type = "danger";
@@ -236,57 +260,60 @@ function wrapper_html($data, $card_body, $is_modal = false)
      * $data[active_button][title]
      */
     // ---------------
-    $data = (object)$data;
+    $data = (object) $data;
     $string = '<div class="content-page">';
     $string .= '<div class="content">';
-    $string .=    '<div class="container-fluid">';
-    $string .=        '<div class="page-title-box">';
-    $string .=            '<div class="row align-items-center">';
-    $string .=                '<div class="col-sm-6">';
-    $string .=                    '<h4 class="page-title">Finanzas</h4>';
-    $string .=                '</div>';
-    $string .=                '<div class="col-sm-6">';
-    $string .=                    '<ol class="breadcrumb float-right">';
-    $string .=                        '<li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>';
-    $string .=                        "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$data->subtitle}</a></li>";
-    $string .=                        '<li class="breadcrumb-item active">Listado</li>';
-    $string .=                    '</ol>';
-    $string .=                '</div>';
-    $string .=            '</div>';
-    $string .=        '</div>';
-    $string .=        '<div class="row">';
-    $string .=            '<div class="col-12">';
-    $string .=                '<div class="card m-b-30">';
-    $string .=                    '<div class="m-3">';
-    $string .=                        '<div class="float-left">';
-    $string .=                            "<h4 class='mt-0  mb-3 header-title '>{$data->title}</h4>";
-    $string .=                        '</div>';
+    $string .= '<div class="container-fluid">';
+    $string .= '<div class="page-title-box">';
+    $string .= '<div class="row align-items-center">';
+    $string .= '<div class="col-sm-6">';
+    $string .= '<h4 class="page-title">Finanzas</h4>';
+    $string .= '</div>';
+    $string .= '<div class="col-sm-6">';
+    $string .= '<ol class="breadcrumb float-right">';
+    $string .= '<li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>';
+    $string .= "<li class='breadcrumb-item'><a href='javascript:void(0);'>{$data->subtitle}</a></li>";
+    $string .= '<li class="breadcrumb-item active">Listado</li>';
+    $string .= '</ol>';
+    $string .= '</div>';
+    $string .= '</div>';
+    $string .= '</div>';
+    $string .= isset($data->statistic_panel) ? $data->statistic_panel : "";
+    $string .= '<div class="row">';
+    $string .= '<div class="col-12">';
+    $string .= '<div class="card m-b-30">';
+    $string .= '<div class="m-3">';
+    $string .= '<div class="float-left">';
+    $string .= "<h4 class='mt-0  mb-3 header-title '>{$data->title}</h4>";
+    $string .= '</div>';
     if (isset($data->active_button)) {
+        $attr = isset($data->active_button["onclick"]) ? ' onclick="' . $data->active_button["onclick"] . '" ' : "";
         if ($is_modal) {
 
             $string .= '<div class="float-right">';
-            $string .= "<a data-target='#myModal' href='#' type='button' data-toggle='modal' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
+            $string .= "<a {$attr} data-target='#myModal' href='#' type='button' data-toggle='modal' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
             $string .= '</div>';
         } else {
             $string .= '<div class="float-right">';
-            $string .= "<a  href='{$data->active_button["path"]}' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
+            $string .= "<a {$attr} href='{$data->active_button["path"]}' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
             $string .= '</div>';
         }
     }
-    $string .=                    '</div>';
-    $string .=                    '<div class="card-body">';
-    $string .=                          $card_body;
-    $string .=                    '</div>';
-    $string .=                '</div>';
-    $string .=            '</div>';
-    $string .=            '</div>';
-    $string .=        '</div>';
+    $string .= '</div>';
+    $string .= '<div class="card-body">';
+    $string .= $card_body;
+    $string .= '</div>';
+    $string .= '</div>';
+    $string .= '</div>';
+    $string .= '</div>';
+    $string .= '</div>';
 
     $string .= '</div>';
     $string .= file_get_contents(URL_APP . "views" . SEPARATOR . "layouts" . SEPARATOR . "footerbar.php");
     $string .= '</div>';
     return $string;
-};
+}
+;
 
 /**
  * $data[name_user]
@@ -296,7 +323,7 @@ function wrapper_html($data, $card_body, $is_modal = false)
  */
 function structure_html_send_email($data)
 {
-    $data = (object)$data;
+    $data = (object) $data;
     $content = '<!DOCTYPE html>';
     $content .= '<html lang="en">';
     $content .= '<head>';
@@ -323,4 +350,34 @@ function structure_html_send_email($data)
     $content .= '  </body>';
     $content .= ' </html>';
     return $content;
+}
+
+function card_statistic_component($title, $amount1, $amount2, $amount3 = [])
+{
+    return ' <div class="col-sm-6 col-xl-4">
+    <div class="card">
+        <div class="card-heading p-4">
+            <div class="mini-stat-icon float-right">
+            </div>
+            <div>
+                <h5 class="font-16">
+                    ' . $title . '
+                </h5>
+            </div>
+            <h6 class="mt-4">
+                <span data-toggle="tooltip" data-placement="top" title="' . $amount1[0] . '">' . number_price($amount1[1]) . '</span> -
+                <span data-toggle="tooltip" data-placement="top" title="' . $amount2[0] . '">' . number_price($amount2[1]) . '</span>
+                ' . (count($amount3) > 0 ? ' - <small data-toggle="tooltip" data-placement="top" title="' . $amount3[0] . '">' . number_price($amount3[1]) . '</small>' : '') . '
+            </h6>
+        </div>
+    </div>
+</div>';
+}
+function card_container_statistic_component(...$body)
+{
+    $html = "";
+    foreach ($body as $string) {
+        $html .= $string;
+    }
+    return '<div class="row">' . $html . "</div>";
 }

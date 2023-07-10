@@ -22,7 +22,7 @@ class Base extends PDO
         try {
             parent::__construct($this->dsn, $this->dbuser, $this->dbpassword, $this->options);
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ class Base extends PDO
         try {
             return $this->stmt->execute();
         } catch (PDOException $e) {
-            exit($e->getMessage());
+            throw new ErrorException($e->getMessage());
         }
     }
     protected function lastId()

@@ -43,6 +43,7 @@
 <script src="<?php echo URL_ASSETS ?>assets/js/statistics.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/js/queries.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/js/budget.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/js/investment.js"></script>
 </body>
 
 </html>

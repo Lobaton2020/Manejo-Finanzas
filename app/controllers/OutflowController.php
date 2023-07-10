@@ -9,6 +9,7 @@ class OutflowController extends Controller
     private $notification;
     private $category;
     private $outflowService;
+    private $investment;
     public function __construct()
     {
         parent::__construct();
@@ -19,9 +20,12 @@ class OutflowController extends Controller
         $this->porcent = $this->model("porcent");
         $this->outflow_type = $this->model("outflowType");
         $this->category = $this->model("category");
+        $this->investment = $this->model("investment");
         $this->outflowService = new OutflowServie(
             $this->model,
-            $this->notification
+            $this->notification,
+            $this->outflow_type,
+            $this->investment
         );
     }
 

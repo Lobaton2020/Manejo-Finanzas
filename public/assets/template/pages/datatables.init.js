@@ -6,9 +6,18 @@
  */
 
 const InitDataTables = () => {
-    $('#datatable').DataTable({
-        order: [[0, 'DESC']]
-    });
+    let options = {
+        order: [[0, 'DESC']],
+        pageLength: 50
+    }
+    if (document.querySelector("[data-type='datatable-state-asc']")) {
+        console.log(document.querySelector("[data-type='datatable-state-asc']"))
+        options = {
+            order: [[6, 'asc']],
+            pageLength: 50
+        }
+    }
+    $('#datatable').DataTable(options);
 
     //Buttons examples
     var table = $('#datatable-buttons').DataTable({

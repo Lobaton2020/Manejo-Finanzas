@@ -14,7 +14,7 @@ function arrayEmpty($validate, $object)
                 return true;
             }
         } else {
-            exit("Llave no encontrada");
+            return false;
         }
     }
     return false;

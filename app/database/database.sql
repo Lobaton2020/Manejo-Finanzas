@@ -199,7 +199,7 @@ create table queries(
     primary key (id_query),
     foreign key(id_user) references users (id_user)
 );
-
+-- This table represents the budgets in the main option to do monitoring
 create table budget(
     id_budget int not null auto_increment,
     id_user int not null,
@@ -230,7 +230,7 @@ create or replace view view_budget as
         ORDER BY created_at DESC
     ) AS t
 
-
+-- This table representa the budgets in the module in the UI
 create table temporal_budgets(
     id_temporal_budget int not null auto_increment,
     id_user int not null,
@@ -272,6 +272,30 @@ FROM
     and otb.status = 1
 GROUP BY
     tb.id_temporal_budget;
+
+create table investments(
+    id_investment int not null auto_increment,
+    id_outflow int not null,
+    percent_annual_effective float not null default 0,
+    state varchar(255) not null,
+    init_date date not null default (CURRENT_DATE + INTERVAL 0 MONTH),
+    end_date date not null default (CURRENT_DATE + INTERVAL 1 MONTH),
+    real_retribution float not null default 0,
+    risk_level varchar(255) null,
+    updated_at datetime not null default CURRENT_TIMESTAMP,
+    created_at datetime not null default CURRENT_TIMESTAMP,
+    primary key (id_investment),
+    foreign key(id_outflow) references outflows (id_outflow)
+);
+
+create or replace view investments_view as
+SELECT i.*, o.id_user, o.amount, o.description, c.name,
+       (o.amount * ((i.percent_annual_effective / 100) / 12) *
+       (PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM i.end_date), EXTRACT(YEAR_MONTH FROM i.init_date)))) as earn_amount
+FROM investments i
+INNER JOIN outflows o ON o.id_outflow = i.id_outflow
+INNER JOIN users u ON u.id_user = o.id_user
+INNER JOIN categories c ON o.id_category = c.id_category;
 
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");

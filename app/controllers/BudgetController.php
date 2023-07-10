@@ -16,7 +16,7 @@ class BudgetController extends Controller
     private $category;
     private $outflowService;
     private $modelOutflow;
-
+    private $investment;
     public function __construct()
     {
         parent::__construct();
@@ -31,10 +31,13 @@ class BudgetController extends Controller
         $this->outflow_type = $this->model("outflowType");
         $this->category = $this->model("category");
         $this->modelOutflow = $this->model("outflow");
+        $this->investment = $this->model("investment");
 
         $this->outflowService = new OutflowServie(
             $this->modelOutflow,
-            $this->notification
+            $this->notification,
+            $this->outflow_type,
+            $this->investment
         );
     }
 
