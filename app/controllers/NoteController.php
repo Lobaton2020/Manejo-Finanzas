@@ -14,6 +14,9 @@ class NoteController extends Controller
     public function index()
     {
         $notes = $this->model->select("*", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array();
+        foreach ($notes as $note) {
+            $note->preview = substr($note->description, 0, 30) . (strlen($note->description) > 30 ? "..." : "");
+        }
         return view("notes.list", ["notes" => $notes]);
     }
 
