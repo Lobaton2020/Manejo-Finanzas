@@ -297,6 +297,67 @@ INNER JOIN outflows o ON o.id_outflow = i.id_outflow
 INNER JOIN users u ON u.id_user = o.id_user
 INNER JOIN categories c ON o.id_category = c.id_category;
 
+-- Esta vista no toma como egreso aquellos que son tipo inversion y que se encuentran activos
+CREATE PROCEDURE report_inflows_and_outflows(IN id_user INT)
+BEGIN
+    SELECT
+        year,
+        month,
+        inflow,
+        outflow,
+        inflow - outflow AS total_revenue,
+        SUM(inflow - outflow) OVER (ORDER BY year, month) AS net_worth
+    FROM (
+        SELECT
+            COALESCE(i.year, e.year) AS year,
+            COALESCE(i.month, e.month) AS month,
+            COALESCE(inflow, 0) AS inflow,
+            COALESCE(outflow, 0) AS outflow
+        FROM
+            (SELECT YEAR(i.set_date) AS year,
+                    MONTH(i.set_date) AS month,
+                    SUM(i.total) AS inflow
+            FROM inflows i
+            WHERE i.id_user = id_user
+            GROUP BY YEAR(i.set_date), MONTH(i.set_date)) i
+        LEFT JOIN
+            (SELECT YEAR(o.set_date) AS year,
+                    MONTH(o.set_date) AS month,
+                    SUM(CASE WHEN inv.state = 'Activo' THEN 0 ELSE o.amount END) AS outflow
+            FROM outflows o
+            LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+            WHERE o.id_user = id_user
+            GROUP BY YEAR(o.set_date), MONTH(o.set_date)) e
+        ON i.year = e.year AND i.month = e.month
+
+        UNION
+
+        SELECT
+            COALESCE(i.year, e.year) AS year,
+            COALESCE(i.month, e.month) AS month,
+            COALESCE(inflow, 0) AS inflow,
+            COALESCE(outflow, 0) AS outflow
+        FROM
+            (SELECT YEAR(i.set_date) AS year,
+                    MONTH(i.set_date) AS month,
+                    SUM(i.total) AS inflow
+            FROM inflows i
+            WHERE i.id_user = id_user
+            GROUP BY YEAR(i.set_date), MONTH(i.set_date)) i
+        RIGHT JOIN
+            (SELECT YEAR(o.set_date) AS year,
+                    MONTH(o.set_date) AS month,
+                    SUM(CASE WHEN inv.state = 'Activo' THEN 0 ELSE o.amount END) AS outflow
+            FROM outflows o
+            LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+            WHERE o.id_user = id_user
+            GROUP BY YEAR(o.set_date), MONTH(o.set_date)) e
+        ON i.year = e.year AND i.month = e.month
+        ORDER BY year, month
+    ) AS inflow_and_outflow
+    ORDER BY year, month;
+END;
+
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
  insert into notificationtypes values ("register"," se ha registrado por medio de un token"),

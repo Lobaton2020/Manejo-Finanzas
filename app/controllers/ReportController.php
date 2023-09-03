@@ -5,6 +5,7 @@ class ReportController extends Controller
 
     private $outflow;
     private $porcent; // simil to deposit
+    private $query;
 
     public function __construct()
     {
@@ -13,6 +14,7 @@ class ReportController extends Controller
         $this->authentication();
         $this->outflow = $this->model("outflow");
         $this->porcent = $this->model("porcent");
+        $this->query = $this->model("query");
     }
 
     public function moneyTotalbyDeposit()
@@ -22,7 +24,7 @@ class ReportController extends Controller
                                                     left join inflow_porcent as ip on ip.id_porcent = p.id_porcent
                                                     left join inflows as i on ip.id_inflow = i.id_inflow  where p.id_user = {$this->id} and p.status = 1
                                                     group by p.id_porcent ORDER BY ip.id_porcent ASC")->array();
-													
+
         return $porcents;
     }
     public function moneyEgressbyDeposit()
@@ -61,6 +63,12 @@ class ReportController extends Controller
 
         return httpResponse($money_disponible)->json();
     }
+    public function getNetWorth()
+    {
+        $data = $this->query->getResumeNetWorthByUserId($this->id)->array();
+        return httpResponse($data)->json();
+    }
+
     private function getIdsPorcent($porcents, $name_id)
     {
         $ids_porcent = [];

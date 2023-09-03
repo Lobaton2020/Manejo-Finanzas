@@ -1,3 +1,7 @@
+const MESES = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 const renderStatisticMoneyDisponiblebyDeposits = async() => {
     try {
         let element = document.getElementById("money-deposit-disponible");
@@ -74,8 +78,81 @@ const defaultActionAmounts = () => {
         console.error("NO SE PUEDE MOSTRAR PLATA", { error })
     }
 }
+
+const renderStatisticNetWorthByMonth = async () => {
+    try {
+        const id = "money-net-worth"
+        let element = document.getElementById(id);
+        let result = await fetch(`${URL_PROJECT}report/getNetWorth`)
+        result = await result.json();
+        if (result.status == 200) {
+            if (result.data.length == 0) {
+                element.innerHTML = "<h3 class='text-center text-info'>Ohh</h3><p class='text-muted text-center'>No hay datos por mostrar</p>";
+                return;
+            }
+            let data = result.data.map(({ year, month, net_worth }) => ({
+                x: `${year}-${month}`,
+                a: parseInt(net_worth),
+            }));
+            const [
+                keys,
+                labels,
+                colors
+            ] = [
+                    ['a'],
+                    ['Patrimonio Neto'],
+                    ['#1DB4F1']
+                ]
+            $.MorrisCharts.createAreaChart(id, 0, 0, data, 'x', keys, labels, colors);
+        } else {
+            element.innerHTML = "<h3 class='text-center text-danger'>Hubo un error al renderizar la grafica</h3>"
+        }
+    } catch (err) {
+        console.error(err)
+    }
+};
+
+const renderStatisticNetWortDetail = async () => {
+    try {
+        const id = "money-net-worth-detail"
+        let element = document.getElementById(id);
+        let result = await fetch(`${URL_PROJECT}report/getNetWorth`)
+        result = await result.json();
+        if (result.status == 200) {
+            if (result.data.length == 0) {
+                element.innerHTML = "<h3 class='text-center text-info'>Ohh</h3><p class='text-muted text-center'>No hay datos por mostrar</p>";
+                return;
+            }
+            let data = result.data.map(({ year, month, net_worth, total_revenue, inflow, outflow }) => ({
+                x: `${year}-${month}`,
+                a: parseInt(net_worth),
+                b: parseInt(total_revenue),
+                c: parseInt(inflow),
+                d: parseInt(outflow)
+            }));
+            const [
+                keys,
+                labels,
+                colors
+            ] = [
+                    ['a', 'b', 'c', 'd'],
+                    ['Patrimonio neto (blue)', 'Ganancias(purple)', 'Ingresos(green)', 'Egresos (red)'],
+                    ['#59c6fb', '#30419b', '#02c58d', '#fc5454']
+                ]
+            $.MorrisCharts.createLineChart(id, data, 'x', keys, labels, colors);
+
+        } else {
+            element.innerHTML = "<h3 class='text-center text-danger'>Hubo un error al renderizar la grafica</h3>"
+        }
+    } catch (err) {
+        console.error(err)
+    }
+};
+
 window.addEventListener("DOMContentLoaded", () => {
     renderStatisticMoneyDisponiblebyDeposits();
     renderStatisticMoneySpendbyDeposits();
+    renderStatisticNetWorthByMonth();
+    renderStatisticNetWortDetail();
     defaultActionAmounts();
 });

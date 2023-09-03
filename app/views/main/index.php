@@ -97,19 +97,45 @@
                 <div class="col-xl-12">
                     <div class="card m-b-30">
                         <div class="card-body">
-                            <h4 class="mt-0 header-title d-inline">Dinero disponible por deposito</h4> <span>(Solo los depositos activos)</span>
+                            <h4 class="mt-0 header-title d-inline">Dinero disponible por deposito</h4>
+                            <span>(Solo los depositos activos)</span>
                             <p class="sub-title d-inline-block text-truncate w-100">
                                 Representa el dinero que tienes por deposito menos los gastos.
                             </p>
-
-                            <li class="text-muted text-decoration-none">
-                                Desde siempre
-                            </li>
+                            <ul>
+                                <li class="text-muted text-decoration-none"> Desde siempre </li>
+                            </ul>
                             <div id="money-deposit-disponible"></div>
 
                         </div>
                     </div>
                 </div> <!-- end col -->
+
+                <div class="col-xl-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title d-inline">Patrimonio neto</h4>
+                            <p class="sub-title d-inline-block text-truncate w-100">
+                                Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.
+                            </p>
+                            <li class="text-muted text-decoration-none"> Desde siempre </li>
+                            <div id="money-net-worth"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title d-inline">Detalle patrimonio</h4>
+                            <p class="sub-title d-inline-block text-truncate w-100">
+                                Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.
+                            </p>
+                            <li class="text-muted text-decoration-none"> Desde siempre </li>
+                            <div id="money-net-worth-detail"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end col -->
                 <div class="col-xl-12">
                     <div class="card m-b-30">
                         <div class="card-body">
