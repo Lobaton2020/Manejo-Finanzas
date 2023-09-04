@@ -76,12 +76,24 @@ const savePorcent = async (e) => {
     }
 };
 
+const sumPercentages = (className = ".porcent-forms-ref") => {
+    const elements = document.querySelectorAll(className)
+    const total = Array.from(elements).reduce((acc, curr) => {
+        const number = parseInt(curr.value)
+        if (isNaN(number)) {
+            return acc
+        }
+        return acc + number
+    }, 0)
+    document.querySelector("#sum-percentages").textContent = total + "%"
+
+}
 const handleKeyUp = (e) => {
-    const percent = parseFloat(e.target.value)
-    const total = document.querySelector("#total").value
+    const percent = isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value)
+    const total = document.querySelector("#total").value || 0
     const number = percent * parseInt(total) / 100
     const currency = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(number);
-    console.log({ currency })
     e.target.parentNode.parentNode.querySelector("#money_deposit").textContent = currency
+    sumPercentages()
 };
 window.addEventListener("DOMContentLoaded", () => { })

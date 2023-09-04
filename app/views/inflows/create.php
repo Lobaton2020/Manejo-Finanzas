@@ -84,14 +84,19 @@
                                                 <div class="row">
                                                     <div class="form-group col-6">
                                                         <label for="total"><?php echo $porcent->name ?> <span class="text-danger">*</span></label>
-                                                        <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]" class="porcents form-control" required="" parsley-type="email" placeholder="ej: <?php echo rand(1, 60) ?>">
+                                                        <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]"
+                                                                class="porcents form-control porcent-forms-ref" required="" parsley-type="email"
+                                                                placeholder="ej: <?php echo rand(1, 60) ?>">
+                                                        </div>
+                                                        <div class="form-group col-6">
+                                                            <label for="total">&nbsp;</label>
+                                                            <div id="money_deposit" name="" class="porcents form-control" disabled></div>
+                                                        </div>
                                                     </div>
-                                                    <div class="form-group col-6">
-                                                        <label for="total">&nbsp;</label>
-                                                        <div id="money_deposit" name="" class="porcents form-control" disabled></div>
-                                                    </div>
-                                                </div>
                                             <?php endforeach; ?>
+                                        </div>
+                                        <div class="">
+                                            <p>Sumatoria: <strong id="sum-percentages">0%</strong></p>
                                         </div>
                                         <h6>A tener en cuenta:</h6>
 
