@@ -43,7 +43,7 @@ class MainController extends Controller
                 "amount" => number_price($sum_egress, true)
             ],
             "allinvestment" => [
-                "title" => "Total disponible",
+                "title" => "Total Liquido",
                 "amount" => number_price($number_disponible, true)
             ],
             "allspends" => [
