@@ -352,11 +352,18 @@ function structure_html_send_email($data)
     return $content;
 }
 
+function js_debugger($text)
+{
+    echo "<script>alert(" . $text . ")</script>";
+}
 function card_statistic_component($title, $amount1, $amount2, $amount3 = [])
 {
     $total = count($amount3) > 0 ? $amount1[1] + $amount3[1] : $amount1[1] + $amount2[1];
     $part = count($amount3) > 0 ? $amount3[1] : $amount2[1];
-    $percentage = intval($part * 100 / $total);
+    $percentage = 0;
+    if ($part != 0) {
+        $percentage = number_format($part * 100 / $total, 1, '.', '') . "%";
+    }
     return ' <div class="col-sm-6 col-xl-4">
     <div class="card">
         <div class="card-heading p-4">
@@ -370,8 +377,8 @@ function card_statistic_component($title, $amount1, $amount2, $amount3 = [])
             <h6 class="mt-4">
                 <span data-toggle="tooltip" data-placement="top" title="' . $amount1[0] . '">' . number_price($amount1[1]) . '</span> -
                 <span data-toggle="tooltip" data-placement="top" title="' . $amount2[0] . '">' . number_price($amount2[1]) . ' ' .
-        count($amount3) == 0 ? $percentage . '%' : '' . ' </span>
-                ' . (count($amount3) > 0 ? ' - <small data-toggle="tooltip" data-placement="top" title="' . $amount3[0] . '">' . number_price($amount3[1]) . ' ' . $percentage . '%</small>' : '') . '
+        (count($amount3) == 0 ? $percentage : '') . ' </span>
+                ' . (count($amount3) > 0 ? ' - <small data-toggle="tooltip" data-placement="top" title="' . $amount3[0] . '">' . number_price($amount3[1]) . ' ' . $percentage . '</small>' : '') . '
             </h6>
         </div>
     </div>
