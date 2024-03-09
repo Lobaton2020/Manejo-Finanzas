@@ -111,6 +111,19 @@
                     </div>
                 </div> <!-- end col -->
 
+
+                <div class="col-xl-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title d-inline">Patrimonio neto con prestamos</h4>
+                            <p class="sub-title d-inline-block text-truncate w-100">
+                                Representa el dinero que tienes restandole los prestamos que has hecho a otros.
+                            </p>
+                            <li class="text-muted text-decoration-none"> Desde siempre </li>
+                            <div id="money-net-worth-moneyloan"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-xl-12">
                     <div class="card m-b-30">
                         <div class="card-body">

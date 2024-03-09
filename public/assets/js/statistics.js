@@ -111,6 +111,38 @@ const renderStatisticNetWorthByMonth = async () => {
         console.error(err)
     }
 };
+const renderStatisticNetWorthWithMoneyLoans = async () => {
+    try {
+        const id = "money-net-worth-moneyloan"
+        let element = document.getElementById(id);
+        let result = await fetch(`${URL_PROJECT}report/getNetWorthWithRestMoneyLoans`)
+        result = await result.json();
+        if (result.status == 200) {
+            if (result.data.length == 0) {
+                element.innerHTML = "<h3 class='text-center text-info'>Ohh</h3><p class='text-muted text-center'>No hay datos por mostrar</p>";
+                return;
+            }
+            let data = result.data.map(({ year, month, net_worth }) => ({
+                x: `${year}-${month}`,
+                a: parseInt(net_worth),
+            }));
+            const [
+                keys,
+                labels,
+                colors
+            ] = [
+                    ['a'],
+                    ['Patrimonio con prestamos a otros'],
+                    ['#FCBE2D']
+                ]
+            $.MorrisCharts.createAreaChart(id, 0, 0, data, 'x', keys, labels, colors);
+        } else {
+            element.innerHTML = "<h3 class='text-center text-danger'>Hubo un error al renderizar la grafica</h3>"
+        }
+    } catch (err) {
+        console.error(err)
+    }
+};
 
 const renderStatisticNetWortDetail = async () => {
     try {
@@ -150,6 +182,7 @@ const renderStatisticNetWortDetail = async () => {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
+    renderStatisticNetWorthWithMoneyLoans();
     renderStatisticMoneyDisponiblebyDeposits();
     renderStatisticMoneySpendbyDeposits();
     renderStatisticNetWorthByMonth();

@@ -6,6 +6,7 @@ class ReportController extends Controller
     private $outflow;
     private $porcent; // simil to deposit
     private $query;
+    private $moneyLoan;
 
     public function __construct()
     {
@@ -15,6 +16,7 @@ class ReportController extends Controller
         $this->outflow = $this->model("outflow");
         $this->porcent = $this->model("porcent");
         $this->query = $this->model("query");
+        $this->moneyLoan = $this->model("moneyLoan");
     }
 
     public function moneyTotalbyDeposit()
@@ -66,6 +68,17 @@ class ReportController extends Controller
     public function getNetWorth()
     {
         $data = $this->query->getResumeNetWorthByUserId($this->id)->array();
+        return httpResponse($data)->json();
+    }
+    public function getNetWorthWithRestMoneyLoans()
+    {
+        $data = $this->query->getResumeNetWorthByUserId($this->id)->array();
+        $length = count($data);
+        if ($length > 0) {
+            $index = count($data) - 1;
+            $sumLoansFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "FROM_ME", "AND"])->array();
+            $data[$index]->net_worth = intval($data[$index]->net_worth) - $sumLoansFromMe;
+        }
         return httpResponse($data)->json();
     }
 

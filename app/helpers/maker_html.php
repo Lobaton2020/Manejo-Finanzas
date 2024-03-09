@@ -249,7 +249,10 @@ function make_table($head, $fillable, $data, $extra = null)
     $string .= "</div>";
     return $string;
 }
-
+function badge($name, $type)
+{
+    return "<span class='size-text badge badge-{$type} font-19'>{$name}</span>";
+}
 
 function wrapper_html($data, $card_body, $is_modal = false)
 {

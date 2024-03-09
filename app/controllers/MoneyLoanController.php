@@ -14,6 +14,10 @@ class MoneyLoanController extends Controller
     public function index()
     {
         $loans = $this->model->select("*", ["id_user[=]" => $this->id, "status[is not]" => null, "AND"])->array();
+        foreach ($loans as $item) {
+            $item->type = $item->type == 'TO_ME' ? badge('Me prestan', 'warning') : badge("Yo presto", 'info');
+
+        }
         return view("loans.list", ["loans" => $loans]);
     }
     public function create()
@@ -24,7 +28,7 @@ class MoneyLoanController extends Controller
     public function store()
     {
         return execute_post(function ($request) {
-            if (arrayEmpty(["description", "total", "set_date"], $request)) {
+            if (arrayEmpty(["description", "total", "set_date", "type"], $request)) {
                 return redirect("moneyLoan")->with("error", "Lo sentimos, llena todos los campos");
             }
             $data = [
@@ -32,6 +36,7 @@ class MoneyLoanController extends Controller
                 "description" => $request->description,
                 "total" => $request->total,
                 "set_date" => $request->set_date,
+                "type" => $request->type,
                 "status" => 1,
                 "create_at" => getCurrentDatetime()
             ];

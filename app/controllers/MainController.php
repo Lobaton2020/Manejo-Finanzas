@@ -6,6 +6,8 @@ class MainController extends Controller
     private $outflow;
     private $budgetView;
     private $budget;
+    private $moneyLoan;
+
     public function __construct()
     {
         parent::__construct();
@@ -15,6 +17,7 @@ class MainController extends Controller
         $this->outflow = $this->model("outflow");
         $this->budgetView = $this->model("budgetView");
         $this->budget = $this->model("budget");
+        $this->moneyLoan = $this->model("moneyLoan");
     }
 
 
@@ -32,7 +35,8 @@ class MainController extends Controller
         $sum_egress = intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
         $sum_entrys = intval($this->inflow->sum("total", ["id_user[=]" => $this->id])->array());
         $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
-        $number_disponible = $sum_entrys - $sum_egress;
+        $loansFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "FROM_ME", "AND"])->array();
+        $number_disponible = $sum_entrys - $sum_egress - $loansFromMe;
         $data = [
             "allentry" => [
                 "title" => "Total Ingresos",

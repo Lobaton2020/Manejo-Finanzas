@@ -213,6 +213,10 @@ create table budget(
 ALTER TABLE outflows
 ADD is_in_budget boolean not null default false;
 
+ALTER TABLE
+    moneyloans
+ADD
+    COLUMN type ENUM('TO_ME', 'FROM_ME') NOT null DEFAULT 'FROM_ME';
 create or replace view view_budget as
     SELECT id_budget, id_user, budget, total_a as total, IFNULL(budget - total_a, 0) as remain, IFNULL( floor(100 * total_a / budget),0) as percent, date
     FROM (

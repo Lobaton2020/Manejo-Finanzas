@@ -27,11 +27,29 @@
                                     <div class="col-md-2"></div>
 
                                     <div class="col-md-8">
+                                    <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="state">Tipo de prestamo<span class="text-danger">*</span></label>
+                                                    <select class="form-control" name="type" id="type" required>
+                                                        <option value="">--Seleccione--</option>
+                                                        <option selected value="FROM_ME">Yo presto</option>
+                                                        <option value="TO_ME">Me prestan</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label>Fecha estimada de devolucion del dinero <span class="text-danger">*</span></label>
+                                                    <div>
+                                                        <input type="date" name="set_date" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto que va a prestar: <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="text" name="total" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000">
+                                                    <input onkeyup="formatPrice(event)" type="number" name="total" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
@@ -45,15 +63,10 @@
                                                 <textarea name="description" placeholder="Escribe a quien y por que le vas a prestar el dinero." class="form-control" rows="4"></textarea>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Fecha estimada de devolucion del dinero <span class="text-danger">*</span></label>
-                                            <div>
-                                                <input type="date" name="set_date" class="form-control">
-                                            </div>
-                                        </div>
+
                                         <div class="form-group">
                                             <small class="text-muted">
-                                                Ten en cuenta que el dinero registrado aqui no influira en las graficas ni en mediciones del inicio.
+                                                Ten en cuenta que el dinero registrado aqui no influira en las graficas pero si en mi resumen de liquides.
                                             </small>
                                         </div>
                                         <div class="form-group">

@@ -1,7 +1,7 @@
 <?php
 
-$head = ["#", "Descripcion", "Total prestado", "Estado", "Fecha Devolucion", "Creado"];
-$fillable = ["id_money_loan", "description", "total", "status", "set_date", "create_at"];
+$head = ["#", "Tipo", "Descripcion", "Total prestado", "Estado", "Fecha Devolucion", "Creado"];
+$fillable = ["id_money_loan", "type", "description", "total", "status", "set_date", "create_at"];
 
 $data = [
     "redirect" => "moneyLoan",
