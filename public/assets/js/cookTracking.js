@@ -80,6 +80,11 @@ const loadCalendar = async () => {
     $("#valor-total").val((events.length * baseValue).toLocaleString('de-DE'))
     $('#calendar').fullCalendar({
         defaultDate: new Date(date.format()),
+        dayRender: function (date, cell) {
+            if (date.isSame(new Date(), "day")) {
+                cell.css("background-color", "#D6EAF8");
+            }
+        },
         header: {
             left: 'prev,next today',
             center: 'title',
