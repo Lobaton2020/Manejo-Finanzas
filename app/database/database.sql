@@ -362,6 +362,15 @@ BEGIN
     ORDER BY year, month;
 END;
 
+CREATE TABLE cook_tracking (
+    id integer auto_increment NOT NULL,
+    `date` DATE NOT NULL,
+    descripcion varchar(255) NULL,
+    user_id INT NOT NULL,
+    created_at datetime DEFAULT now() NULL,
+    CONSTRAINT cook_tracking_pk PRIMARY KEY (id),
+    CONSTRAINT cook_tracking_FK FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE
+);
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
  insert into notificationtypes values ("register"," se ha registrado por medio de un token"),

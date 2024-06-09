@@ -41,6 +41,11 @@
                 </li>
                 <?php if ($self["rol"]["name"] == "Administrador") : ?>
                     <li>
+                        <a href="<?php echo route("cookTracking") ?>" class=""><i class="size-icon fas fa-cookie
+                                                                        "></i><span>Cook Tracking<span class="float-right menu-arrow">
+                                </span></a>
+                        </li>
+                        <li>
                         <a href="<?php echo route("query") ?>" class=""><i class="size-icon mdi mdi mdi-database-edit"></i><span>SQL<span class="float-right menu-arrow"> </span></a>
                     </li>
                     <li>

@@ -23,6 +23,11 @@
 <!-- Responsive examples -->
 <script src="<?php echo URL_ASSETS ?>/plugins/datatables/dataTables.responsive.min.js"></script>
 <script src="<?php echo URL_ASSETS ?>/plugins/datatables/responsive.bootstrap4.min.js"></script>
+
+<!-- Calendario-->
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/moment/moment.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/fullcalendar/js/fullcalendar.min.js"></script>
 <!--Morris Chart-->
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/morris/morris.min.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/raphael/raphael.min.js"></script>
@@ -44,6 +49,7 @@
 <script src="<?php echo URL_ASSETS ?>assets/js/queries.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/js/budget.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/js/investment.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/js/cookTracking.js"></script>
 </body>
 
 </html>

@@ -35,5 +35,6 @@ function httpResponse($code = 200, $type = "ok", $message = null, $datos = null)
     }
     $data["status"] = $code;
     http_response_code($code);
+    header("Content-Type: application/json");
     return new JSON($data);
 }
