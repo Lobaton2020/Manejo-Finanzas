@@ -29,12 +29,12 @@ function httpResponse($code = 200, $type = "ok", $message = null, $datos = null)
     if (gettype($type) == "array") {
         $data = array_merge($data, $type);
         $type = "ok";
+        header("Content-Type: application/json");
     }
     if (gettype($type) == "string") {
         $data["type"] = $type;
     }
     $data["status"] = $code;
     http_response_code($code);
-    header("Content-Type: application/json");
     return new JSON($data);
 }
