@@ -77,7 +77,7 @@
                                         <div class="form-group">
                                             <label>Descripcion</label>
                                             <div>
-                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="1"></textarea>
+                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="3"></textarea>
                                             </div>
                                         </div>
                                         <? if (!$is_budget): ?>
