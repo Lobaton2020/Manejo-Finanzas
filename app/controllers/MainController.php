@@ -36,7 +36,8 @@ class MainController extends Controller
         $sum_entrys = intval($this->inflow->sum("total", ["id_user[=]" => $this->id])->array());
         $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
         $loansFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "FROM_ME", "AND"])->array();
-        $number_disponible = $sum_entrys - $sum_egress - $loansFromMe;
+        $loansToFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "TO_ME", "AND"])->array();
+        $number_disponible = ($sum_entrys + $loansToFromMe) - $sum_egress - $loansFromMe;
         $data = [
             "allentry" => [
                 "title" => "Total Ingresos",
