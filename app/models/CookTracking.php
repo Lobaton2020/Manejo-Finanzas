@@ -21,7 +21,9 @@ class CookTracking extends Orm
         JSON_ARRAYAGG(
             JSON_OBJECT(
                 'dia', DATE_FORMAT(`date`, '%d'),
-                'descripcion', descripcion
+                'descripcion', descripcion,
+                'title', title,
+                'id', id
             )
         ) AS registros
     FROM

@@ -371,6 +371,20 @@ CREATE TABLE cook_tracking (
     CONSTRAINT cook_tracking_pk PRIMARY KEY (id),
     CONSTRAINT cook_tracking_FK FOREIGN KEY (user_id) REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE
 );
+ALTER TABLE
+    cook_tracking
+MODIFY
+    COLUMN descripcion text;
+
+ALTER TABLE
+    cook_tracking
+ADD
+    title varchar(255) NULL;
+
+update
+    cook_tracking
+set
+    title = descripcion;
 insert into rols values (1,"Administrador"),
                         (2,"Usuario");
  insert into notificationtypes values ("register"," se ha registrado por medio de un token"),

@@ -37,15 +37,36 @@ class CookTrackingController extends Controller
     public function store()
     {
         return execute_post(function ($request) {
-            if (arrayEmpty(["date"], $request)) {
+            if (arrayEmpty(["date", 'title'], $request)) {
                 return redirect("moneyLoan")->with("error", "Lo sentimos, llena todos los campos");
             }
             $data = [
                 "user_id" => $this->id,
+                "title" => $request->title,
                 "descripcion" => $request->descripcion,
                 "date" => $request->date,
             ];
             if ($this->cookTracking->insert($data)->array()) {
+                return httpResponse()->json();
+            } else {
+                return httpResponse(500, "ok", "Error al crear nuevo registro")->json();
+            }
+        });
+    }
+
+    public function update($id)
+    {
+        return execute_post(function ($request) use ($id) {
+            if (arrayEmpty(["descipcion"], $request)) {
+                return redirect("moneyLoan")->with("error", "La descripcion es obligatoria");
+            }
+            $data = [
+                "descripcion" => $request->descripcion
+            ];
+            if (isset($request->date)) {
+                $data["date"] = $request->date;
+            }
+            if ($this->cookTracking->update($data, ["id[=]" => $id])->array()) {
                 return httpResponse()->json();
             } else {
                 return httpResponse(500, "ok", "Error al crear nuevo registro")->json();

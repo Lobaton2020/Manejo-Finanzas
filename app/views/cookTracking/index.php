@@ -35,7 +35,7 @@
 
                                             <div class="row">
                                                 <div class="col-xl-2 col-lg-3 col-md-4">
-
+                                                    <button id="resumen_p_mes" class="btn btn-info btn-block">Resumen por mes</button>
                                                     <h4 class="m-t-5 m-b-15 font-14">Created Events</h4>
                                                     <form method="post" id="add_event_form" class="m-t-5 m-b-20">
                                                         <input type="text" class="form-control new-event-form"
@@ -83,3 +83,33 @@
     <?php include_document("layouts.footerbar") ?>
 
 </div>
+
+
+<!-- sample modal content -->
+<div id="revisarNota" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myModalLabel">Detalle cocinada</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="show-message"></div>
+                <form id="form-item" action="">
+                    <div id="detalle-tarea">
+                        <textarea
+                            style="background-color:white; height:16rem"
+                            class="form-control  text-peque border_none"
+                            disabled></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
+                <button type="submit" id="commonButton" fzorm="form-item" class="btn btn-info waves-effect waves-light">Editar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
