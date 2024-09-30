@@ -77,7 +77,7 @@
                                                 <p class="text-muted text-center ">
                                                     No tienes nada <br> Añade un deposito
                                                 </p>
-                                            <? endif; ?>
+                                            <?php endif; ?>
                                         </div>
                                         <div id="elements">
                                             <?php foreach ($porcents as $porcent) : ?>
