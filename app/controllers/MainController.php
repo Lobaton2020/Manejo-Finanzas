@@ -7,6 +7,7 @@ class MainController extends Controller
     private $budgetView;
     private $budget;
     private $moneyLoan;
+    private $investmentRetirement;
 
     public function __construct()
     {
@@ -18,6 +19,8 @@ class MainController extends Controller
         $this->budgetView = $this->model("budgetView");
         $this->budget = $this->model("budget");
         $this->moneyLoan = $this->model("moneyLoan");
+        $this->investmentRetirement = $this->model("investmentRetirement");
+        $this->model("investment");
     }
 
 
@@ -29,7 +32,6 @@ class MainController extends Controller
         } else {
             setcookie("show-cookie", "ok", time() - 4);
         }
-
         $number_ingres = $this->inflow->count(["id_user[=]" => $this->id])->array();
         $number_egres = $this->outflow->count(["id_user[=]" => $this->id])->array();
         $sum_egress = intval($this->outflow->sum("amount", ["id_user[=]" =>  $this->id])->array());
@@ -37,7 +39,8 @@ class MainController extends Controller
         $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
         $loansFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "FROM_ME", "AND"])->array();
         $loansToFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "TO_ME", "AND"])->array();
-        $number_disponible = ($sum_entrys + $loansToFromMe) - $sum_egress - $loansFromMe;
+        $retirementActiveInvestments = $this->investmentRetirement->consultaSaldoRetirosActivos($this->id, Investment::$InvestmentState["ACTIVED"]);
+        $number_disponible = ($sum_entrys + $loansToFromMe) - $sum_egress - intval($loansFromMe) - $retirementActiveInvestments;
         $data = [
             "allentry" => [
                 "title" => "Total Ingresos",

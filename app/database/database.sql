@@ -292,14 +292,81 @@ create table investments(
     foreign key(id_outflow) references outflows (id_outflow)
 );
 
+create table retirement_investments(
+    id_retirement_investment int not null auto_increment primary key,
+    id_investment int not null,
+    id_user int not null,
+    descripcion text null,
+    retirement_amount float not null default 0,
+    init_date date not null,
+    end_date date not null,
+    real_retribution float not null default 0,
+    created_at datetime not null default CURRENT_TIMESTAMP,
+    foreign key(id_investment) references investments (id_investment)
+);
 create or replace view investments_view as
-SELECT i.*, o.id_user, o.amount, o.description, c.name,
-       (o.amount * ((i.percent_annual_effective / 100) / 12) *
-       (PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM i.end_date), EXTRACT(YEAR_MONTH FROM i.init_date)))) as earn_amount
-FROM investments i
-INNER JOIN outflows o ON o.id_outflow = i.id_outflow
-INNER JOIN users u ON u.id_user = o.id_user
-INNER JOIN categories c ON o.id_category = c.id_category;
+SELECT
+    i.*,
+    o.id_user,
+    o.amount as original_amount,
+    o.amount - COALESCE(a.sum_additional_values, 0) amount,
+    o.description,
+    c.name,
+    COALESCE(a.retirement_real_retribution, 0) as retirement_real_retribution,
+    COALESCE(a.sum_additional_values, 0) AS retirements_amount,
+    (
+        (
+            o.amount - COALESCE(a.sum_additional_values, 0)
+        ) * (
+            (i.percent_annual_effective / 100) / 12
+        ) * (
+            PERIOD_DIFF(
+                EXTRACT(
+                    YEAR_MONTH
+                    FROM
+                        i.end_date
+                ),
+                EXTRACT(
+                    YEAR_MONTH
+                    FROM
+                        i.init_date
+                )
+            )
+        )
+    ) AS earn_amount,
+    (
+        (o.amount) * (
+            (i.percent_annual_effective / 100) / 12
+        ) * (
+            PERIOD_DIFF(
+                EXTRACT(
+                    YEAR_MONTH
+                    FROM
+                        i.end_date
+                ),
+                EXTRACT(
+                    YEAR_MONTH
+                    FROM
+                        i.init_date
+                )
+            )
+        )
+    ) AS earn_amount_all
+FROM
+    investments i
+    INNER JOIN outflows o ON o.id_outflow = i.id_outflow
+    INNER JOIN users u ON u.id_user = o.id_user
+INNER JOIN categories c ON o.id_category = c.id_category
+LEFT JOIN (
+    SELECT
+        id_investment,
+        SUM(retirement_amount) AS sum_additional_values,
+        SUM(real_retribution) AS retirement_real_retribution
+    FROM
+        retirement_investments
+    GROUP BY
+        id_investment
+) AS a ON a.id_investment = i.id_investment;
 
 -- Esta vista no toma como egreso aquellos que son tipo inversion y que se encuentran activos
 CREATE PROCEDURE report_inflows_and_outflows(IN id_user INT)
@@ -327,9 +394,23 @@ BEGIN
         LEFT JOIN
             (SELECT YEAR(o.set_date) AS year,
                     MONTH(o.set_date) AS month,
-                    SUM(CASE WHEN inv.state = 'Activo' THEN 0 ELSE o.amount END) AS outflow
+SUM(
+    CASE
+        WHEN inv.state = 'Activo' THEN COALESCE(sum_retiros, 0)
+        ELSE o.amount
+    END
+) AS outflow
             FROM outflows o
             LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+LEFT JOIN (
+    SELECT
+        id_investment,
+        SUM(retirement_amount) AS sum_retiros
+    FROM
+        retirement_investments
+    GROUP BY
+        id_investment
+) AS ri ON ri.id_investment = inv.id_investment
             WHERE o.id_user = id_user
             GROUP BY YEAR(o.set_date), MONTH(o.set_date)) e
         ON i.year = e.year AND i.month = e.month
@@ -351,15 +432,31 @@ BEGIN
         RIGHT JOIN
             (SELECT YEAR(o.set_date) AS year,
                     MONTH(o.set_date) AS month,
-                    SUM(CASE WHEN inv.state = 'Activo' THEN 0 ELSE o.amount END) AS outflow
-            FROM outflows o
-            LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+        SUM(
+            CASE
+                WHEN inv.state = 'Activo' THEN COALESCE(sum_retiros, 0)
+                ELSE o.amount
+            END
+        ) AS outflow
+                    FROM outflows o
+                    LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+        LEFT JOIN (
+            SELECT
+                id_investment,
+                SUM(retirement_amount) AS sum_retiros
+            FROM
+                retirement_investments
+            GROUP BY
+                id_investment
+        ) AS ri ON ri.id_investment = inv.id_investment
             WHERE o.id_user = id_user
             GROUP BY YEAR(o.set_date), MONTH(o.set_date)) e
         ON i.year = e.year AND i.month = e.month
         ORDER BY year, month
     ) AS inflow_and_outflow
-    ORDER BY year, month;
+ORDER BY
+    year desc,
+    month desc;
 END;
 
 CREATE TABLE cook_tracking (

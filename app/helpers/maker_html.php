@@ -156,6 +156,8 @@ function make_table($head, $fillable, $data, $extra = null)
                         $fecha_entrada = strtotime("{$data[$i]->{$fillable[$k]}} 00:00:00");
                         $bg_expire = $fecha_actual > $fecha_entrada ? "alert-danger" : "alert-success";
                         $string .= "<td class=' alert {$bg_expire}'>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                    } elseif (isset($extra["simple-date-enddate"])) {
+                        $string .= "<td>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
                     } else {
                         if ($fillable[$k] == "end_date") {
                             $x = date_diff_in_months($data[$i]->{$fillable[$k]}, $data[$i]->{$fillable[$k - 1]});
@@ -182,6 +184,8 @@ function make_table($head, $fillable, $data, $extra = null)
                 case "amount":
                 case "total_amount":
                 case "earn_amount":
+                case "retirements_amount":
+                case "retirement_amount":
                 case "real_retribution":
                     $string .= "<td>" . number_price($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
@@ -298,7 +302,8 @@ function wrapper_html($data, $card_body, $is_modal = false)
             $string .= '</div>';
         } else {
             $string .= '<div class="float-right">';
-            $string .= "<a {$attr} href='{$data->active_button["path"]}' class='btn btn-success float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
+            $typeButton = $data->active_button["type"] ? $data->active_button["type"] : 'success';
+            $string .= "<a {$attr} href='{$data->active_button["path"]}' class='btn btn-{$typeButton} float-right'><i class='mdi mdi-plus '></i>{$data->active_button["title"]}</a>";
             $string .= '</div>';
         }
     }
@@ -359,7 +364,7 @@ function js_debugger($text)
 {
     echo "<script>alert(" . $text . ")</script>";
 }
-function card_statistic_component($title, $amount1, $amount2, $amount3 = [])
+function card_statistic_component($title, $amount1, $amount2, $amount3 = [], $msg_detail = '')
 {
     $total = count($amount3) > 0 ? $amount1[1] + $amount3[1] : $amount1[1] + $amount2[1];
     $part = count($amount3) > 0 ? $amount3[1] : $amount2[1];
@@ -383,6 +388,7 @@ function card_statistic_component($title, $amount1, $amount2, $amount3 = [])
         (count($amount3) == 0 ? $percentage : '') . ' </span>
                 ' . (count($amount3) > 0 ? ' - <small data-toggle="tooltip" data-placement="top" title="' . $amount3[0] . '">' . number_price($amount3[1]) . ' ' . $percentage . '</small>' : '') . '
             </h6>
+            <small class="text-muted">' . $msg_detail . '</small>
         </div>
     </div>
 </div>';

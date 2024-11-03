@@ -15,6 +15,10 @@ function calculatePercentageAnualEfective() {
 
 document.addEventListener("DOMContentLoaded", () => {
     formatPrice({
+        target: document.querySelector("#retirement_amount")
+    }, "#number-format");
+
+    formatPrice({
         target: document.querySelector("#real_retribution")
-    });
+    }, "#number-format-2");
 });

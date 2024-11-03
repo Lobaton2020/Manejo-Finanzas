@@ -15,7 +15,7 @@ class Router
 
         $this->params = $this->params ? array_values($this->params) : [];
         $this->params[] = empty($this->params) ? (object) $_POST : $this->params;
-        echo  call_user_func_array([$this->controller, $this->method], $this->params);
+        echo call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
     public function getController($index = 0)

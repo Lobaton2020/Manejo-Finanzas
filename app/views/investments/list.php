@@ -11,7 +11,8 @@ $head = [
     "Riesgo",
     "PAE %",
     "Estimacion COP",
-    "Ganacia Real"
+    "Ganacia Real",
+    "Dinero retirado"
 ];
 $fillable = [
     "id_investment",
@@ -25,12 +26,15 @@ $fillable = [
     "risk_level",
     "percent_annual_effective",
     "earn_amount",
-    "real_retribution"
+    "real_retribution",
+    "retirements_amount"
 ];
 
 $configTable = [
     "use" => "custom",
-    "html" => ' <a class="dropdown-item "  href="' . route("investment/edit/:id_investment") . '" "> Editar </a>
+    "html" => ' <a class="dropdown-item "  href="' . route("investment/retirement/:id_investment") . '" "> Retiro parcial </a>
+                <a class="dropdown-item "  href="' . route("investment/retiremnetList/:id_investment") . '" "> Ver retiros </a>
+                <a class="dropdown-item "  href="' . route("investment/edit/:id_investment") . '" "> Editar </a>
                 <a class="dropdown-item question"  href="' . route("investment/hide/:id_investment") . '"> Quitar </a>
                 ',
     "html-replace" => ["id_investment", 'name'],
@@ -83,7 +87,8 @@ $config = [
             $completed->state,
             ["Monto invertido", $completed->invested_amount],
             ["Monto de ganancia", $completed->earned_amount],
-            ["Monto de ganancia real", $completed->real_retribution]
+            ["Monto de ganancia real", $completed->real_retribution],
+            "Este saldo suma montos retirados de estados diferentes de activo y completado"
         )
     )
 ];

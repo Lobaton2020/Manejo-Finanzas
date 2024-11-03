@@ -1,6 +1,6 @@
-const formatPrice = (e) => {
+const formatPrice = (e, id = "#number-format") => {
     let value = parseInt(e.target.value);
-    let number = document.querySelector("#number-format");
+    let number = document.querySelector(id);
     number.value = "0";
     if (value) {
         let result = (value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');

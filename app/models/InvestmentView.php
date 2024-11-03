@@ -8,9 +8,10 @@ class InvestmentView extends Orm
 
     public function getResumeByState($state)
     {
-        $sql = "select coalesce(sum(amount),0) invested_amount,
+        $fieldSum = $state === Investment::$InvestmentState["COMPLETED"] ? 'original_amount' : 'amount';
+        $sql = "SELECT coalesce(sum({$fieldSum}),0) invested_amount,
             coalesce( sum(earn_amount),0) as earned_amount,
-            coalesce( sum(real_retribution),0) as real_retribution,
+            coalesce( sum(real_retribution + retirement_real_retribution),0) as real_retribution,
             state
             from investments_view
             where state = :state
