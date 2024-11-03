@@ -25,7 +25,7 @@ class InvestmentController extends Controller
 
 
 
-        $retribuition = $this->investmentRetirement->consultaSaldosRetirosNoActivos($this->id)->object();
+        $retribuition = $this->investmentRetirement->consultaSaldosRetirosNoCompletados($this->id)->object();
         $completed->real_retribution += intval($retribuition->real_retribution);
         $completed->invested_amount += intval($retribuition->retirement_amount);
         $options = [

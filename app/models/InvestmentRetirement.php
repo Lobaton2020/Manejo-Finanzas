@@ -6,17 +6,16 @@ class InvestmentRetirement extends Orm
         parent::__construct("retirement_investments");
     }
 
-    public function consultaSaldosRetirosNoActivos($id_user)
+    public function consultaSaldosRetirosNoCompletados($id_user)
     {
         $sql = "SELECT
             sum(x.retirement_amount) as retirement_amount,
             sum(x.real_retribution) as real_retribution
             FROM retirement_investments x
         join investments i on i.id_investment = x.id_investment
-        where x.id_user = :id_user AND i.state NOT IN (:s_active, :s_complete)";
+        where x.id_user = :id_user AND i.state NOT IN (:s_complete)";
         $this->querye($sql);
         $this->bind(":id_user", $id_user);
-        $this->bind(":s_active", Investment::$InvestmentState["ACTIVED"]);
         $this->bind(":s_complete", Investment::$InvestmentState["COMPLETED"]);
         $this->execute();
         return new JSON($this->fetch());

@@ -88,7 +88,10 @@ $config = [
             ["Monto invertido", $completed->invested_amount],
             ["Monto de ganancia", $completed->earned_amount],
             ["Monto de ganancia real", $completed->real_retribution],
-            "Este saldo suma montos retirados de estados diferentes de activo y completado"
+            "Este saldo suma montos retirados de estados diferentes de activo y completado",
+            [
+                "hide-1" => true //Se esconde por que el valor se cacula y al haber retiros va a parecer erroneo, Los retiros no tienen estimacion
+            ]
         )
     )
 ];
