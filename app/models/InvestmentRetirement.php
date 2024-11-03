@@ -13,7 +13,7 @@ class InvestmentRetirement extends Orm
             sum(x.real_retribution) as real_retribution
             FROM retirement_investments x
         join investments i on i.id_investment = x.id_investment
-        where X.id_user = :id_user AND i.state NOT IN (:s_active, :s_complete)";
+        where x.id_user = :id_user AND i.state NOT IN (:s_active, :s_complete)";
         $this->querye($sql);
         $this->bind(":id_user", $id_user);
         $this->bind(":s_active", Investment::$InvestmentState["ACTIVED"]);
@@ -28,7 +28,7 @@ class InvestmentRetirement extends Orm
             sum(x.retirement_amount) as retirement_amount
             FROM retirement_investments x
         join investments i on i.id_investment = x.id_investment
-        where X.id_user = :id_user AND i.state IN (:state)";
+        where x.id_user = :id_user AND i.state IN (:state)";
         $this->querye($sql);
         $this->bind(":id_user", $id_user);
         $this->bind(":state", $state);
