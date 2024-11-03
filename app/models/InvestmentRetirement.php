@@ -11,7 +11,7 @@ class InvestmentRetirement extends Orm
         $sql = "SELECT
             sum(x.retirement_amount) as retirement_amount,
             sum(x.real_retribution) as real_retribution
-            FROM finanzas.retirement_investments x
+            FROM retirement_investments x
         join investments i on i.id_investment = x.id_investment
         where X.id_user = :id_user AND i.state NOT IN (:s_active, :s_complete)";
         $this->querye($sql);
@@ -26,7 +26,7 @@ class InvestmentRetirement extends Orm
     {
         $sql = "SELECT
             sum(x.retirement_amount) as retirement_amount
-            FROM finanzas.retirement_investments x
+            FROM retirement_investments x
         join investments i on i.id_investment = x.id_investment
         where X.id_user = :id_user AND i.state IN (:state)";
         $this->querye($sql);

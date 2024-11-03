@@ -394,23 +394,23 @@ BEGIN
         LEFT JOIN
             (SELECT YEAR(o.set_date) AS year,
                     MONTH(o.set_date) AS month,
-SUM(
-    CASE
-        WHEN inv.state = 'Activo' THEN COALESCE(sum_retiros, 0)
-        ELSE o.amount
-    END
-) AS outflow
-            FROM outflows o
-            LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
-LEFT JOIN (
-    SELECT
-        id_investment,
-        SUM(retirement_amount) AS sum_retiros
-    FROM
-        retirement_investments
-    GROUP BY
-        id_investment
-) AS ri ON ri.id_investment = inv.id_investment
+        SUM(
+            CASE
+                WHEN inv.state = 'Activo' THEN COALESCE(sum_retiros, 0)
+                ELSE o.amount
+            END
+        ) AS outflow
+                    FROM outflows o
+                    LEFT JOIN investments inv ON inv.id_outflow = o.id_outflow
+        LEFT JOIN (
+            SELECT
+                id_investment,
+                SUM(retirement_amount) AS sum_retiros
+            FROM
+                retirement_investments
+            GROUP BY
+                id_investment
+        ) AS ri ON ri.id_investment = inv.id_investment
             WHERE o.id_user = id_user
             GROUP BY YEAR(o.set_date), MONTH(o.set_date)) e
         ON i.year = e.year AND i.month = e.month
