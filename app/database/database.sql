@@ -369,6 +369,7 @@ LEFT JOIN (
 ) AS a ON a.id_investment = i.id_investment;
 
 -- Esta vista no toma como egreso aquellos que son tipo inversion y que se encuentran activos
+drop PROCEDURE report_inflows_and_outflows:
 CREATE PROCEDURE report_inflows_and_outflows(IN id_user INT)
 BEGIN
     SELECT
@@ -455,8 +456,8 @@ BEGIN
         ORDER BY year, month
     ) AS inflow_and_outflow
 ORDER BY
-    year desc,
-    month desc;
+    year,
+    month;
 END;
 
 CREATE TABLE cook_tracking (
