@@ -7,7 +7,6 @@ class MainController extends Controller
     private $budgetView;
     private $budget;
     private $moneyLoan;
-    private $investmentRetirement;
 
     public function __construct()
     {
@@ -19,8 +18,6 @@ class MainController extends Controller
         $this->budgetView = $this->model("budgetView");
         $this->budget = $this->model("budget");
         $this->moneyLoan = $this->model("moneyLoan");
-        $this->investmentRetirement = $this->model("investmentRetirement");
-        $this->model("investment");
     }
 
 
@@ -39,8 +36,7 @@ class MainController extends Controller
         $budgetView = $this->budgetView->get("*", ["date[=]" => date('Y-m-01'), "id_user[=]" => $this->id, "AND"])->array();
         $loansFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "FROM_ME", "AND"])->array();
         $loansToFromMe = $this->moneyLoan->sum("total", ["id_user[=]" => $this->id, "status[is not]" => null, "type[=]" => "TO_ME", "AND"])->array();
-        $retirementActiveInvestments = $this->investmentRetirement->consultaSaldoRetirosActivos($this->id, Investment::$InvestmentState["ACTIVED"]);
-        $number_disponible = ($sum_entrys + $loansToFromMe) - $sum_egress - intval($loansFromMe) - $retirementActiveInvestments;
+        $number_disponible = ($sum_entrys + $loansToFromMe) - $sum_egress - intval($loansFromMe);
         $data = [
             "allentry" => [
                 "title" => "Total Ingresos",
