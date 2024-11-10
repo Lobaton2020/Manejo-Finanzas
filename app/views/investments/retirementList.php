@@ -24,6 +24,10 @@ $configTable = [
     "redirect" => "investment",
     "properties" => [
         "data-type" => "datatable-state-asc"
+    ],
+    "row-sums" => [
+        "retirement_amount",
+        "real_retribution",
     ]
 ];
 $card_body = renderMessage("success");

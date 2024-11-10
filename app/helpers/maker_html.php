@@ -19,6 +19,39 @@ function renderJumbotron($data, $title, $path = null)
     }
 }
 
+function make_table_tfoot($listData, $columns, $fillable)
+{
+    if (empty($columns) || count($listData) == 0) {
+        return '';
+    }
+    $totals = array_fill_keys($columns, 0);
+    foreach ($listData as $data) {
+        foreach ($columns as $column) {
+            if (isset($data->$column)) {
+                $totals[$column] += $data->$column;
+            }
+        }
+    }
+    $tfoot = "<tfoot><tr>";
+    $counter = 0;
+    foreach ($fillable as $column) {
+        // dd($column);
+        if (!isset($totals[$column]) && $counter != 0) {
+            $tfoot .= $counter == 1 ? "<td><strong>Sumatoria: </strong></td>" : "<td></td>";
+            $counter++;
+            continue;
+        }
+        if (isset($totals[$column])) {
+            $tfoot .= "<td>" . number_price($totals[$column]) . "</td>";
+        }
+        $counter++;
+    }
+    $tfoot .= "</tr></tfoot>";
+
+    return $tfoot;
+}
+
+
 
 
 //    $head = ["#", "Descripcion", "Total", "Fecha"];
@@ -249,6 +282,7 @@ function make_table($head, $fillable, $data, $extra = null)
         $string .= "</tr>";
     }
     $string .= "</tbody>";
+    $string .= make_table_tfoot($data, isset($extra["row-sums"]) ? $extra["row-sums"] : [], $fillable);
     $string .= "</table>";
     $string .= "</div>";
     return $string;
