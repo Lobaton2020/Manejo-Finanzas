@@ -28,7 +28,8 @@ $configTable = [
     "row-sums" => [
         "retirement_amount",
         "real_retribution",
-    ]
+    ],
+    "row-sums-consolidate" => true
 ];
 $card_body = renderMessage("success");
 $card_body .= renderMessage("info");

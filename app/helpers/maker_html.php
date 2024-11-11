@@ -19,7 +19,7 @@ function renderJumbotron($data, $title, $path = null)
     }
 }
 
-function make_table_tfoot($listData, $columns, $fillable)
+function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado)
 {
     if (empty($columns) || count($listData) == 0) {
         return '';
@@ -34,8 +34,8 @@ function make_table_tfoot($listData, $columns, $fillable)
     }
     $tfoot = "<tfoot><tr>";
     $counter = 0;
+    $sumatoria = 0;
     foreach ($fillable as $column) {
-        // dd($column);
         if (!isset($totals[$column]) && $counter != 0) {
             $tfoot .= $counter == 1 ? "<td><strong>Sumatoria: </strong></td>" : "<td></td>";
             $counter++;
@@ -43,11 +43,35 @@ function make_table_tfoot($listData, $columns, $fillable)
         }
         if (isset($totals[$column])) {
             $tfoot .= "<td>" . number_price($totals[$column]) . "</td>";
+            $sumatoria += $totals[$column];
         }
         $counter++;
     }
-    $tfoot .= "</tr></tfoot>";
+    $tfoot .= "</tr>";
+    $counter = 0;
+    if ($allowConsolidado) {
+        $tfoot .= "<tr style=\"background: #b2ffbf\">";
+        foreach ($fillable as $column) {
+            if ($counter == 0) {
+                $tfoot .= "<td ><strong>Consolidado total: </strong></td>";
+                $counter++;
+                continue;
+            }
+            if ($counter == 1) {
+                $counter++;
+                continue;
+            }
+            if (count($fillable) == ($counter + 1)) {
+                $tfoot .= "<td> <b>" . number_price($sumatoria) . "</b></td>";
+            } else {
+                $tfoot .= "<td ></td>";
+            }
+            $counter++;
+        }
+        $tfoot .= "</tr>";
+    }
 
+    $tfoot .= "</tfoot>";
     return $tfoot;
 }
 
@@ -282,7 +306,9 @@ function make_table($head, $fillable, $data, $extra = null)
         $string .= "</tr>";
     }
     $string .= "</tbody>";
-    $string .= make_table_tfoot($data, isset($extra["row-sums"]) ? $extra["row-sums"] : [], $fillable);
+    $allowConsolidado = isset($extra["row-sums-consolidate"]) ? $extra["row-sums-consolidate"] : false;
+    $rowsToSum = isset($extra["row-sums"]) ? $extra["row-sums"] : [];
+    $string .= make_table_tfoot($data, $rowsToSum, $fillable, $allowConsolidado);
     $string .= "</table>";
     $string .= "</div>";
     return $string;
