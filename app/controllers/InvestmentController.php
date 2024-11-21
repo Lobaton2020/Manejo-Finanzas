@@ -24,8 +24,9 @@ class InvestmentController extends Controller
         $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
 
         foreach ($data as &$item) {
-            if ($item->state === Investment::$InvestmentState["COMPLETED"]) {
+            if ($item->state !== Investment::$InvestmentState["ACTIVED"]) {
                 $item->amount = $item->original_amount;
+                $item->earn_amount = $item->earn_amount_all;
             }
         }
 
