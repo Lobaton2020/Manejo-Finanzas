@@ -23,6 +23,11 @@ class InvestmentController extends Controller
         $actived = $this->investmentView->getResumeByState(Investment::$InvestmentState["ACTIVED"])->object();
         $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
 
+        foreach ($data as &$item) {
+            if ($item->state === Investment::$InvestmentState["COMPLETED"]) {
+                $item->amount = $item->original_amount;
+            }
+        }
 
 
         $retribuition = $this->investmentRetirement->consultaSaldosRetirosNoCompletados($this->id)->object();
