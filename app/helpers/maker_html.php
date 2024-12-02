@@ -259,7 +259,7 @@ function make_table($head, $fillable, $data, $extra = null)
                 case "real_retribution":
                     $string .= "<td>" . number_price($data[$i]->{$fillable[$k]});
                     if (isset($extra["show-percentage-real-retribution"])) {
-                        $string .= "<small class='text-info'> " . calculatePercentageAnualEfectiveWithParams($data[$i]) . "</small>";
+                        $string .= "<small class='text-small'> " . calculatePercentageAnualEfectiveWithParams($data[$i]) . "</small>";
                     }
                     $string .= "</td>";
                     break;
