@@ -3,9 +3,8 @@ function calculatePercentageAnualEfective() {
     if (isNaN(monto)) return
     const ganancia = parseFloat(prompt("Ingrese el valor de ganancia:"));
     if (isNaN(ganancia)) return
-    const dias = parseInt(prompt("Ingrese el número de días:"));
-    if (isNaN(dias)) return
-    const meses = dias / 30; // Convertir los días a meses
+    const meses = parseInt(prompt("Ingrese el numero de meses:"));
+    if (isNaN(meses)) return
 
     const pea = Math.pow((monto + ganancia) / monto, 12 / meses) - 1;
 
