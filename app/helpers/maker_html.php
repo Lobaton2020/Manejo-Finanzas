@@ -77,6 +77,17 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado)
 
 
 
+function calculatePercentageAnualEfectiveWithParams($item)
+{
+    try {
+        $meses = date_diff_in_months($item->init_date, $item->end_date);
+        $monto = floatval($item->original_amount);
+        $pea = pow(($monto + $item->real_retribution) / $monto, 12 / $meses) - 1;
+        return number_format($pea * 100, 1) . "%";
+    } catch (Exception $e) {
+        return "" . $e->getMessage();
+    }
+}
 
 //    $head = ["#", "Descripcion", "Total", "Fecha"];
 //    $fillable = ["id_inflow", "description", "total", "create_at"];
@@ -243,8 +254,14 @@ function make_table($head, $fillable, $data, $extra = null)
                 case "earn_amount":
                 case "retirements_amount":
                 case "retirement_amount":
-                case "real_retribution":
                     $string .= "<td>" . number_price($data[$i]->{$fillable[$k]}) . "</td>";
+                    break;
+                case "real_retribution":
+                    $string .= "<td>" . number_price($data[$i]->{$fillable[$k]});
+                    if (isset($extra["show-percentage-real-retribution"])) {
+                        $string .= "<small class='text-info'> " . calculatePercentageAnualEfectiveWithParams($data[$i]) . "</small>";
+                    }
+                    $string .= "</td>";
                     break;
                 case "percent_annual_effective":
                     $string .= "<td>" . number_percentage($data[$i]->{$fillable[$k]}) . "</td>";

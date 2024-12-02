@@ -56,7 +56,8 @@ $configTable = [
     ],
     "properties" => [
         "data-type" => "datatable-state-asc"
-    ]
+    ],
+    "show-percentage-real-retribution" => true
 ];
 $card_body = renderMessage("success");
 $card_body .= renderMessage("info");
