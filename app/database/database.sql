@@ -479,6 +479,16 @@ ALTER TABLE
 ADD
     title varchar(255) NULL;
 
+CREATE TABLE moneyloan_notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_money_loan INT NULL,
+    email VARCHAR(255) NULL,
+    username VARCHAR(255) NULL,
+    is_active BOOLEAN NULL,
+    is_subscription BOOLEAN NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
+    FOREIGN KEY (id_money_loan) REFERENCES moneyloans(id_money_loan)
+);
 update
     cook_tracking
 set

@@ -2,11 +2,11 @@
 
 $head = ["#", "Tipo", "Descripcion", "Total prestado", "Estado", "Fecha Devolucion", "Creado"];
 $fillable = ["id_money_loan", "type", "description", "total", "status", "set_date", "create_at"];
-
 $data = [
+    "use" => "custom",
+    "html" => require URL_APP . "/views/loans/custom/options.php",
+    "html-replace" => ["id_money_loan"],
     "redirect" => "moneyLoan",
-    "use" => "delete",
-    "btn_delete_delete" => "delete",
     "verify-date-before" => "true"
 ];
 
@@ -25,4 +25,4 @@ $config = [
     ]
 ];
 
-echo wrapper_html($config, $card_body);
+echo wrapper_html($config, $card_body, false);

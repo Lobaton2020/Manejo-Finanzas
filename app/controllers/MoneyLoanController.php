@@ -3,12 +3,15 @@
 class MoneyLoanController extends Controller
 {
     private $model;
+    private $modelListener;
     public function __construct()
     {
         parent::__construct();
         countVisits($this->model("countVisit"), $this->id);
         $this->authentication();
         $this->model = $this->model("moneyLoan");
+        $this->modelListener = $this->model("moneyLoanListener");
+
     }
 
     public function index()
@@ -23,7 +26,44 @@ class MoneyLoanController extends Controller
     public function create()
     {
         return view("loans.create");
+
     }
+    public function createListenerNotification($id)
+    {
+        $listener = $this->modelListener->select("*", ["id_money_loan[=]" => $id])->firstElement();
+        $default = new stdClass();
+        $default->id = 0;
+        $default->id_money_loan = 0;
+        $default->email = '';
+        $default->username = '';
+        $default->is_active = false;
+        $default->is_subscription = false;
+        return view("loans.createListenerNotification", ["listener" => isset($listener) ? $listener : $default, "idMoneyLoan" => $id]);
+
+    }
+
+    public function storeListener($idMoneyLoan, $id = 0)
+    {
+        return execute_post(function ($request) use ($idMoneyLoan, $id) {
+            try {
+                if (arrayEmpty(["is_subscription", "username", "email", "is_active", "type"], $request)) {
+                    return redirect("moneyLoan/createListenerNotification/" . $idMoneyLoan)->with("error", "Lo sentimos, llena todos los campos");
+                }
+                $listener = $this->modelListener->select("*", ["id[=]" => $id])->firstElement();
+                if ($listener) {
+                    $this->modelListener->update((array) $request, ["id[=]" => $id]);
+                    return redirect("moneyLoan")->with("success", "Notificacion actualizada correctamente");
+                }
+                $data = (array) $request;
+                $data["id_money_loan"] = $idMoneyLoan;
+                $this->modelListener->insert($data);
+                return redirect("moneyLoan")->with("success", "Notificacion creada correctamente");
+            } catch (Exception $e) {
+                return redirect("moneyLoan")->with("error", "Lo sentimos, no se pudo crear el Notificacion: " . $e->getMessage());
+            }
+        });
+    }
+
 
     public function store()
     {
