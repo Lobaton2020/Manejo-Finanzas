@@ -489,6 +489,10 @@ CREATE TABLE moneyloan_notifications (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NULL,
     FOREIGN KEY (id_money_loan) REFERENCES moneyloans(id_money_loan)
 );
+ALTER TABLE
+    moneyloan_notifications
+ADD
+    executed_at DATE DEFAULT CURRENT_DATE NOT NULL;
 update
     cook_tracking
 set
