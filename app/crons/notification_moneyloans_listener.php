@@ -66,7 +66,7 @@ try {
                     : "¡Recordatorio amable! Tu crédito esta pendiente de pago";
         $payload = [
             "from" => "Andres Lobaton <onboarding@resend.dev>",
-            "to" => ["andrespipe021028@gmail.com", $notification->email_to],
+            "to" => [$notification->email_to],
             "subject" => $subject,
             "template" => $template,
             "payload_template" => [
