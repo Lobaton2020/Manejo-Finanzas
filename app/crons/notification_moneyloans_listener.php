@@ -20,9 +20,9 @@ function formatSubscriptionDay($date) {
     $day = date('j', strtotime($date));
     return "el $day del presente mes";
 }
-
-function httpRequesPost($url, $data) {
-    $ch = curl_init($url);
+function httpRequestPost($url, $data)
+{
+    $ch = curl_init(trim($url));
 
     $payload = json_encode($data);
 
@@ -38,13 +38,22 @@ function httpRequesPost($url, $data) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    $curlErrNo = curl_errno($ch);
 
-    if (curl_errno($ch) || $httpCode > 299) {
-        throw new Exception('Request Error: ' . curl_error($ch) . $response);
-    }
+    $debugInfo = [
+        'url' => $url,
+        'payload' => $data,
+        'http_code' => $httpCode,
+        'curl_error' => $curlError,
+        'response' => $response,
+    ];
 
     curl_close($ch);
 
+    if ($curlErrNo || $httpCode >= 400) {
+        throw new Exception("HTTP Request failed:\n" . print_r($debugInfo, true));
+    }
 
     return $response;
 }
@@ -65,8 +74,8 @@ try {
                     ? "¡Tienes un pago pendiente! Recordatorio de renovación de suscripción"
                     : "¡Recordatorio amable! Tu crédito esta pendiente de pago";
         $payload = [
-            "from" => "Andres Lobaton <onboarding@resend.dev>",
-            "to" => [$notification->email_to],
+            "from" => "Andres Lobaton <noreply@" . $_ENV["DOMAIN_EMAIL"] . ">",
+            "to" => ["andrespipe021028+copy@gmail.com", $notification->email_to],
             "subject" => $subject,
             "template" => $template,
             "payload_template" => [
@@ -79,7 +88,7 @@ try {
         if($notification->is_subscription) {
             $payload["payload_template"]["nombre_servicio"] = "Youtube premium";
         }
-        $response = httpRequesPost($_ENV["URL_EMAIL_NOTIFIER_MS"], $payload);
+        $response = httpRequestPost($_ENV["URL_EMAIL_NOTIFIER_MS"], $payload);
 
         $moneyLoanListener->actualizarUltimoLlamado($notification->id);
         array_push($ids, $notification->id);
