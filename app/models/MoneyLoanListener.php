@@ -19,7 +19,7 @@ class MoneyLoanListener extends Orm
                 mn.executed_at
             FROM moneyloan_notifications mn
             JOIN moneyloans m ON m.id_money_loan = mn.id_money_loan
-            WHERE is_active = true  AND (
+            WHERE is_active = true AND m.status = true  AND (
                 is_subscription = 0
                 and executed_at is null
                 OR executed_at <> set_date
