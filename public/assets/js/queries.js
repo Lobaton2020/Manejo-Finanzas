@@ -100,7 +100,7 @@ const drawTable = (elem, data) => {
         let tr = document.createElement("tr")
         info.forEach(item => {
             let th = document.createElement("th")
-            th.textContent = item
+            th.innerHTML = item
             tr.appendChild(th)
         });
         thead.appendChild(tr)
@@ -108,7 +108,7 @@ const drawTable = (elem, data) => {
     };
     const evalToNumberFormat = (number) => {
         let num = String(number)
-        if (num.length > 3) {
+        if (Number(num) === Number(num)) {
             if (!isNaN(parseFloat(number))) {
                 num = parseFloat(num)
                 return new Intl.NumberFormat("de-DE").format(num)
