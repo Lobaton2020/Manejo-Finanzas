@@ -64,6 +64,26 @@ $card_body .= renderMessage("info");
 $card_body .= renderMessage("error");
 $card_body .= renderJumbotron($data, "Parece que no hay ninguna inversion actualmente.");
 
+function pie_charts(){
+    return ' <div class="col-xl-6">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <h4 class="mt-0 header-title">Porfafolio de inversion</h4>
+                <div id="simple-pie-porfolio" class="ct-chart ct-golden-section simple-pie-chart-chartist"></div>
+            </div>
+        </div>
+    </div>
+     <div class="col-xl-6">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <h4 class="mt-0 header-title">Nivel de riesgo</h4>
+                <div id="simple-pie-risk" class="ct-chart ct-golden-section simple-pie-chart-chartist"></div>
+            </div>
+        </div>
+    </div>
+    ';
+}
+
 $card_body .= make_table($head, $fillable, $data, $configTable);
 $config = [
     "title" => "Listado de inversiones hechas",
@@ -93,7 +113,8 @@ $config = [
             [
                 "hide-1" => true //Se esconde por que el valor se cacula y al haber retiros va a parecer erroneo, Los retiros no tienen estimacion
             ]
-        )
+        ),
+        pie_charts(),
     )
 ];
 

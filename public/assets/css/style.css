@@ -35,3 +35,17 @@
   top: 0;
   right: 0;
 }
+
+.ct-chart .ct-series.ct-series-d .ct-bar, .ct-chart .ct-series.ct-series-d .ct-line, .ct-chart .ct-series.ct-series-d .ct-point, .ct-chart .ct-series.ct-series-d .ct-slice-donut
+{
+  stroke:red !important;
+}
+
+.ct-series-b .ct-area, .ct-series-b .ct-slice-donut-solid, .ct-series-b .ct-slice-pie
+{
+  fill:#59c6fb !important;
+}
+
+.ct-series-c .ct-area, .ct-series-c .ct-slice-donut-solid, .ct-series-c .ct-slice-pie {
+  fill:#ecb3b3 !important;
+}

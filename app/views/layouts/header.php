@@ -24,6 +24,9 @@
     <link href="<?php echo URL_ASSETS ?>assets/template/css/style.css" rel="stylesheet" type="text/css">
     <link href="<?php echo URL_ASSETS ?>assets/css/style.css" rel="stylesheet" type="text/css">
 
+    <link href="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/css/chartist.min.css" rel="stylesheet" type="text/css">
+    <link href="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/css/chartist-plugin-tooltip.min.css" rel="stylesheet" type="text/css">
+
     <link href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script type="text/javascript">

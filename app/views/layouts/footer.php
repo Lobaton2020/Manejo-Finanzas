@@ -36,6 +36,9 @@
 <script src="<?php echo URL_ASSETS ?>assets/template/pages/dashboard.init.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/RWD-Table-Patterns/dist/js/rwd-table.min.js"></script>
 
+<!-- Chartist -->
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/js/chartist.min.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/js/chartist-plugin-tooltip.min.js"></script>
 
 <!-- Datatable init js -->
 <script src="<?php echo URL_ASSETS ?>assets/template/pages/datatables.init.js"></script>
