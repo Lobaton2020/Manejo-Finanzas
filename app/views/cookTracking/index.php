@@ -50,7 +50,7 @@
                                                     <div id=''>
                                                         <h4 class="m-b-15 font-14">Facturacion</h4>
                                                         <label>Valor unitario</label>
-                                                        <input disabled value="12.000" class="form-control"
+                                                        <input value="12.000" class="form-control"
                                                             id="valor-unitario">
                                                         <label>Total a pagar:</label>
                                                         <input disabled value="0" class="form-control" id="valor-total">

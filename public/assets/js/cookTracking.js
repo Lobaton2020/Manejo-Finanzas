@@ -252,7 +252,25 @@ const mostrarModalDetalleData = async () => {
     }).join('______________________________\r\n'));
     $('#detalle-tarea > textarea').css('height', '550');
 }
-//init
+// Function to manage input value with localStorage
+function setupValorUnitario() {
+    const input = document.getElementById('valor-unitario');
+    const storageKey = 'valorUnitario';
+    const defaultValue = '15.000';
+
+    // Set initial value from localStorage or default
+    const savedValue = localStorage.getItem(storageKey) || defaultValue;
+    input.value = savedValue;
+
+    // Save to localStorage when input changes
+    input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        localStorage.setItem(storageKey, value);
+    });
+}
+
+//Init
+// Initialize the calendar page
 $.CalendarPage = new CalendarPage, $.CalendarPage.Constructor = CalendarPage
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -260,6 +278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const newUrl = window.location.pathname;
         window.history.pushState({ path: newUrl }, '', newUrl);
         $("#resumen_p_mes").click(mostrarModalDetalleData)
+        setupValorUnitario();
         await $.CalendarPage.init()
     } catch (error) {
         console.log("ERROR CALENDARIO", error)
