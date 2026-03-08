@@ -199,6 +199,31 @@ class BudgetController extends Controller
             return redirect($this->pathSub . $id_budget)->with("error", "El estado no pertenece a los tuyos.");
         }
     }
+    public function update_element()
+    {
+        execute_post(function ($request) {
+            if (!isset($request->id_temporal_budget_outflow) || !isset($request->id_temporal_budget)) {
+                return redirect($this->path)->with("error", "Parametros invalidos");
+            }
+            if (arrayEmpty(["amount"], $request)) {
+                return redirect($this->pathSub . $request->id_temporal_budget)->with("error", "El monto es requerido.");
+            }
+            $cond = ["id_user[=]" => $this->id, "id_temporal_budget_outflow[=]" => $request->id_temporal_budget_outflow, "AND"];
+            if (!$this->temporalBudgetOutflow->has($cond)->array()) {
+                return redirect($this->pathSub . $request->id_temporal_budget)->with("error", "El elemento no pertenece a tus presupuestos.");
+            }
+            $data = [
+                "amount" => $request->amount,
+                "description" => is_correct($request->description),
+                "update_at" => getCurrentDatetime()
+            ];
+            if ($this->temporalBudgetOutflow->update($data, $cond)->array()) {
+                return redirect($this->pathSub . $request->id_temporal_budget)->with("success", "Elemento actualizado correctamente.");
+            } else {
+                return redirect($this->pathSub . $request->id_temporal_budget)->with("error", "No se pudo actualizar el elemento.");
+            }
+        });
+    }
     public function delete($id)
     {
         $cond = ["id_user[=]" => $this->id, "id_temporal_budget[=]" => $id, "AND"];
