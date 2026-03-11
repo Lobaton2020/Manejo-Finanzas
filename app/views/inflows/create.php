@@ -18,7 +18,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card m-b-30">
+                    <div class="bg-dark-800 rounded-lg border border-dark-700 p-4">
                         <div class="card-body">
                             <h4 class="mt-0 header-title text-center">Crear entrada de dinero</h4>
                             <?php echo renderMessage("error") ?>
@@ -31,7 +31,7 @@
                                         <?php else : ?>
                                             <div class="form-group">
                                                 <label for="inflow_type">Tipo de entrada del dinero <span class="text-danger">*</span></label>
-                                                <select class="form-control " name="id_inflow_type" id="inflow_type" required>
+                                                <select class="form-control bg-dark-700 border-dark-600 text-white" name="id_inflow_type" id="inflow_type" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($inflow_types  as $inflow_type) : ?>
                                                         <option value="<?php echo $inflow_type->id_inflow_type ?>"><?php echo $inflow_type->name ?></option>
@@ -44,24 +44,24 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto a registrar <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="text" name="total" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000">
+                                                    <input onkeyup="formatPrice(event)" type="text" name="total" id="total" class="form-control bg-dark-700 border-dark-600 text-white" required="" parsley-type="email" placeholder="ej: 2000000">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
-                                                    <input id="number-format" type="text" readonly class="form-control" value="ej: 2,000,000.00">
+                                                    <input id="number-format" type="text" readonly class="form-control bg-dark-700 border-dark-600 text-white" value="ej: 2,000,000.00">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>Descripcion</label>
                                             <div>
-                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="1"></textarea>
+                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control bg-dark-700 border-dark-600 text-white" rows="1"></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
-                                                <input type="date" class="form-control" value=<?= date('Y-m-d') ?> name="set_date" required="" placeholder="Pon la fecha">
+                                                <input type="date" class="form-control bg-dark-700 border-dark-600 text-white" value=<?= date('Y-m-d') ?> name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
 
@@ -69,7 +69,7 @@
                                     <div class="col-md-4">
                                         <h6>Depositos:</h6>
                                         <div class="text-right">
-                                            <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal"><i class="mdi mdi-plus "></i> Nuevo deposito </button>
+                                            <button type="button" class="px-4 py-2 rounded-lg bg-primary-600 text-white" data-toggle="modal" data-target="#myModal"><i class="mdi mdi-plus"></i> Nuevo deposito </button>
                                         </div>
                                         <div id="empty">
                                             <?php if (empty($porcents)) : ?>
@@ -85,7 +85,7 @@
                                                     <div class="form-group col-6">
                                                         <label for="total"><?php echo $porcent->name ?> <span class="text-danger">*</span></label>
                                                         <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]"
-                                                                class="porcents form-control porcent-forms-ref" required="" parsley-type="email"
+                                                                class="porcents form-control bg-dark-700 border-dark-600 text-white porcent-forms-ref" required="" parsley-type="email"
                                                                 placeholder="ej: <?php echo rand(1, 60) ?>">
                                                         </div>
                                                         <div class="form-group col-6">
@@ -114,10 +114,10 @@
                                 </div>
                                 <div class="form-group">
                                     <div>
-                                        <button type="submit" class="btn btn-success waves-effect waves-light float-right">
+                                        <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white float-right">
                                             Enviar datos
                                         </button>
-                                        <a href="<?php echo route("inflow") ?>" class="btn btn-secondary waves-effect m-l-5">
+                                        <a href="<?php echo route("inflow") ?>" class="px-4 py-2 rounded-lg bg-dark-600 text-white m-l-5">
                                             Regresar
                                         </a>
                                     </div>
@@ -141,14 +141,14 @@
                                                 <div class="form-group">
                                                     <label>Nuevo deposito: <span class="text-danger">*</span></label>
                                                     <div>
-                                                        <input type="text" class="form-control" name="name" required="" placeholder="Agrega el nombre">
+                                                        <input type="text" class="form-control bg-dark-700 border-dark-600 text-white" name="name" required="" placeholder="Agrega el nombre">
                                                     </div>
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
-                                            <button type="submit" form="form-item" class="btn btn-primary waves-effect waves-light">Guardar</button>
+                                        <button type="button" class="px-4 py-2 rounded-lg bg-dark-600 text-white" data-dismiss="modal">Cerrar</button>
+                                        <button type="submit" form="form-item" class="px-4 py-2 rounded-lg bg-primary-600 text-white">Guardar</button>
                                         </div>
                                     </div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->

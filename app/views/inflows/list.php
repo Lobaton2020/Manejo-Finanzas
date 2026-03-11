@@ -1,103 +1,82 @@
-<div class="content-page">
-    <div class="content">
-        <div class="container-fluid">
-            <div class="page-title-box">
-                <div class="row align-items-center">
-                    <div class="col-sm-6">
-                        <h4 class="page-title">Finanzas</h4>
+<div class="p-6 ml-64">
+    <div class="container-fluid px-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h4 class="text-2xl font-bold text-white">Finanzas</h4>
+            </div>
+            <div>
+                <ol class="flex items-center space-x-2 text-dark-400">
+                    <li><a href="javascript:void(0);" class="text-dark-300 hover:text-primary-400">Inicio</a></li>
+                    <li class="text-dark-500">/</li>
+                    <li><a href="javascript:void(0);" class="text-dark-300 hover:text-primary-400">Finanzas</a></li>
+                    <li class="text-dark-500">/</li>
+                    <li class="text-primary-400">Listado</li>
+                </ol>
+            </div>
+        </div>
+
+                        <div class="bg-dark-800 rounded-lg border border-dark-700">
+                            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-xl font-bold text-white mb-1">Listado de entradas de dinero</h4>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Finanzas</a></li>
-                            <li class="breadcrumb-item active">Listado</li>
-                        </ol>
+                    <div>
+                        <a href="<?php echo route("inflow/create") ?>" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg">
+                            <i class="mdi mdi-plus"></i>
+                            Añadir Ingresos
+                        </a>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card m-b-30">
-                        <div class="m-3">
-                            <div class="float-left">
-                                <h4 class="mt-0  mb-3 header-title ">Listado de entradas de dinero</h4>
-                            </div>
-                            <div class="float-right">
-                                <a href="<?php echo route("inflow/create") ?>" class="btn btn-success float-right"><i class="mdi mdi-plus "></i> Añadir Ingresos</a>
+
+                <?php echo renderMessage("success") ?>
+                <?php echo renderJumbotron($inflows, "No se ha encontrado ingresos", "inflow/create") ?>
+                
+                <div>
+                    <?php foreach ($inflows as $inflow) : ?>
+                        <div id="accordion-<?php echo $inflow->id_inflow ?>" class="mb-4">
+                            <div class="bg-dark-700 rounded-lg overflow-hidden border border-dark-600">
+                                <div class="card-header bg-dark-700 p-4 cursor-pointer" data-toggle="collapse" data-parent="#accordion-<?php echo $inflow->id_inflow ?>" href="#collapse-<?php echo $inflow->id_inflow ?>" aria-expanded="false" aria-controls="collapseThree" id="headingThree">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <h5 class="text-white font-medium">
+                                                <?php echo $inflow->inflow_type->name ?>
+                                            </h5>
+                                            <span class="px-3 py-1 bg-primary-600 rounded-full text-white text-sm">
+                                                <?php echo number_price($inflow->total) ?>
+                                            </span>
+                                            <span class="text-dark-400 text-sm"><?php echo format_date($inflow->set_date, false) ?></span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <span class="text-dark-500 text-sm"><?php echo time_ago($inflow->create_at) ?></span>
+                                            <i class="mdi mdi-menu-down-outline mdi-24px text-primary-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="collapse-<?php echo $inflow->id_inflow ?>" class="collapse bg-dark-800 p-4" aria-labelledby="headingThree" data-parent="#accordion-<?php echo $inflow->id_inflow ?>">
+                                    <h4 class="text-white font-bold mb-4">Destinacion del dinero</h4>
+                                    <ul class="space-y-3">
+                                        <?php foreach ($inflow->detail as $detail) : ?>
+                                            <li class="pb-2 border-b border-dark-700">
+                                                <p class="text-dark-300 mb-1"><?php echo $detail->porcents->name ?></p>
+                                                <p class="text-white"><?php echo number_price($detail->value) ?> <strong class="text-primary-400"><?php echo $detail->porcent ?>%</strong></p>
+                                            </li>
+                                        <?php endforeach; ?>
+                                        <?php if (empty($inflow->detail)) : ?>
+                                            <p class="text-dark-400">Parece que no te propusiste metas de organizacion</p>
+                                        <?php endif; ?>
+                                    </ul>
+                                    <?php if (!empty($inflow->description)) : ?>
+                                        <hr class="border-dark-600 my-4">
+                                        <p class="text-dark-300"><?php echo $inflow->description ?></p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <?php echo renderMessage("success") ?>
-                            <?php echo renderJumbotron($inflows, "No se ha encontrado ingresos", "inflow/create") ?>
-                            <div>
-                                <?php foreach ($inflows as $inflow) : ?>
-                                    <div id="accordion-<?php echo $inflow->id_inflow ?>">
-                                        <div class="card mb-0">
-                                            <div class="card-header" data-toggle="collapse" data-parent="#accordion-<?php echo $inflow->id_inflow ?>" href="#collapse-<?php echo $inflow->id_inflow ?>" aria-expanded="false" aria-controls="collapseThree" id="headingThree">
-                                                <h5 class="mb-0 mt-0 font-14">
-                                                    <a class="collapsed text-dark">
-                                                        <div class="my-0 float-left">
-                                                            <h5 class="d-inline"><?php echo $inflow->inflow_type->name ?></h5>
-                                                            <p class="d-inline align-center  w-100 p-2 border border-round"> <?php echo number_price($inflow->total) ?> - <?php echo format_date($inflow->set_date, false) ?> </p>
-                                                            <b>
-                                                                <span class="float-right text-green align-center"><i class="mdi mdi-menu-down-outline mdi-24px text-primary    "></i></span>
-                                                            </b>
-                                                        </div>
-                                                        <div class="float-right">
-                                                            <div class="dropdown mo-mb-2 show">
-                                                                <small class="text-muted"><?php echo time_ago($inflow->create_at) ?></small>
-                                                                <!-- <a class="btn btn-default btn-sm" href="#" id="detail-<?php echo $inflow->id_inflow ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                                                    <i style="font-size:19px" class="mdi mdi-dots-horizontal"></i>
-                                                                </a>
-                                                                <div class="dropdown-menu " aria-labelledby="detail-<?php echo $inflow->id_inflow ?>" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);">
-                                                                    <a class="dropdown-item" href="<?php echo route("salary/edit/{$inflow->id_inflow}") ?>">Editar</a>
-                                                                    <a class="dropdown-item" href="<?php echo route("salary/edit/{$inflow->id_inflow}") ?>">Eliminar</a>
-                                                                </div> -->
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </h5>
-                                            </div>
-                                            <div id="collapse-<?php echo $inflow->id_inflow ?>" class="collapse" aria-labelledby="headingThree" data-parent="#accordion-<?php echo $inflow->id_inflow ?>">
-                                                <div class="card-body">
-                                                    <h4 class="mt-0 header-title mb-4">Destinacion del dinero</h4>
-                                                    <ol class="activity-feed mb-0">
-                                                        <?php foreach ($inflow->detail as $detail) : ?>
-                                                            <li class="feed-item pb-1">
-                                                                <p class="mb-1"><?php echo $detail->porcents->name ?></p>
-                                                                <p class="font-15 mt-0 mb-2"><?php echo number_price($detail->value) ?> <b class="font-weight-bold"><?php echo $detail->porcent ?>%</b></p>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                        <?php if (empty($inflow->detail)) : ?>
-                                                            <p class="text-muted">Parece que no te propusiste metas de organizacion</p>
-                                                        <?php endif; ?>
-                                                    </ol>
-                                                    <?php if (!empty($inflow->description)) : ?>
-                                                        <hr>
-                                                        <p class=""><?php echo $inflow->description ?></p>
-                                                    <?php endif; ?>
-
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-
-                        </div> <!-- end col -->
-
-
-                    </div> <!-- end row -->
+                    <?php endforeach; ?>
                 </div>
             </div>
-
-
         </div>
-        <!-- container-fluid -->
-
     </div>
     <?php include_document("layouts.footerbar") ?>
-
 </div>

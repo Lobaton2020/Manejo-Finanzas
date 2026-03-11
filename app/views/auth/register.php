@@ -1,113 +1,96 @@
-<div class="accountbg"></div>
-<div class="wrapper-page mt-5 mb-0">
-    <div class="card card-pages shadow-none">
-
-        <div class="card-body">
-            <div class="text-center m-t-0 m-b-15">
-                <a href=" <?php echo route("main") ?>" class="">
-                    <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png"" alt=""> <h5 class=" d-inline">Mis Finanzas</h5></a>
-            </div>
-            <hr class="mt-n1 mb-n1">
-            <h5 class="font-18 text-center">Registro usuario</h5>
-            <?php echo renderMessage("error") ?>
-            <?php echo renderMessage("success") ?>
-            <?php if (!isset($token_empty)) : ?>
-                <form class="form-horizontal m-t-30" action="<?php echo route("auth/storeUser") ?>" method="POST">
-                    <input type="hidden" name="token" value="<?php echo $token ?>">
-                    <div class="form-group">
-                        <div class="col-12">
-
-                            <label for="type_document">Tipo documento <span class="text-danger">*</span></label>
-                            <select class="form-control " name="type_document" id="type_document" required>
+<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div class="w-full max-w-md">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg mt-n3">
+            <div class="p-6">
+                <div class="text-center m-b-15">
+                    <a href="<?php echo route("main") ?>" class="">
+                        <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png" alt=""> <h5 class="d-inline text-gray-800 dark:text-white">Mis Finanzas</h5></a>
+                </div>
+                <hr class="mt-n1 mb-n1 border-gray-300 dark:border-gray-700">
+                <h5 class="font-19 text-center text-gray-700 dark:text-gray-200">Registro usuario</h5>
+                <?php echo renderMessage("error") ?>
+                <?php echo renderMessage("success") ?>
+                <?php if (!isset($token_empty)) : ?>
+                    <form class="mt-8" action="<?php echo route("auth/storeUser") ?>" method="POST">
+                        <input type="hidden" name="token" value="<?php echo $token ?>">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo documento <span class="text-red-500">*</span></label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="type_document" id="type_document" required>
                                 <option value="">--Seleccione--</option>
                                 <?php foreach ($type_documents  as $type_document) : ?>
                                     <option value="<?php echo $type_document->id_document_type  ?>"><?php echo $type_document->name ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-12">
-                            <label>Numero de documento <span class="text-danger">*</span></label>
-                            <input class="form-control" name="document" required="" placeholder="Numero de documento">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Numero de documento <span class="text-red-500">*</span></label>
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="document" required="" placeholder="Numero de documento">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-12">
-                            <label>Nombre completo <span class="text-danger">*</span></label>
-                            <input class="form-control" name="name" required="" placeholder="Tu nombre">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre completo <span class="text-red-500">*</span></label>
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="name" required="" placeholder="Tu nombre">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-12">
-                            <label>Email <span class="text-danger">*</span></label>
-                            <input class="form-control" name="email" type="text" required="" placeholder="Email">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="email" type="text" required="" placeholder="Email">
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-12">
-                            <label>Password <span class="text-danger">*</span></label>
-                            <input class="form-control" minlength="8" name="password" type="password" required="" placeholder="Password">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password <span class="text-red-500">*</span></label>
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" minlength="8" name="password" type="password" required="" placeholder="Password">
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <div class="col-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck1" required>
-                                <label class="custom-control-label font-weight-normal" for="customCheck1">Acepto los
-                                    <a class="text-decoration-underline" href="#" data-toggle="modal" data-target="#myModal">Terminos y condiciones</a>
+                        <div class="mb-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600" id="customCheck1" required>
+                                <label class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300" for="customCheck1">Acepto los
+                                    <a class="text-blue-600 hover:underline dark:text-blue-400" href="#" data-toggle="modal" data-target="#myModal">Terminos y condiciones</a>
                                 </label>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-group text-center m-t-20">
-                        <div class="col-12">
-                            <button class="btn btn-primary btn-block btn-lg waves-effect waves-light" type="submit">Registrarme!</button>
+                        <div class="mt-6">
+                            <button class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition duration-200" type="submit">Registrarme!</button>
                         </div>
-                    </div>
-                </form>
-            <?php endif; ?>
-            <div class="form-groupm-t-30 m-b-0">
-                <div class="text-center">
-                    <a href="<?php echo route("auth") ?>" class="text-">Quiero iniciar sesion!</a>
+                    </form>
+                <?php endif; ?>
+                <div class="mt-6 text-center">
+                    <a href="<?php echo route("auth") ?>" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">Quiero iniciar sesion!</a>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
 <!-- sample modal content -->
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">Terminos y condiciones</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content bg-white dark:bg-gray-800">
+            <div class="modal-header border-b border-gray-200 dark:border-gray-700">
+                <h5 class="modal-title mt-0 text-gray-800 dark:text-white" id="myModalLabel">Terminos y condiciones</h5>
+                <button type="button" class="close text-gray-500 dark:text-gray-400" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <ul>
+            <div class="modal-body text-gray-700 dark:text-gray-300">
+                <ul class="list-disc list-inside space-y-2">
                     <li>Seguridad de datos:
-                        <ul>
+                        <ul class="list-disc list-inside ml-4">
                             <li>Tus datos no se compartiran</li>
                             <li>No usamos cookies</li>
                             <li>Este sitio esta bajo un subdomio</li>
                         </ul>
                     </li>
                     <li>Tus restricciones:
-                        <ul>
+                        <ul class="list-disc list-inside ml-4">
                             <li>Evita el guardar datos inncesarios</li>
                             <li>No Trates de atentar contra la seguridad del sitio, puedes ser detectado por el sistema</li>
                         </ul>
                     </li>
                 </ul>
-                <div class="modal-footer py-0">
-                    <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
+                <div class="modal-footer py-0 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg" data-dismiss="modal">Cerrar</button>
                 </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+            </div>
+        </div>
+    </div>
+</div>

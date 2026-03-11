@@ -18,8 +18,8 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
+                    <div class="bg-dark-800 rounded-lg border border-dark-700 p-4">
+                        <div class="p-4">
                             <h4 class="mt-0 header-title text-center">Crear salida de dinero</h4>
                             <?php echo renderMessage("error") ?>
                             <form onsubmit="saveOutflow(event)" action="<?php echo route("{$controller_uri}") ?>" method="POST">
@@ -35,7 +35,7 @@
                                             <div id=""></div>
                                             <div class="form-group">
                                                 <label for="inflow_type">Tipo de salida del dinero <span class="text-danger">*</span></label>
-                                                <select onchange="renderCategories(event)" class="form-control" name="id_outflow_type" id="inflow_type" required>
+                                                <select onchange="renderCategories(event)" class="form-control bg-dark-700 border-dark-600 text-white" name="id_outflow_type" id="inflow_type" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($outflow_types  as $outflow_type) : ?>
                                                         <option value="<?php echo $outflow_type->id_outflow_type ?>"><?php echo $outflow_type->name ?></option>
@@ -54,7 +54,7 @@
                                             <div id="input-required-hide"></div>
                                             <div class="form-group">
                                                 <label for="id_porcent">Deposito <span class="text-danger">*</span></label>
-                                                <select class="form-control" name="id_porcent" id="id_porcent" required>
+                                                <select class="form-control bg-dark-700 border-dark-600 text-white" name="id_porcent" id="id_porcent" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($porcents  as $porcent) : ?>
                                                         <option value="<?php echo $porcent->id_porcent ?>"><?php echo $porcent->name ?></option>
@@ -66,31 +66,31 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto a sacar <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="text" name="amount" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000">
+                                                    <input onkeyup="formatPrice(event)" type="text" name="amount" id="total" class="form-control bg-dark-700 border-dark-600 text-white" required="" parsley-type="email" placeholder="ej: 2000000">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
-                                                    <input id="number-format" type="text" readonly class="form-control" value="ej: 2,000,000.00">
+                                                    <input id="number-format" type="text" readonly class="form-control bg-dark-700 border-dark-600 text-white" value="ej: 2,000,000.00">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>Descripcion</label>
                                             <div>
-                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="3"></textarea>
+                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control bg-dark-700 border-dark-600 text-white" rows="3"></textarea>
                                             </div>
                                         </div>
                                         <? if (!$is_budget): ?>
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
-                                                <input type="date" value=<?= date('Y-m-d') ?> class="form-control" name="set_date" required="" placeholder="Pon la fecha">
+                                                <input type="date" value=<?= date('Y-m-d') ?> class="form-control bg-dark-700 border-dark-600" name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
                                         <? endif; ?>
                                         <div class="form-group">
                                             <label>Esta en el presupuesto? <span class="text-danger">*</span></label>
-                                            <select class="form-control" name="is_in_budget" id="is_in_budget" required>
+                                            <select class="form-control bg-dark-700 border-dark-600" name="is_in_budget" id="is_in_budget" required>
                                                 <option value="1" selected>Si</option>
                                                 <option value="0">No</option>
                                             </select>
@@ -100,7 +100,7 @@
                                     <div class="col-md-4">
                                         <h6>Categorias de egresos:</h6>
                                         <div class="text-right">
-                                            <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal"><i class="mdi mdi-plus "></i> Nueva categoria </button>
+                                            <button type="button" class="btn btn-primary px-4 py-2 rounded-lg" data-toggle="modal" data-target="#myModal"><i class="mdi mdi-plus "></i> Nueva categoria </button>
                                         </div>
                                         <div id="empty">
 
@@ -124,10 +124,10 @@
                                 </div>
                                 <div class="form-group mt-2">
                                     <div>
-                                        <button type="submit" class="btn btn-success waves-effect waves-light float-right">
+                                        <button type="submit" class="btn btn-success px-4 py-2 rounded-lg waves-effect waves-light float-right">
                                             Enviar datos
                                         </button>
-                                        <a href="<?php echo route("outflow") ?>" class="btn btn-secondary waves-effect m-l-5">
+                                        <a href="<?php echo route("outflow") ?>" class="btn btn-secondary px-4 py-2 rounded-lg waves-effect m-l-5">
                                             Regresar
                                         </a>
                                     </div>
@@ -164,14 +164,14 @@
                     <div class="form-group">
                         <label>Nueva categoria: <span class="text-danger">*</span></label>
                         <div>
-                            <input type="text" class="form-control" name="name" required="" placeholder="Agrega el nombre">
+                            <input type="text" class="form-control bg-dark-700 border-dark-600" name="name" required="" placeholder="Agrega el nombre">
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
-                <button type="submit" form="form-item" class="btn btn-primary waves-effect waves-light">Guardar</button>
+                <button type="button" class="btn btn-secondary px-4 py-2 rounded-lg waves-effect" data-dismiss="modal">Cerrar</button>
+                <button type="submit" form="form-item" class="btn btn-primary px-4 py-2 rounded-lg waves-effect waves-light">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

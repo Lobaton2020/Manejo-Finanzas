@@ -1,106 +1,76 @@
-<div class="topbar">
-    <?php $self = $_SESSION["credentials"]; ?>
-    <!-- LOGO -->
-    <div class="topbar-left">
-        <a href="<?php echo route("main") ?>" class="logo">
-            <span class="logo-light">
-                <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png"" alt=""> Mis Finanzas
-            </span>
-            <span class=" logo-sm">
-                <i class="mdi mdi-camera-control"></i>
-            </span>
-        </a>
+<?php use app\core\Authentication; ?>
+<!-- Navbar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-dark-800/80 backdrop-blur-md border-b border-dark-700 z-40 flex items-center justify-between px-6">
+    <!-- Left: Toggle & Search -->
+    <div class="flex items-center gap-4">
+        <button id="toggleSidebar" class="p-2 rounded-lg hover:bg-dark-700 text-dark-300">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Search -->
+        <div class="relative">
+            <input type="text" placeholder="Buscar..." class="w-64 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 pl-10 text-dark-200 placeholder-dark-400 focus:outline-none focus:border-primary-500">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-dark-400"></i>
+        </div>
     </div>
-
-    <nav class="navbar-custom">
-        <ul class="navbar-right list-inline float-right mb-0">
-            <!-- notification -->
-            <li class="dropdown notification-list list-inline-item">
-                <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                    <!-- <i class="mdi mdi-bell-outline noti-icon"></i>
-                    <span class="badge badge-pill badge-danger noti-icon-badge">3</span> -->
+    
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-4">
+        <!-- Notifications -->
+        <button class="relative p-2 rounded-lg hover:bg-dark-700 text-dark-300">
+            <i class="fas fa-bell"></i>
+            <?php if (isset($notifications_count) && $notifications_count > 0): ?>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <?php endif; ?>
+        </button>
+        
+        <!-- Quick Add -->
+        <div class="relative group">
+            <button class="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg">
+                <i class="fas fa-plus"></i>
+                <span>Nuevo</span>
+            </button>
+            <div class="absolute right-0 top-full mt-2 w-48 bg-dark-700 rounded-lg shadow-xl border border-dark-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <a href="<?php echo URL_BASE ?>inflows/add" class="flex items-center gap-3 px-4 py-3 text-dark-200 hover:bg-dark-600 rounded-t-lg">
+                    <i class="fas fa-arrow-up text-green-400"></i>
+                    <span>Ingreso</span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-lg px-1">
-                    <!-- item-->
-                    <h6 class="dropdown-item-text">
-                        Notifications
-                    </h6>
-                    <div class="slimscroll notification-item-list">
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item active">
-                            <div class="notify-icon bg-success"><i class="mdi mdi-cart-outline"></i></div>
-                            <p class="notify-details"><b>Your order is placed</b><span class="text-muted">Dummy text of the printing and typesetting industry.</span></p>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                            <div class="notify-icon bg-danger"><i class="mdi mdi-message-text-outline"></i></div>
-                            <p class="notify-details"><b>New Message received</b><span class="text-muted">You have 87 unread messages</span></p>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                            <div class="notify-icon bg-info"><i class="mdi mdi-filter-outline"></i></div>
-                            <p class="notify-details"><b>Your item is shipped</b><span class="text-muted">It is a long established fact that a reader will</span></p>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                            <div class="notify-icon bg-success"><i class="mdi mdi-message-text-outline"></i></div>
-                            <p class="notify-details"><b>New Message received</b><span class="text-muted">You have 87 unread messages</span></p>
-                        </a>
-
-                        <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                            <div class="notify-icon bg-warning"><i class="mdi mdi-cart-outline"></i></div>
-                            <p class="notify-details"><b>Your order is placed</b><span class="text-muted">Dummy text of the printing and typesetting industry.</span></p>
-                        </a>
-
-                    </div>
-                    <!-- All-->
-                    <a href="javascript:void(0);" class="dropdown-item text-center notify-all text-primary">
-                        View all <i class="fi-arrow-right"></i>
-                    </a>
+                <a href="<?php echo URL_BASE ?>outflows/add" class="flex items-center gap-3 px-4 py-3 text-dark-200 hover:bg-dark-600 rounded-b-lg">
+                    <i class="fas fa-arrow-down text-red-400"></i>
+                    <span>Egreso</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="p-2 rounded-lg hover:bg-dark-700 text-dark-300">
+            <i class="fas fa-moon"></i>
+        </button>
+        
+        <!-- User Menu -->
+        <div class="relative group">
+            <button class="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-700">
+                <div class="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold">
+                    <?php echo strtoupper(substr(Authentication::user()->username ?? 'U', 0, 1)); ?>
                 </div>
-                <button id="eyeButton" class="dropdown-item"><i class="fa fa-eye"></i></button>
-            </li>
-
-            <li class="dropdown notification-list list-inline-item">
-                <div class="dropdown notification-list nav-pro-img">
-                    <a class="dropdown-toggle nav-link arrow-none nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <span class="pr-2"><?php echo $self["name"] ?></span><img src="https://icon-library.com/images/default-user-icon/default-user-icon-4.jpg" alt="user" class="rounded-circle">
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
-                        <!-- item-->
-                        <a class="dropdown-item " href="#"><b class="text-primary"><?php echo $self["rol"]["name"] ?></b></a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="<?php echo route("user/profile") ?>"><i class="mdi mdi-account-circle"></i> Mi Perfil</a>
-                        <!-- <a class="dropdown-item d-block" href="#"><i class="mdi mdi-settings"></i> Ajustes</a> -->
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="<?php echo route("main/logout") ?>"><i class="mdi mdi-power text-danger"></i> Cerrar sesion</a>
-                    </div>
-                </div>
-            </li>
-
-        </ul>
-
-        <ul class="list-inline menu-left mb-0">
-            <li class="float-left">
-                <button class="button-menu-mobile open-left waves-effect">
-                    <i class="mdi mdi-menu"></i>
-                </button>
-            </li>
-            <!--  <li class="d-none d-md-inline-block">
-                <form role="search" class="app-search">
-                    <div class="form-group mb-0">
-                        <input type="text" class="form-control" placeholder="Search..">
-                        <button type="submit"><i class="fa fa-search"></i></button>
-                    </div>
-                </form>
-            </li> -->
-        </ul>
-
-    </nav>
-
-</div>
-<!-- Top Bar End -->
+                <span class="text-dark-200"><?php echo Authentication::user()->username ?? 'Usuario' ?></span>
+                <i class="fas fa-chevron-down text-dark-400 text-xs"></i>
+            </button>
+            <div class="absolute right-0 top-full mt-2 w-56 bg-dark-700 rounded-lg shadow-xl border border-dark-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <a href="<?php echo URL_BASE ?>profile" class="flex items-center gap-3 px-4 py-3 text-dark-200 hover:bg-dark-600 rounded-t-lg">
+                    <i class="fas fa-user"></i>
+                    <span>Perfil</span>
+                </a>
+                <a href="<?php echo URL_BASE ?>settings" class="flex items-center gap-3 px-4 py-3 text-dark-200 hover:bg-dark-600">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+                <div class="border-t border-dark-600"></div>
+                <a href="<?php echo URL_BASE ?>auth/logout" class="flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-dark-600 rounded-b-lg">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar sesión</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

@@ -17,16 +17,16 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="card m-b-30">
+                    <div class="bg-dark-800 rounded-lg">
                         <div class="m-3">
                             <div class="float-left">
                                 <h4 class="mt-0  mb-3 header-title ">Listado de salidas de dinero</h4>
                             </div>
                             <div class="float-right">
-                                <a href="<?php echo route("outflow/create") ?>" class="btn btn-success float-right"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
+                                <a href="<?php echo route("outflow/create") ?>" class="btn btn-success px-4 py-2 rounded-lg float-right"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="p-4">
                             <?php echo renderMessage("success") ?>
                             <?php echo renderMessage("info") ?>
                             <?php echo renderMessage("error") ?>

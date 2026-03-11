@@ -1,233 +1,178 @@
-<div class="content-page">
-    <!-- Start content -->
-    <div class="content">
-        <div class="container-fluid">
-            <div class="page-title-box">
-                <div class="row align-items-center">
-                    <div class="col-sm-6">
-                        <h4 class="page-title">Panel de control</h4>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Tus Finanzas</a></li>
-                            <li class="breadcrumb-item active">Panel de control</li>
-                        </ol>
-                    </div>
-                </div>
-                <!-- end row -->
+<div class="p-6 ml-64">
+    <div class="container-fluid px-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h4 class="text-2xl font-bold text-white">Panel de control</h4>
             </div>
-            <!-- end page-title -->
-            <?php echo renderMessage("info") ?>
-
-            <div class="row">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-heading p-4">
-                            <div class="mini-stat-icon float-right">
-                                <i class="mdi mdi-cube-outline bg-primary  text-white"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-16"><?php echo $allentry["title"] ?></h5>
-                            </div>
-                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allentry["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
-                            <!-- <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div> -->
-                            <!-- <p class="text-muted mt-2 mb-0">Previous period<span class="float-right">75%</span></p> -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-heading p-4">
-                            <div class="mini-stat-icon float-right">
-                                <i class="mdi mdi-briefcase-check bg-success text-white"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-16"><?php echo $allegress["title"] ?></h5>
-                            </div>
-                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allegress["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
-                            <!-- <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 88%" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="text-muted mt-2 mb-0">Previous period<span class="float-right">88%</span></p> -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-heading p-4">
-                            <div class="mini-stat-icon float-right">
-                                <i class="mdi mdi-tag-text-outline bg-warning text-white"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-16"><?php echo $allinvestment["title"] ?></h5>
-                            </div>
-                            <h5 class="mt-4 show_hide__ammount" amount="<?php echo $allinvestment["amount"] ?>">$ -'---.--- <small class='text-muted'>COP</small></h5>
-                            <!-- <div class="progress mt-4" style="height: 4px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 68%" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="text-muted mt-2 mb-0">Previous period<span class="float-right">68%</span></p> -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card">
-                        <div class="card-heading p-4">
-                            <div onclick="handleEditBudget(event)" class="mini-stat-icon float-right">
-                                <i class="mdi mdi-buffer bg-danger text-white"></i>
-                            </div>
-                            <div>
-                                <h5 class="font-16">Presupuesto <?php echo ucwords(strftime("%B")); ?></h5>
-                            </div>
-                            <div class="progress mt-4" style="height: 4px;" data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] . " - " . $budget["percent"] ?>%">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: <?= $budget["percent"] ?>%" aria-valuenow="<?= $budget["percent"] ?>" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="text-muted mt-2 mb-0"><?php echo $budget["remain"] ?><span class="float-right"><?php echo $budget["budget"] ?></span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- END ROW -->
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title d-inline">Dinero disponible por deposito</h4>
-                            <span>(Solo los depositos activos)</span>
-                            <p class="sub-title d-inline-block text-truncate w-100">
-                                Representa el dinero que tienes por deposito menos los gastos.
-                            </p>
-                            <ul>
-                                <li class="text-muted text-decoration-none"> Desde siempre </li>
-                            </ul>
-                            <div id="money-deposit-disponible"></div>
-
-                        </div>
-                    </div>
-                </div> <!-- end col -->
-
-
-                <div class="col-xl-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title d-inline">Patrimonio neto con prestamos</h4>
-                            <p class="sub-title d-inline-block text-truncate w-100">
-                                Representa el dinero que tienes restandole los prestamos que has hecho a otros.
-                            </p>
-                            <li class="text-muted text-decoration-none"> Desde siempre </li>
-                            <div id="money-net-worth-moneyloan"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title d-inline">Patrimonio neto</h4>
-                            <p class="sub-title d-inline-block text-truncate w-100">
-                                Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.
-                            </p>
-                            <li class="text-muted text-decoration-none"> Desde siempre </li>
-                            <div id="money-net-worth"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title d-inline">Detalle patrimonio</h4>
-                            <p class="sub-title d-inline-block text-truncate w-100">
-                                Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.
-                            </p>
-                            <li class="text-muted text-decoration-none"> Desde siempre </li>
-                            <div id="money-net-worth-detail"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end col -->
-                <div class="col-xl-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title">Total dinero gastado por deposito</h4>
-                            <p class="sub-title d-inline-block text-truncate w-100">
-                                Representa todo el dinero que has gastado por cada uno de los depositos existentes.
-                            </p>
-                            <li class="text-muted text-decoration-none">
-                                Desde siempre
-                            </li>
-                            <div id="money-deposit-spend"></div>
-                        </div>
-                    </div>
-                </div> <!-- end col -->
-
+            <div>
+                <ol class="flex items-center space-x-2 text-dark-400">
+                    <li><a href="javascript:void(0);" class="text-dark-300 hover:text-primary-400">Tus Finanzas</a></li>
+                    <li class="text-dark-500">/</li>
+                    <li class="text-primary-400">Panel de control</li>
+                </ol>
             </div>
         </div>
-        <!-- container-fluid -->
+        <?php echo renderMessage("info") ?>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <div class="bg-dark-800 rounded-xl shadow-lg p-6 border border-dark-700">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-dark-400 text-sm mb-1"><?php echo $allentry["title"] ?></p>
+                        <h5 class="text-2xl font-bold text-white show_hide__ammount" amount="<?php echo $allentry["amount"] ?>">$ -'---.--- <span class="text-sm text-dark-400 font-normal">COP</span></h5>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-primary-600 flex items-center justify-center">
+                        <i class="mdi mdi-cube-outline text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg p-6 border border-dark-700">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-dark-400 text-sm mb-1"><?php echo $allegress["title"] ?></p>
+                        <h5 class="text-2xl font-bold text-white show_hide__ammount" amount="<?php echo $allegress["amount"] ?>">$ -'---.--- <span class="text-sm text-dark-400 font-normal">COP</span></h5>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-green-600 flex items-center justify-center">
+                        <i class="mdi mdi-briefcase-check text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg p-6 border border-dark-700">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-dark-400 text-sm mb-1"><?php echo $allinvestment["title"] ?></p>
+                        <h5 class="text-2xl font-bold text-white show_hide__ammount" amount="<?php echo $allinvestment["amount"] ?>">$ -'---.--- <span class="text-sm text-dark-400 font-normal">COP</span></h5>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-yellow-600 flex items-center justify-center">
+                        <i class="mdi mdi-tag-text-outline text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg p-6 border border-dark-700 cursor-pointer" onclick="handleEditBudget(event)">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="text-dark-400 text-sm mb-1">Presupuesto <?php echo ucwords(strftime("%B")); ?></p>
+                        <div class="w-full bg-dark-700 rounded-full h-2 mb-2" data-toggle="tooltip" data-placement="top" title="<?= $budget["total"] . " - " . $budget["percent"] ?>%">
+                            <div class="bg-red-600 h-2 rounded-full" style="width: <?= $budget["percent"] ?>%"></div>
+                        </div>
+                        <p class="text-dark-400 text-sm"><?php echo $budget["remain"] ?><span class="float-right text-white"><?php echo $budget["budget"] ?></span></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-red-600 flex items-center justify-center">
+                        <i class="mdi mdi-buffer text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-dark-800 rounded-xl shadow-lg border border-dark-700">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xl font-bold text-white">Dinero disponible por deposito</h4>
+                        <span class="text-dark-400 text-sm">(Solo los depositos activos)</span>
+                    </div>
+                    <p class="text-dark-400 mb-4">Representa el dinero que tienes por deposito menos los gastos.</p>
+                    <ul>
+                        <li class="text-dark-500">Desde siempre</li>
+                    </ul>
+                    <div id="money-deposit-disponible" class="mt-4"></div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg border border-dark-700">
+                <div class="p-6">
+                    <h4 class="text-xl font-bold text-white mb-4">Patrimonio neto con prestamos</h4>
+                    <p class="text-dark-400 mb-4">Representa el dinero que tienes restandole los prestamos que has hecho a otros.</p>
+                    <li class="text-dark-500">Desde siempre</li>
+                    <div id="money-net-worth-moneyloan" class="mt-4"></div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg border border-dark-700">
+                <div class="p-6">
+                    <h4 class="text-xl font-bold text-white mb-4">Patrimonio neto</h4>
+                    <p class="text-dark-400 mb-4">Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.</p>
+                    <li class="text-dark-500">Desde siempre</li>
+                    <div id="money-net-worth" class="mt-4"></div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg border border-dark-700">
+                <div class="p-6">
+                    <h4 class="text-xl font-bold text-white mb-4">Detalle patrimonio</h4>
+                    <p class="text-dark-400 mb-4">Representa el dinero que tienes y las inversiones que estan activas no cuentas como egreso.</p>
+                    <li class="text-dark-500">Desde siempre</li>
+                    <div id="money-net-worth-detail" class="mt-4"></div>
+                </div>
+            </div>
+
+            <div class="bg-dark-800 rounded-xl shadow-lg border border-dark-700">
+                <div class="p-6">
+                    <h4 class="text-xl font-bold text-white mb-4">Total dinero gastado por deposito</h4>
+                    <p class="text-dark-400 mb-4">Representa todo el dinero que has gastado por cada uno de los depositos existentes.</p>
+                    <li class="text-dark-500">Desde siempre</li>
+                    <div id="money-deposit-spend" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- content -->
 
-    <footer class="footer">
-        © 2019 - 2020 Stexo <span class="d-none d-sm-inline-block"> - Crafted with <i class="mdi mdi-heart text-danger"></i> by Themesdesign</span>.
+    <footer class="ml-64 py-4 px-6 bg-dark-800 border-t border-dark-700">
+        <p class="text-dark-400 text-center">© 2019 - 2020 Stexo <span class="hidden sm:inline"> - Crafted with <i class="mdi mdi-heart text-red-500"></i> by Themesdesign</span>.</p>
     </footer>
-
 </div>
-<!-- Modal welcom first visit -->
 
 <div id="first-visit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">Bienvenid@</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content bg-dark-800">
+            <div class="modal-header border-b border-dark-700">
+                <h5 class="modal-title text-white" id="myModalLabel">Bienvenid@</h5>
+                <button type="button" class="close text-dark-300" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="border border-rounded p-3" role="alert">
-                    <h4 class="alert-heading">Version Beta!</h4>
-                    <p>Te presentamos la version Beta...</p>
-                    <hr>
-                    <p class="mb-0">Aqui encontraras la funcionalidades basicas del sistema para poder hacer un oden de tus finanzas.<br>
+                <div class="border border-dark-600 rounded-lg p-4" role="alert">
+                    <h4 class="alert-heading text-white">Version Beta!</h4>
+                    <p class="text-dark-300">Te presentamos la version Beta...</p>
+                    <hr class="border-dark-600">
+                    <p class="mb-0 text-dark-300">Aqui encontraras la funcionalidades basicas del sistema para poder hacer un oden de tus finanzas.<br>
                         Para que contabilices el dinero y lo manejes de la manera mas optima posible</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
+            <div class="modal-footer border-t border-dark-700">
+                <button type="button" class="px-4 py-2 bg-dark-600 text-white rounded-lg hover:bg-dark-500" data-dismiss="modal">Cerrar</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<!-- Modal edit budget -->
+        </div>
+    </div>
+</div>
+
 <div id="edit-budget" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title mt-0" id="myModalLabel">Editar presupuesto del mes</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content bg-dark-800">
+            <div class="modal-header border-b border-dark-700">
+                <h5 class="modal-title text-white" id="myModalLabel">Editar presupuesto del mes</h5>
+                <button type="button" class="close text-dark-300" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div id="show-message"></div>
                 <form id="form-item" onsubmit="updateBudget(event)" action="">
-                    <div class="form-group">
-                        <label>Actualizar presupuesto: <span class="text-danger">*</span></label>
-                        <div>
-                            <input type="number" oninput="formatCurrency(event)" class="form-control" name="total" value="<?= $budget["budget_int"] ?>" required="" placeholder="Añade un valor"><br />
-                            <span class="form-control" id="formattedMoney"></span>
-                        </div>
+                    <div class="mb-4">
+                        <label class="block text-dark-300 mb-2">Actualizar presupuesto: <span class="text-red-500">*</span></label>
+                        <input type="number" oninput="formatCurrency(event)" class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary-500" name="total" value="<?= $budget["budget_int"] ?>" required="" placeholder="Añade un valor">
+                        <span class="block w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-dark-400 mt-2" id="formattedMoney"></span>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Cerrar</button>
-                <button type="submit" form="form-item" class="btn btn-primary waves-effect waves-light">Guardar</button>
+            <div class="modal-footer border-t border-dark-700">
+                <button type="button" class="px-4 py-2 bg-dark-600 text-white rounded-lg hover:bg-dark-500" data-dismiss="modal">Cerrar</button>
+                <button type="submit" form="form-item" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500">Guardar</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div>

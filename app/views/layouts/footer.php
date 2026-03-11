@@ -1,58 +1,59 @@
+<?php if (!isset($page)) $page = ''; ?>
+
+<!-- Main Content Wrapper -->
+<div class="ml-64 pt-16 min-h-screen">
+    <div class="p-6">
+        <!-- Page Content -->
+        <?php echo $content; ?>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="border-t border-dark-700 py-6 px-6 text-center text-dark-400 text-sm">
+        <p>&copy; <?php echo date('Y'); ?> Mis Finanzas. Todos los derechos reservados.</p>
+    </footer>
 </div>
-<!-- END wrapper -->
 
-<!-- jQuery  -->
-<script src="<?php echo URL_ASSETS ?>assets/template/js/jquery.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="<?php echo URL_ASSETS ?>assets/js/jquery.min.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/js/jquery.slim.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="<?php echo URL_ASSETS ?>assets/js/bootstrap.bundle.min.js"></script>
+
+<!-- MetisMenu -->
 <script src="<?php echo URL_ASSETS ?>assets/template/js/metismenu.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/js/jquery.slimscroll.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/js/waves.min.js"></script>
 
-<!-- Required datatable js -->
+<!-- DataTables -->
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/dataTables.bootstrap4.min.js"></script>
-<!-- Buttons examples -->
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/dataTables.buttons.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.bootstrap4.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/jszip.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/pdfmake.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/vfs_fonts.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.html5.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.print.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.colVis.min.js"></script>
-<!-- Responsive examples -->
-<script src="<?php echo URL_ASSETS ?>/plugins/datatables/dataTables.responsive.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>/plugins/datatables/responsive.bootstrap4.min.js"></script>
 
-<!-- Calendario-->
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/jquery-ui/jquery-ui.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/moment/moment.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/fullcalendar/js/fullcalendar.min.js"></script>
-<!--Morris Chart-->
+<!-- Morris Charts -->
 <script src="<?php echo URL_ASSETS ?>assets/template/plugins/morris/morris.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/raphael/raphael.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/pages/morris.init.js"></script>
+<script src="<?php echo URL_ASSETS ?>assets/template/plugins/raphael/raphael-min.js"></script>
 
-<script src="<?php echo URL_ASSETS ?>assets/template/pages/dashboard.init.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/RWD-Table-Patterns/dist/js/rwd-table.min.js"></script>
+<!-- Custom App JS -->
+<script src="<?php echo URL_ASSETS ?>assets/js/app.js"></script>
 
-<!-- Chartist -->
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/js/chartist.min.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/template/plugins/chartist/js/chartist-plugin-tooltip.min.js"></script>
+<!-- Page specific JS -->
+<?php if (isset($page_js)): ?>
+<script src="<?php echo URL_ASSETS ?>assets/js/<?php echo $page_js; ?>.js"></script>
+<?php endif; ?>
 
-<!-- Datatable init js -->
-<script src="<?php echo URL_ASSETS ?>assets/template/pages/datatables.init.js"></script>
-<!-- App js -->
-<script src="<?php echo URL_ASSETS ?>assets/template/js/app.js"></script>
-<!-- Mis scripts -->
-<script src="<?php echo URL_ASSETS ?>assets/js/main.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/inflow.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/outflow.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/statistics.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/queries.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/budget.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/investment.js"></script>
-<script src="<?php echo URL_ASSETS ?>assets/js/cookTracking.js"></script>
+<!-- Theme Toggle Script -->
+<script>
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+    });
+    
+    // Sidebar toggle
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('aside');
+    toggleSidebar.addEventListener('click', () => {
+        sidebar.classList.toggle('-ml-64');
+    });
+</script>
+
 </body>
-
 </html>

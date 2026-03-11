@@ -8,28 +8,28 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-right">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Inicio</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Perfil</a></li>
-                            <li class="breadcrumb-item active">Editar</li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);" class="text-gray-600 dark:text-gray-400">Inicio</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);" class="text-gray-600 dark:text-gray-400">Perfil</a></li>
+                            <li class="breadcrumb-item active text-gray-800 dark:text-white">Editar</li>
                         </ol>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card m-b-30">
-                        <div class="card-body">
-                            <h4 class="mt-0 header-title text-center">Editar mi perfil</h4>
+            <div class="grid grid-cols-1 gap-6">
+                <div class="w-full">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+                        <div class="p-6">
+                            <h4 class="mt-0 text-xl font-semibold text-center text-gray-800 dark:text-white">Editar mi perfil</h4>
                             <?php echo renderMessage("error") ?>
                             <?php echo renderMessage("success") ?>
-                            <div class="row">
-                                <div class="col-md-2"></div>
-                                <div class="col-md-8">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-2"></div>
+                                <div class="md:col-span-8">
                                     <form action="<?php echo route("user/updateProfile") ?>" method="POST">
-                                        <div class="form-group">
-                                            <label for="id_document_type">Tipo de documento <span class="text-danger">*</span></label>
-                                            <select class="form-control" name="document_type" id="id_document_type" required>
+                                        <div class="mb-4">
+                                            <label for="id_document_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de documento <span class="text-red-500">*</span></label>
+                                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" name="document_type" id="id_document_type" required>
                                                 <option value="">--Seleccione--</option>
                                                 <?php foreach ($documents  as $document) : ?>
                                                     <option <?php echo $user->id_document_type == $document->id_document_type ? "selected" : "" ?> value="<?php echo $document->id_document_type ?>"><?php echo $document->name ?></option>
@@ -37,55 +37,51 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="total">Numero de documento <span class="text-danger">*</span></label>
-                                                    <input type="text" name="document" class="form-control" required="" value="<?php echo $user->number_document ?>">
+                                        <div class="mb-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label for="total" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Numero de documento <span class="text-red-500">*</span></label>
+                                                    <input type="text" name="document" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required="" value="<?php echo $user->number_document ?>">
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <label>Nacimiento</label>
-                                                    <input type="date" name="born_date" class="form-control" value="<?php echo $user->born_date ?>">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nacimiento</label>
+                                                    <input type="date" name="born_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="<?php echo $user->born_date ?>">
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <div>
-                                                <label>Nombre completo <span class="text-danger">*</span></label>
-                                                <input type="text" name="name" class="form-control" value="<?php echo $user->complete_name ?>">
-                                            </div>
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre completo <span class="text-red-500">*</span></label>
+                                            <input type="text" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="<?php echo $user->complete_name ?>">
                                         </div>
-                                        <div class="form-group">
-                                            <div>
-                                                <button type="submit" class="btn btn-success waves-effect waves-light float-right">
+                                        <div class="mb-4">
+                                            <div class="flex justify-end gap-3">
+                                                <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow transition duration-200">
                                                     Enviar datos
                                                 </button>
-                                                <a href="<?php echo route("main") ?>" class="btn btn-secondary waves-effect m-l-5">
+                                                <a href="<?php echo route("main") ?>" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition duration-200 ml-3">
                                                     Regresar
                                                 </a>
                                             </div>
                                     </form>
-                                    <div class="form-group mt-4">
+                                    <div class="mb-4 mt-4">
                                         <form onsubmit="questionSend(event)" action="<?php echo route("user/disableMyAcount") ?>" method="POST">
-                                            <button type="submit" class="btn btn-search"><i>Eiminar mi cuenta</i></button>
+                                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm"><i>Eliminar mi cuenta</i></button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                            </div>
+                            <div class="md:col-span-2"></div>
+                        </div>
 
                         </div>
 
                     </div>
 
-                </div> <!-- end col -->
-            </div> <!-- end row -->
-        </div>
+                </div>
+            </div>
 
 
     </div>
-    <!-- container-fluid -->
 
 </div>
 <?php include_document("layouts.footerbar") ?>

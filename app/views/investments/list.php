@@ -66,17 +66,17 @@ $card_body .= renderJumbotron($data, "Parece que no hay ninguna inversion actual
 
 function pie_charts(){
     return ' <div class="col-xl-6">
-        <div class="card m-b-30">
+        <div class="bg-dark-800 rounded-lg border border-dark-700 p-4">
             <div class="card-body">
-                <h4 class="mt-0 header-title">Porfafolio de inversion</h4>
+                <h4 class="mt-0 header-title text-white">Porfafolio de inversion</h4>
                 <div id="simple-pie-porfolio" class="ct-chart ct-golden-section simple-pie-chart-chartist"></div>
             </div>
         </div>
     </div>
      <div class="col-xl-6">
-        <div class="card m-b-30">
+        <div class="bg-dark-800 rounded-lg border border-dark-700 p-4">
             <div class="card-body">
-                <h4 class="mt-0 header-title">Nivel de riesgo</h4>
+                <h4 class="mt-0 header-title text-white">Nivel de riesgo</h4>
                 <div id="simple-pie-risk" class="ct-chart ct-golden-section simple-pie-chart-chartist"></div>
             </div>
         </div>
