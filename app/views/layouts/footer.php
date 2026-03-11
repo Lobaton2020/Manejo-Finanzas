@@ -1,7 +1,7 @@
 <?php if (!isset($page)) $page = ''; ?>
 
 <!-- Main Content Wrapper -->
-<div class="ml-64 pt-16 min-h-screen">
+<div class="pt-16 min-h-screen">
     <div class="p-6">
         <!-- Page Content -->
         <?php echo $content; ?>
