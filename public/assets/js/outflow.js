@@ -171,10 +171,90 @@ function initOutflowFilters() {
     }
 
     initQuickDateRange();
+    initDateNavigation();
     initFilterForm();
     initApplyFilters();
     initClearFilters();
     initRemoveFilterChips();
+}
+
+function applyQuickDateRange(value) {
+    const fromDate = document.getElementById('filterDateFrom');
+    const toDate = document.getElementById('filterDateTo');
+    
+    if (!value || !fromDate || !toDate) return;
+    
+    const today = new Date();
+    let from, to;
+    
+    switch(value) {
+        case 'today':
+            from = today;
+            to = today;
+            break;
+        case 'yesterday':
+            from = new Date(today);
+            from.setDate(from.getDate() - 1);
+            to = new Date(from);
+            break;
+        case 'last2days':
+            from = new Date(today);
+            from.setDate(from.getDate() - 2);
+            to = today;
+            break;
+        case 'last7days':
+            from = new Date(today);
+            from.setDate(from.getDate() - 7);
+            to = today;
+            break;
+        case 'last30days':
+            from = new Date(today);
+            from.setDate(from.getDate() - 30);
+            to = today;
+            break;
+        case 'last90days':
+            from = new Date(today);
+            from.setDate(from.getDate() - 90);
+            to = today;
+            break;
+        case 'last6months':
+            from = new Date(today);
+            from.setMonth(from.getMonth() - 6);
+            to = today;
+            break;
+        case 'lastyear':
+            from = new Date(today);
+            from.setFullYear(from.getFullYear() - 1);
+            to = today;
+            break;
+        case 'current_month':
+            from = new Date(today.getFullYear(), today.getMonth(), 1);
+            to = today;
+            break;
+        case 'last_year_full':
+            from = new Date(today.getFullYear() - 1, 0, 1);
+            to = new Date(today.getFullYear() - 1, 11, 31);
+            break;
+        case 'last2years':
+            from = new Date(today);
+            from.setFullYear(from.getFullYear() - 2);
+            to = today;
+            break;
+        case 'last3years':
+            from = new Date(today);
+            from.setFullYear(from.getFullYear() - 3);
+            to = today;
+            break;
+        case 'year_to_date':
+            from = new Date(today.getFullYear(), 0, 1);
+            to = today;
+            break;
+    }
+    
+    if (from && to) {
+        fromDate.value = from.toISOString().split('T')[0];
+        toDate.value = to.toISOString().split('T')[0];
+    }
 }
 
 function initQuickDateRange() {
@@ -182,83 +262,7 @@ function initQuickDateRange() {
     if (!quickDateRange) return;
 
     quickDateRange.addEventListener('change', function() {
-        const value = this.value;
-        const fromDate = document.getElementById('filterDateFrom');
-        const toDate = document.getElementById('filterDateTo');
-        
-        if (!value || !fromDate || !toDate) return;
-        
-        const today = new Date();
-        let from, to;
-        
-        switch(value) {
-            case 'today':
-                from = today;
-                to = today;
-                break;
-            case 'yesterday':
-                from = new Date(today);
-                from.setDate(from.getDate() - 1);
-                to = new Date(from);
-                break;
-            case 'last2days':
-                from = new Date(today);
-                from.setDate(from.getDate() - 2);
-                to = today;
-                break;
-            case 'last7days':
-                from = new Date(today);
-                from.setDate(from.getDate() - 7);
-                to = today;
-                break;
-            case 'last30days':
-                from = new Date(today);
-                from.setDate(from.getDate() - 30);
-                to = today;
-                break;
-            case 'last90days':
-                from = new Date(today);
-                from.setDate(from.getDate() - 90);
-                to = today;
-                break;
-            case 'last6months':
-                from = new Date(today);
-                from.setMonth(from.getMonth() - 6);
-                to = today;
-                break;
-            case 'lastyear':
-                from = new Date(today);
-                from.setFullYear(from.getFullYear() - 1);
-                to = today;
-                break;
-            case 'current_month':
-                from = new Date(today.getFullYear(), today.getMonth(), 1);
-                to = today;
-                break;
-            case 'last_year_full':
-                from = new Date(today.getFullYear() - 1, 0, 1);
-                to = new Date(today.getFullYear() - 1, 11, 31);
-                break;
-            case 'last2years':
-                from = new Date(today);
-                from.setFullYear(from.getFullYear() - 2);
-                to = today;
-                break;
-            case 'last3years':
-                from = new Date(today);
-                from.setFullYear(from.getFullYear() - 3);
-                to = today;
-                break;
-            case 'year_to_date':
-                from = new Date(today.getFullYear(), 0, 1);
-                to = today;
-                break;
-        }
-        
-        if (from && to) {
-            fromDate.value = from.toISOString().split('T')[0];
-            toDate.value = to.toISOString().split('T')[0];
-        }
+        applyQuickDateRange(this.value);
     });
 
     const fromDate = document.getElementById('filterDateFrom');
@@ -278,6 +282,52 @@ function updateQuickDateRange() {
     if (from || to) {
         quickSelect.value = '';
     }
+}
+
+function initDateNavigation() {
+    const prevBtn = document.getElementById('datePrevBtn');
+    const nextBtn = document.getElementById('dateNextBtn');
+    const quickSelect = document.getElementById('quickDateRange');
+    const fromDate = document.getElementById('filterDateFrom');
+    const toDate = document.getElementById('filterDateTo');
+    
+    if (!prevBtn || !nextBtn || !quickSelect || !fromDate || !toDate) return;
+    
+    function navigateRange(direction) {
+        const fromVal = fromDate.value;
+        const toVal = toDate.value;
+        
+        if (!fromVal || !toVal) {
+            quickSelect.value = 'last30days';
+            applyQuickDateRange('last30days');
+            return;
+        }
+        
+        const fromD = new Date(fromVal);
+        const toD = new Date(toVal);
+        const diffDays = Math.round((toD - fromD) / (1000 * 60 * 60 * 24)) + 1;
+        
+        let newFrom, newTo;
+        
+        if (direction === 'prev') {
+            newFrom = new Date(fromD);
+            newFrom.setDate(newFrom.getDate() - diffDays);
+            newTo = new Date(fromD);
+            newTo.setDate(newTo.getDate() - 1);
+        } else {
+            newFrom = new Date(toD);
+            newFrom.setDate(newFrom.getDate() + 1);
+            newTo = new Date(toD);
+            newTo.setDate(newTo.getDate() + diffDays);
+        }
+        
+        fromDate.value = newFrom.toISOString().split('T')[0];
+        toDate.value = newTo.toISOString().split('T')[0];
+        quickSelect.value = '';
+    }
+    
+    prevBtn.addEventListener('click', () => navigateRange('prev'));
+    nextBtn.addEventListener('click', () => navigateRange('next'));
 }
 
 function initFilterForm() {

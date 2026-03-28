@@ -205,7 +205,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="quickDateRange">Rango de fecha</label>
                             <select class="form-control" id="quickDateRange">
                                 <option value="">Personalizado</option>
@@ -224,13 +224,23 @@
                                 <option value="year_to_date">Año actual (YTD)</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="filterDateFrom">Desde</label>
                             <input type="date" class="form-control" id="filterDateFrom" name="date_from" value="<?php echo $filters['date_from'] ?? ''; ?>">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="filterDateTo">Hasta</label>
                             <input type="date" class="form-control" id="filterDateTo" name="date_to" value="<?php echo $filters['date_to'] ?? ''; ?>">
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-secondary" id="datePrevBtn" title="Rango anterior">
+                                    <i class="mdi mdi-chevron-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="dateNextBtn" title="Siguiente rango">
+                                    <i class="mdi mdi-chevron-right"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
