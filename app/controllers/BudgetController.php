@@ -146,12 +146,19 @@ class BudgetController extends Controller
         if (!isset($id) || !isset($id_budget)) {
             throw new ErrorException("Bad request, params invalids");
         }
+        $setDate = getCurrentDatetime();
+        execute_post(function ($request) use (&$setDate) {
+            if (isset($request->set_date) && !empty($request->set_date)) {
+                $setDate = $request->set_date;
+            }
+        });
         try {
             $query = ["id_user[=]" => $this->id, "id_temporal_budget_outflow[=]" => $id, "id_temporal_budget[=]" => $id_budget, "status[=]" => 1, "AND"];
             $egress = $this->temporalBudgetOutflow->get("*", $query)->array();
             if (!$egress) {
                 throw new ErrorException("Debes tener el estado activo, No data found");
             }
+            $egress->set_date = $setDate;
             $this->outflowService->perform_egress($this->id, $egress);
             return redirect($this->pathSub . $id_budget)->with("success", "Egreso hecho de forma correcta");
         } catch (Exception $e) {

@@ -54,16 +54,34 @@ const questionRedirection = () => {
 
 const questionSend = (e) => {
     e.preventDefault();
+    const form = e.target;
+    const today = new Date().toISOString().split('T')[0];
+    
     Swal.fire({
         title: '¿Estas seguro?',
+        html: `
+            <div class="form-group text-left">
+                <label for="swal-set-date" class="swal2-label">Fecha del egreso:</label>
+                <input type="date" id="swal-set-date" class="swal2-input" value="${today}">
+            </div>
+        `,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Si, lo estoy!'
+        confirmButtonText: 'Si, lo estoy!',
+        preConfirm: () => {
+            const setDate = document.getElementById('swal-set-date').value;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'set_date';
+            input.value = setDate;
+            form.appendChild(input);
+            return true;
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            e.target.submit();
+            form.submit();
         }
     })
 }
