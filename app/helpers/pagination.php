@@ -2,8 +2,8 @@
 
 function make_pagination($currentPage, $totalPages, $baseUrl, $perPage, $totalRecords = null)
 {
-    if ($totalPages <= 1) {
-        return '';
+    if ($totalPages < 1) {
+        $totalPages = 1;
     }
 
     $html = '<div class="row mt-3">';
@@ -70,17 +70,36 @@ function make_pagination($currentPage, $totalPages, $baseUrl, $perPage, $totalRe
     return $html;
 }
 
-function build_pagination_url($baseUrl, $page, $perPage)
+function build_pagination_url($baseUrl, $page, $perPage, $filters = [])
 {
+    $params = ['page' => $page, 'length' => $perPage];
+    
+    $currentParams = $_GET;
+    unset($currentParams['page']);
+    unset($currentParams['length']);
+    
+    foreach ($currentParams as $key => $value) {
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                $params[$key][] = $v;
+            }
+        } elseif ($value !== '') {
+            $params[$key] = $value;
+        }
+    }
+
     $separator = strpos($baseUrl, '?') !== false ? '&' : '?';
-    return $baseUrl . $separator . 'page=' . $page . '&length=' . $perPage;
+    
+    $queryString = http_build_query($params);
+    
+    return $baseUrl . $separator . $queryString;
 }
 
 function make_length_menu($baseUrl, $currentLength, $currentPage = 1, $options = [10, 25, 50, 100])
 {
-    $html = '<div class="dataTables_length">';
-    $html .= '<label>Mostrar ';
-    $html .= '<select class="form-control form-control-sm" onchange="window.location.href=this.value">';
+    $html = '<div class="dataTables_length d-flex align-items-center">';
+    $html .= '<label class="mb-0 mr-2">Mostrar</label>';
+    $html .= '<select class="form-control form-control-sm" style="width: auto;" onchange="window.location.href=this.value">';
     
     foreach ($options as $option) {
         $selected = $option == $currentLength ? 'selected' : '';
@@ -89,7 +108,7 @@ function make_length_menu($baseUrl, $currentLength, $currentPage = 1, $options =
     }
     
     $html .= '</select>';
-    $html .= ' registros</label>';
+    $html .= '<label class="mb-0 ml-2">registros</label>';
     $html .= '</div>';
     
     return $html;

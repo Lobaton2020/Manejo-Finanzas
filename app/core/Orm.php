@@ -508,8 +508,8 @@ class Orm extends Base
     private function whereToString($where)
     {
         $string = "";
-        $operator = "";
-        $num_rest = 0;
+        $operator = "AND";
+        $num_rest = 4;
         $data = [];
         if (!is_null($where)) {
             $keys = array_keys($where);
@@ -517,14 +517,36 @@ class Orm extends Base
                 $operator = end($where);
                 array_pop($where);
                 array_pop($keys);
-                $num_rest = 3;
             }
             $string = "WHERE";
             foreach ($keys as $key) {
                 $sign = substr($key, strpos($key, "[") + 1, -1);
                 $column = str_replace(substr($key, strpos($key, "[")), "", $key);
-                $string .= " {$column} {$sign} :{$column} {$operator}";
-                array_push($data, ["field" => $column, "value" => $where[$key]]);
+                $columnQuoted = "`" . $column . "`";
+                
+                $value = $where[$key];
+                $fieldName = $column;
+                
+                if (is_array($value) && isset($value["alias"])) {
+                    $fieldName = $value["alias"];
+                    $value = $value["value"];
+                }
+                
+                if (strpos($key, "[[]]") !== false) {
+                    $values = is_array($value) ? $value : [$value];
+                    $placeholders = [];
+                    $idx = 0;
+                    foreach ($values as $v) {
+                        $ph = ":{$column}_{$idx}";
+                        $placeholders[] = $ph;
+                        $data[] = ["field" => "{$column}_{$idx}", "value" => $v];
+                        $idx++;
+                    }
+                    $string .= " {$columnQuoted} IN (" . implode(", ", $placeholders) . ") {$operator}";
+                } else {
+                    $string .= " {$columnQuoted} {$sign} :{$fieldName} {$operator}";
+                    $data[] = ["field" => $fieldName, "value" => $value];
+                }
             }
             $string = substr($string, 0, strlen($string) - $num_rest);
             return ["data" => $data, "string" => $string];
