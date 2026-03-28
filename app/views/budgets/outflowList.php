@@ -16,7 +16,9 @@ $configTable = [
     "redirect" => "budget",
     "use" => "delete",
     "btn_delete_delete" => "delete_element",
-    "param-extra" => $id_temporal_budget
+    "param-extra" => $id_temporal_budget,
+    "row-sums" => ["amount"],
+    "status-filter" => "status"
 ];
 
 

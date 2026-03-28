@@ -19,11 +19,91 @@ function renderJumbotron($data, $title, $path = null)
     }
 }
 
-function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado)
+function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $statusColumn = null)
 {
     if (empty($columns) || count($listData) == 0) {
         return '';
     }
+    
+    if ($statusColumn) {
+        $totalsActivo = array_fill_keys($columns, 0);
+        $totalsInactivo = array_fill_keys($columns, 0);
+        foreach ($listData as $data) {
+            foreach ($columns as $column) {
+                if (isset($data->$column)) {
+                    if (isset($data->$statusColumn) && $data->$statusColumn == 1) {
+                        $totalsActivo[$column] += $data->$column;
+                    } else {
+                        $totalsInactivo[$column] += $data->$column;
+                    }
+                }
+            }
+        }
+        
+        $tfoot = "<tfoot>";
+        
+        // Fila sumatoria activos
+        $tfoot .= "<tr class=\"table-success\">";
+        $counter = 0;
+        $sumaActivo = 0;
+        foreach ($fillable as $column) {
+            if (!isset($totalsActivo[$column]) && $counter != 0) {
+                $tfoot .= $counter == 1 ? "<td><strong>Activos: </strong></td>" : "<td></td>";
+                $counter++;
+                continue;
+            }
+            if (isset($totalsActivo[$column])) {
+                $tfoot .= "<td>" . number_price($totalsActivo[$column]) . "</td>";
+                $sumaActivo += $totalsActivo[$column];
+            }
+            $counter++;
+        }
+        $tfoot .= "</tr>";
+        
+        // Fila sumatoria inactivos
+        $tfoot .= "<tr class=\"table-secondary\">";
+        $counter = 0;
+        $sumaInactivo = 0;
+        foreach ($fillable as $column) {
+            if (!isset($totalsInactivo[$column]) && $counter != 0) {
+                $tfoot .= $counter == 1 ? "<td><strong>Inactivos: </strong></td>" : "<td></td>";
+                $counter++;
+                continue;
+            }
+            if (isset($totalsInactivo[$column])) {
+                $tfoot .= "<td>" . number_price($totalsInactivo[$column]) . "</td>";
+                $sumaInactivo += $totalsInactivo[$column];
+            }
+            $counter++;
+        }
+        $tfoot .= "</tr>";
+        
+        // Fila consolidado total
+        $tfoot .= "<tr class=\"table-primary\">";
+        $counter = 0;
+        foreach ($fillable as $column) {
+            if ($counter == 0) {
+                $tfoot .= "<td ><strong>Total: </strong></td>";
+                $counter++;
+                continue;
+            }
+            if ($counter == 1) {
+                $counter++;
+                continue;
+            }
+            if (count($fillable) == ($counter + 1)) {
+                $tfoot .= "<td> <b>" . number_price($sumaActivo + $sumaInactivo) . "</b></td>";
+            } else {
+                $tfoot .= "<td ></td>";
+            }
+            $counter++;
+        }
+        $tfoot .= "</tr>";
+        
+        $tfoot .= "</tfoot>";
+        return $tfoot;
+    }
+    
     $totals = array_fill_keys($columns, 0);
     foreach ($listData as $data) {
         foreach ($columns as $column) {
@@ -325,7 +405,7 @@ function make_table($head, $fillable, $data, $extra = null)
     $string .= "</tbody>";
     $allowConsolidado = isset($extra["row-sums-consolidate"]) ? $extra["row-sums-consolidate"] : false;
     $rowsToSum = isset($extra["row-sums"]) ? $extra["row-sums"] : [];
-    $string .= make_table_tfoot($data, $rowsToSum, $fillable, $allowConsolidado);
+    $string .= make_table_tfoot($data, $rowsToSum, $fillable, $allowConsolidado, $extra["status-filter"] ?? null);
     $string .= "</table>";
     $string .= "</div>";
     return $string;
