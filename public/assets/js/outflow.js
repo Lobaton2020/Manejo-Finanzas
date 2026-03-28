@@ -149,3 +149,11 @@ const saveCategoryEgress = async (e) => {
     }
 };
 
+window.addEventListener("DOMContentLoaded", () => {
+    const route = getCurrentRoute();
+    
+    if (route === 'outflow') {
+        // Funciones de outflow
+    }
+});
+

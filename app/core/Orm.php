@@ -17,7 +17,7 @@ class Orm extends Base
      * @param Array $where - Asociative
      * ej:select("*", ["iduser[>]" => 20])
      */
-    public function select($select = "*", $where = null,  $type = null, $limit = 200)
+    public function select($select = "*", $where = null, $type = null, $limit = 200, $offset = 0)
     {
         $where = $this->whereToString($where);
         if (is_array($select)) {
@@ -30,7 +30,7 @@ class Orm extends Base
             $type = "ORDER BY {$type}";
         }
         try {
-            $this->querye("SELECT {$select} FROM {$this->table} {$where["string"]}  {$type} limit $limit");
+            $this->querye("SELECT {$select} FROM {$this->table} {$where["string"]} {$type} LIMIT {$limit} OFFSET {$offset}");
             if (!empty($where["string"])) {
                 foreach ($where["data"] as $data) {
                     $this->bind(":" . $data["field"], $data["value"]);

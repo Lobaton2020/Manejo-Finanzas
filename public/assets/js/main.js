@@ -56,7 +56,7 @@ const questionSend = (e) => {
     e.preventDefault();
     const form = e.target;
     const today = new Date().toISOString().split('T')[0];
-    
+
     Swal.fire({
         title: '¿Estas seguro?',
         html: `
@@ -183,10 +183,16 @@ const updateBudget = async(e)=>{
     return message.innerHTML = renderErrorMessage( "Opps! Algo fue mal");
 
 }
+
+function getCurrentRoute() {
+    const path = window.location.pathname;
+    const parts = path.split('/').filter(p => p);
+    return parts[parts.length - 1] || parts[parts.length - 2] || '';
+}
 // Call of functions
 window.addEventListener("DOMContentLoaded", () => {
     questionRedirection();
     fixedSidebar();
     showMessageFirstVisit();
-    formatCurrency()
+    formatCurrency();
 });

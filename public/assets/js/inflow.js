@@ -96,4 +96,11 @@ const handleKeyUp = (e) => {
     e.target.parentNode.parentNode.querySelector("#money_deposit").textContent = currency
     sumPercentages()
 };
-window.addEventListener("DOMContentLoaded", () => { })
+
+window.addEventListener("DOMContentLoaded", () => {
+    const route = getCurrentRoute();
+    
+    if (route === 'inflow') {
+        // Funciones de inflow
+    }
+});

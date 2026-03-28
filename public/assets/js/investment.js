@@ -32,7 +32,7 @@ async function initinitChartistPie() {
             }
         }).then(res => res.json());
         const [{ data: portfolioData }, { data: riskData }] = await Promise.all([portfolio, risk]);
-        
+
         const totalPortfolio = portfolioData.reduce((total, item) => total + parseFloat(item.amount), 0);
         const mapPortfolio = portfolioData.map(item => {
             return {
@@ -61,7 +61,7 @@ async function initinitChartistPie() {
                 )
             ]
         });
-        
+
         const totalRisk = riskData.reduce((total, item) => total + parseFloat(item.amount), 0);
         const mapRisk = riskData.map(item => {
             return {
@@ -92,14 +92,16 @@ async function initinitChartistPie() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    initinitChartistPie();
-    formatPrice({
-        target: document.querySelector("#retirement_amount")
-    }, "#number-format");
+    const route = getCurrentRoute();
 
-    formatPrice({
-        target: document.querySelector("#real_retribution")
-    }, "#number-format-2");
+    if (route === 'investment') {
+        initinitChartistPie();
+        formatPrice({
+            target: document.querySelector("#retirement_amount")
+        }, "#number-format");
 
-
+        formatPrice({
+            target: document.querySelector("#real_retribution")
+        }, "#number-format-2");
+    }
 });

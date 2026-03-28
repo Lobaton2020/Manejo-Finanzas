@@ -255,8 +255,10 @@ function make_table($head, $fillable, $data, $extra = null)
         "enable" => "enable"
     ];
     $reditection = $reditections["delete"];
+    $useDatatable = !isset($extra["datatable"]) || $extra["datatable"] !== false;
+    $tableId = $useDatatable ? "datatable" : "table-basic";
     $attributes = array_merge([
-        "id" => "datatable",
+        "id" => $tableId,
         "class" => "table table-striped table-bordered dt-responsive nowrap",
         "style" => "border-collapse: collapse; border-spacing: 0; width: 100%;"
     ], isset($extra["properties"]) ? $extra["properties"] : []);

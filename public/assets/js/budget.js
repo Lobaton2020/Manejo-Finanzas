@@ -19,17 +19,23 @@ const openEditBudgetItemModal = (e) => {
         const amount = button.dataset.amount
         const description = button.dataset.description
         const budgetId = button.dataset.budget
-        
+
         document.getElementById('edit_id_temporal_budget_outflow').value = id
         document.getElementById('edit_id_temporal_budget').value = budgetId
         document.getElementById('edit_amount').value = amount
         document.getElementById('edit_description').value = description || ''
-        
+
         $('#editBudgetItemModal').modal('show')
     } catch (err) {
         console.log("ERROR", err)
     }
 }
 
-document.addEventListener("DOMContentLoaded", editTemporalBudget)
-setTimeout(editTemporalBudget, 2000)
+document.addEventListener("DOMContentLoaded", () => {
+    const route = getCurrentRoute();
+
+    if (route === 'budget') {
+        editTemporalBudget();
+        setTimeout(editTemporalBudget, 2000)
+    }
+});

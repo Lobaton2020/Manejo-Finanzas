@@ -15,6 +15,7 @@ require_once "helpers/number_format.php";
 require_once "helpers/time.php";
 require_once "helpers/maker_html.php";
 require_once "helpers/countVisits.php";
+require_once "helpers/pagination.php";
 
 date_default_timezone_set('America/Bogota');
 setlocale(LC_TIME, 'es_ES.utf8');

@@ -1,6 +1,7 @@
 <?php
 class Base extends PDO
 {
+    private static ?PDO $connection = null;
     private $dbhost = DBHOST;
     private $dbname = DBNAME;
     private $dbuser = DBUSER;
@@ -14,21 +15,28 @@ class Base extends PDO
 
     protected function __construct()
     {
-        $this->dsn = "{$this->dbdriver}:host={$this->dbhost};dbname={$this->dbname};charset={$this->dbcharset}";
-        $this->options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-        ];
-        try {
-            parent::__construct($this->dsn, $this->dbuser, $this->dbpassword, $this->options);
-        } catch (PDOException $e) {
-            throw new ErrorException($e->getMessage());
+        if (self::$connection === null) {
+            $this->dsn = "{$this->dbdriver}:host={$this->dbhost};dbname={$this->dbname};charset={$this->dbcharset}";
+            $this->options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+            ];
+            try {
+                self::$connection = new PDO($this->dsn, $this->dbuser, $this->dbpassword, $this->options);
+            } catch (PDOException $e) {
+                throw new ErrorException($e->getMessage());
+            }
         }
+    }
+
+    protected function getConnection(): PDO
+    {
+        return self::$connection;
     }
 
     protected function querye($query)
     {
-        $this->stmt = $this->prepare($query);
+        $this->stmt = self::$connection->prepare($query);
     }
 
     protected function bind($param, $value, $type = null)
@@ -44,7 +52,7 @@ class Base extends PDO
                 case is_null($value):
                     $type = PDO::PARAM_NULL;
                     break;
-                default;
+                default:
                     $type = PDO::PARAM_STR;
                     break;
             }
@@ -62,7 +70,7 @@ class Base extends PDO
     }
     protected function lastId()
     {
-        return $this->lastInsertId();
+        return self::$connection->lastInsertId();
     }
 
     protected function fetch()

@@ -32,7 +32,18 @@ class OutflowController extends Controller
 
     public function index()
     {
-        $outflows = $this->model->select("*", ["id_user[=]" => $this->id], "id_outflow DESC")->array();
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $length = isset($_GET['length']) ? (int)$_GET['length'] : 10;
+
+        $length = in_array($length, [10, 25, 50, 100]) ? $length : 10;
+        $offset = ($page - 1) * $length;
+
+        $total = intval($this->model->count(["id_user[=]" => $this->id])->array());
+
+        $outflows = $this->model->select("*", ["id_user[=]" => $this->id], "id_outflow DESC", $length, $offset)->array();
+
+        $totalPages = $total > 0 ? ceil($total / $length) : 1;
+
         foreach ($outflows as $outflow) {
             $outflow->outfow_type = $this->outflow_type->get("*", ["id_outflow_type[=]" => $outflow->id_outflow_type, "id_user[=]" => $this->id, "AND"])->array()->name;
             $outflow->porcent = $this->porcent->get("*", ["id_porcent[=]" => $outflow->id_porcent, "id_user[=]" => $this->id, "AND"])->array()->name;
@@ -40,7 +51,15 @@ class OutflowController extends Controller
             $outflow->description = empty($outflow->description) ? "No aplica" : $outflow->description;
             $outflow->is_in_budget = boolval($outflow->is_in_budget) ? "Si" : "No";
         }
-        return view("outflows.list", ["outflows" => $outflows]);
+        return view("outflows.list", [
+            "outflows" => $outflows,
+            "pagination" => [
+                "current" => $page,
+                "total" => $totalPages,
+                "perPage" => $length,
+                "totalRecords" => $total
+            ]
+        ]);
     }
     public function create()
     {

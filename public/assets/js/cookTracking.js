@@ -274,15 +274,18 @@ function setupValorUnitario() {
 $.CalendarPage = new CalendarPage, $.CalendarPage.Constructor = CalendarPage
 
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const newUrl = window.location.pathname;
-        window.history.pushState({ path: newUrl }, '', newUrl);
-        $("#resumen_p_mes").click(mostrarModalDetalleData)
-        setupValorUnitario();
-        await $.CalendarPage.init()
-    } catch (error) {
-        console.log("ERROR CALENDARIO", error)
-    }
+    const route = getCurrentRoute();
 
+    if (route === 'cookTracking') {
+        try {
+            const newUrl = window.location.pathname;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+            $("#resumen_p_mes").click(mostrarModalDetalleData)
+            setupValorUnitario();
+            await $.CalendarPage.init()
+        } catch (error) {
+            console.log("ERROR CALENDARIO", error)
+        }
+    }
 })
 

@@ -245,4 +245,10 @@ const initQueries = () => {
     queryStringSQL();
 };
 
-document.addEventListener("DOMContentLoaded", initQueries)
+document.addEventListener("DOMContentLoaded", () => {
+    const route = getCurrentRoute();
+    
+    if (route === 'query') {
+        initQueries();
+    }
+});

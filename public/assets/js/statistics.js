@@ -182,10 +182,14 @@ const renderStatisticNetWortDetail = async () => {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-    renderStatisticNetWorthWithMoneyLoans();
-    renderStatisticMoneyDisponiblebyDeposits();
-    renderStatisticMoneySpendbyDeposits();
-    renderStatisticNetWorthByMonth();
-    renderStatisticNetWortDetail();
-    defaultActionAmounts();
+    const route = getCurrentRoute();
+
+    if (route === 'main') {
+        renderStatisticNetWorthWithMoneyLoans();
+        renderStatisticMoneyDisponiblebyDeposits();
+        renderStatisticMoneySpendbyDeposits();
+        renderStatisticNetWorthByMonth();
+        renderStatisticNetWortDetail();
+        defaultActionAmounts();
+    }
 });

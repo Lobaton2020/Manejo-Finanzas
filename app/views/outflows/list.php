@@ -31,11 +31,17 @@
                             <?php echo renderMessage("info") ?>
                             <?php echo renderMessage("error") ?>
                             <?php echo renderJumbotron($outflows, "No se ha encontrado egresos", "outflow/create") ?>
+                            <div class="mb-3">
+                                <?php echo make_length_menu(route("outflow"), $pagination['perPage'] ?? 10, $pagination['current'] ?? 1); ?>
+                            </div>
                             <?php
                             $head = ["#","ID", "Tipo Egreso", "Categoria", "Deposito", "Monto", "Descripcion","Esta en presupuesto", "Fecha"];
                             $fillable = ["id_outflow","id_outflow", "outfow_type", "category", "porcent", "amount", "description","is_in_budget", "set_date"];
-                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "btn_delete_delete", "btn_delete_delete" => "delete"]);
+                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "btn_delete_delete", "btn_delete_delete" => "delete", "datatable" => false]);
                             ?>
+                            <?php if (isset($pagination)): ?>
+                                <?php echo make_pagination($pagination['current'], $pagination['total'], route("outflow"), $pagination['perPage'], $pagination['totalRecords']); ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div> <!-- end col -->

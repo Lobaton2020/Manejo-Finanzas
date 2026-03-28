@@ -8,13 +8,29 @@
 const InitDataTables = () => {
     let options = {
         order: [[0, 'DESC']],
-        pageLength: 50
+        pageLength: 50,
+        paging: false,
+        searching: false,
+        lengthChange: false,
+        info: false,
+        dom: 't',
+        language: {
+            emptyTable: "No hay datos disponibles"
+        }
     }
     if (document.querySelector("[data-type='datatable-state-asc']")) {
         console.log(document.querySelector("[data-type='datatable-state-asc']"))
         options = {
             order: [[6, 'asc']],
-            pageLength: 50
+            pageLength: 50,
+            paging: false,
+            searching: false,
+            lengthChange: false,
+            info: false,
+            dom: 't',
+            language: {
+                emptyTable: "No hay datos disponibles"
+            }
         }
     }
     $('#datatable').DataTable(options);
