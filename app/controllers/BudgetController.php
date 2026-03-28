@@ -130,9 +130,16 @@ class BudgetController extends Controller
     }
     public function execList($id)
     {
+        $setDate = getCurrentDatetime();
+        execute_post(function ($request) use (&$setDate) {
+            if (isset($request->set_date) && !empty($request->set_date)) {
+                $setDate = $request->set_date;
+            }
+        });
         try {
             $egressList = $this->temporalBudgetOutflow->select("*", ["id_user[=]" => $this->id, "id_temporal_budget[=]" => $id, "status[=]" => 1, "AND"])->array();
             foreach ($egressList as $egress) {
+                $egress->set_date = $setDate;
                 $this->outflowService->perform_egress($this->id, $egress);
             }
             return redirect($this->path)->with("success", "Ejecucion de presupuesto realizada, revisa tus egresos.");
