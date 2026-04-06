@@ -49,7 +49,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto prestado: <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="number" name="total" id="total" class="form-control" value="<?php echo $loan->total ?>" required>
+                                                    <input onkeyup="formatPrice(event)" type="text" name="total" id="total" class="form-control" value="<?php echo $loan->total ?>" required>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
@@ -57,6 +57,18 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <script>
+                                            document.addEventListener("DOMContentLoaded", function() {
+                                                const totalInput = document.querySelector("#total");
+                                                const numberFormat = document.querySelector("#number-format");
+                                                if (totalInput && numberFormat) {
+                                                    let value = parseInt(totalInput.value);
+                                                    if (value) {
+                                                        numberFormat.value = value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                                                    }
+                                                }
+                                            });
+                                        </script>
                                         <div class="form-group">
                                             <label>Descripcion <span class="text-danger">*</span> </label>
                                             <div>

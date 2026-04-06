@@ -151,7 +151,7 @@ class MoneyLoanController extends Controller
             $data = [
                 "description" => $request->description,
                 "set_date" => $request->set_date,
-                "total" => $request->total,
+                "total" => str_replace(",", "", $request->total),
             ];
             if ($this->model->update($data, $cond)->array()) {
                 return redirect("moneyLoan")->with("success", "Prestamo actualizado correctamente");
