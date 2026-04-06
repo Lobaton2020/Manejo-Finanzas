@@ -22,7 +22,7 @@
                         <div class="card-body">
                             <h4 class="mt-0 header-title text-center">Editar prestamo</h4>
                             <?php echo renderMessage("error") ?>
-                            <form action="<?php echo route("moneyLoan/update/" . $loan->id_money_loan) ?>" method="POST">
+                            <form action="<?php echo route("moneyLoan/update/" . $loan->id_money_loan) ?>" method="POST" id="editForm">
                                 <div class="row">
                                     <div class="col-md-2"></div>
 
@@ -40,7 +40,7 @@
                                                 <div class="col-md-6">
                                                     <label>Fecha estimada de devolucion del dinero <span class="text-danger">*</span></label>
                                                     <div>
-                                                        <input type="date" name="set_date" class="form-control" value="<?php echo $loan->set_date ?>" required>
+                                                        <input type="date" name="set_date" id="set_date" class="form-control" value="<?php echo $loan->set_date ?>" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -49,7 +49,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto prestado: <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="text" name="total" id="total" class="form-control" value="<?php echo $loan->total ?>" required>
+                                                    <input type="number" name="total" id="total" class="form-control" value="<?php echo $loan->total ?>" required step="1" min="0">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
@@ -62,11 +62,33 @@
                                                 const totalInput = document.querySelector("#total");
                                                 const numberFormat = document.querySelector("#number-format");
                                                 if (totalInput && numberFormat) {
-                                                    let value = parseInt(totalInput.value);
-                                                    if (value) {
+                                                    totalInput.addEventListener("input", function() {
+                                                        let value = parseInt(this.value) || 0;
                                                         numberFormat.value = value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-                                                    }
+                                                    });
                                                 }
+                                                
+                                                document.querySelector("#editForm").addEventListener("submit", function(e) {
+                                                    e.preventDefault();
+                                                    const total = document.querySelector("#total").value;
+                                                    const setDate = document.querySelector("#set_date").value;
+                                                    const description = document.querySelector("textarea[name='description']").value;
+                                                    const totalFormatted = parseInt(total).toLocaleString("es-CO");
+                                                    
+                                                    Swal.fire({
+                                                        title: "Confirmar actualizacion",
+                                                        html: "<b>Monto:</b> $" + totalFormatted + "<br><b>Fecha:</b> " + setDate + "<br><b>Descripcion:</b> " + (description.length > 50 ? description.substring(0, 50) + "..." : description),
+                                                        icon: "question",
+                                                        showCancelButton: true,
+                                                        confirmButtonText: "Si, actualizar",
+                                                        cancelButtonText: "Cancelar",
+                                                        confirmButtonColor: "#28a745"
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            e.target.submit();
+                                                        }
+                                                    });
+                                                });
                                             });
                                         </script>
                                         <div class="form-group">

@@ -141,7 +141,7 @@ class MoneyLoanController extends Controller
     public function update($id)
     {
         return execute_post(function ($request) use ($id) {
-            $total = str_replace(",", "", $request->total ?? "");
+            $total = $request->total ?? "";
             if (empty($request->description) || empty($request->set_date) || empty($total)) {
                 return redirect("moneyLoan/edit/" . $id)->with("error", "Lo sentimos, llena todos los campos");
             }
