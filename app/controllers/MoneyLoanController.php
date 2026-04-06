@@ -127,4 +127,36 @@ class MoneyLoanController extends Controller
             return redirect("moneyLoan")->with("error", "El prestamo no pertenece a los tuyos.");
         }
     }
+
+    public function edit($id)
+    {
+        $cond = ["id_user[=]" => $this->id, "id_money_loan[=]" => $id, "AND"];
+        if ($this->model->has($cond)->array()) {
+            $loan = $this->model->get("*", $cond)->array();
+            return view("loans.edit", ["loan" => $loan]);
+        }
+        return redirect("moneyLoan")->with("error", "El prestamo no pertenece a los tuyos.");
+    }
+
+    public function update($id)
+    {
+        return execute_post(function ($request) use ($id) {
+            if (arrayEmpty(["description", "set_date"], $request)) {
+                return redirect("moneyLoan/edit/" . $id)->with("error", "Lo sentimos, llena todos los campos");
+            }
+            $cond = ["id_user[=]" => $this->id, "id_money_loan[=]" => $id, "AND"];
+            if (!$this->model->has($cond)->array()) {
+                return redirect("moneyLoan")->with("error", "El prestamo no pertenece a los tuyos.");
+            }
+            $data = [
+                "description" => $request->description,
+                "set_date" => $request->set_date,
+            ];
+            if ($this->model->update($data, $cond)->array()) {
+                return redirect("moneyLoan")->with("success", "Prestamo actualizado correctamente");
+            } else {
+                return redirect("moneyLoan/edit/" . $id)->with("error", "No se pudo actualizar el prestamo");
+            }
+        });
+    }
 }
