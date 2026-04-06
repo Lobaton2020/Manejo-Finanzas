@@ -141,7 +141,8 @@ class MoneyLoanController extends Controller
     public function update($id)
     {
         return execute_post(function ($request) use ($id) {
-            if (arrayEmpty(["description", "set_date", "total"], $request)) {
+            $total = str_replace(",", "", $request->total ?? "");
+            if (empty($request->description) || empty($request->set_date) || empty($total)) {
                 return redirect("moneyLoan/edit/" . $id)->with("error", "Lo sentimos, llena todos los campos");
             }
             $cond = ["id_user[=]" => $this->id, "id_money_loan[=]" => $id, "AND"];
@@ -151,7 +152,7 @@ class MoneyLoanController extends Controller
             $data = [
                 "description" => $request->description,
                 "set_date" => $request->set_date,
-                "total" => str_replace(",", "", $request->total),
+                "total" => $total,
             ];
             if ($this->model->update($data, $cond)->array()) {
                 return redirect("moneyLoan")->with("success", "Prestamo actualizado correctamente");
