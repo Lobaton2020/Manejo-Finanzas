@@ -48,12 +48,12 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <label for="total">Monto prestado: </label>
-                                                    <input type="text" class="form-control" value="<?php echo number_format($loan->total, 0, ',', '.') ?>" readonly>
+                                                    <label for="total">Monto prestado: <span class="text-danger">*</span></label>
+                                                    <input onkeyup="formatPrice(event)" type="number" name="total" id="total" class="form-control" value="<?php echo $loan->total ?>" required>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label>Estado</label>
-                                                    <input type="text" class="form-control" value="<?php echo $loan->status ? 'Activo' : 'Inactivo' ?>" readonly>
+                                                    <label>Numero formateado</label>
+                                                    <input id="number-format" type="text" readonly class="form-control" value="<?php echo number_format($loan->total, 0, ',', '.') ?>">
                                                 </div>
                                             </div>
                                         </div>
