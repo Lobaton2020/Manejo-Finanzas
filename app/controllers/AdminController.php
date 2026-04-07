@@ -55,7 +55,7 @@ class AdminController extends Controller
     }
     public function notifications()
     {
-        $notifications = $this->notification->select()->array();
+        $notifications = $this->notification->select("*", null, "create_at DESC")->array();
         foreach ($notifications as $notification) {
             $type = $this->notification_type->get("*", ["key_notification_type[=]" => $notification->key_notification_type])->array()->name;
             $user = $this->user->get("*", ["id_user[=]" => $notification->id_user])->array()->complete_name;
@@ -66,7 +66,7 @@ class AdminController extends Controller
 
     public function visits()
     {
-        $visits = $this->count_visit->select()->array();
+        $visits = $this->count_visit->select("*", null, "update_at DESC")->array();
         foreach ($visits as $visit) {
             $visit->count = intval(intval($visit->count) / 3);
             $visit->user = $this->user->get("*", ["id_user[=]" => $visit->id_user])->array();
