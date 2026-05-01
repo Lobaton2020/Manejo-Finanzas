@@ -19,33 +19,17 @@ class InvestmentController extends Controller
     {
 
         $data = $this->investmentView->select("*", ["id_user[=]" => $this->id, "state[!=]" => Investment::$InvestmentState["HIDDED"], "AND"], " state ASC")->array();
-        
-        $activeCategory = "Compra activo/casa";
-        $groupedData = [];
-        $groupedTotals = ["amount" => 0, "earn_amount" => 0];
-        $otherData = [];
-        
+        $completed = $this->investmentView->getResumeByState(Investment::$InvestmentState["COMPLETED"])->object();
+        $actived = $this->investmentView->getResumeByState(Investment::$InvestmentState["ACTIVED"])->object();
+        $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
+
         foreach ($data as &$item) {
             if ($item->state !== Investment::$InvestmentState["ACTIVED"]) {
                 $item->amount = $item->original_amount;
                 $item->earn_amount = $item->earn_amount_all;
             }
-            
-            if ($item->state === Investment::$InvestmentState["ACTIVED"] && $item->name === $activeCategory) {
-                $groupedData[] = $item;
-                $groupedTotals["amount"] += floatval($item->amount);
-                $groupedTotals["earn_amount"] += floatval($item->earn_amount);
-            } else {
-                $otherData[] = $item;
-            }
         }
-        $groupedTotals["name"] = $activeCategory;
-        
-        $data = array_merge($groupedData, $otherData);
 
-        $completed = $this->investmentView->getResumeByState(Investment::$InvestmentState["COMPLETED"])->object();
-        $actived = $this->investmentView->getResumeByState(Investment::$InvestmentState["ACTIVED"])->object();
-        $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
 
         $retribuition = $this->investmentRetirement->consultaSaldosRetirosNoCompletados($this->id)->object();
         $completed->real_retribution += intval($retribuition->real_retribution);
@@ -55,8 +39,6 @@ class InvestmentController extends Controller
             "completed" => $completed,
             "actived" => $actived,
             "lost" => $lost,
-            "groupedTotals" => $groupedTotals,
-            "groupedCategory" => $activeCategory,
         ];
         return view("investments.list", $options, true);
     }
