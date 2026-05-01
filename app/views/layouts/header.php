@@ -9,6 +9,7 @@
     <meta content="Responsive admin theme build on top of Bootstrap 4" name="description" />
     <meta content="Themesdesign" name="author" />
     <link rel="shortcut icon" href="<?php echo URL_ASSETS ?>assets/img/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
     <!-- Data tables -->
     <link href="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo URL_ASSETS ?>assets/template/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
