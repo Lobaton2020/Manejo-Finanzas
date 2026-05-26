@@ -470,7 +470,7 @@ function wrapper_html($data, $card_body, $is_modal = false)
     }
     if (isset($data->buttons_group)) {
         $string .= '<div class="btn-group float-right mr-2" role="group">';
-        $string .= '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mdi mdi-folder-outline"></i>Grupos</button>';
+        $string .= '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mdi mdi-folder-outline"></i> Grupos</button>';
         $string .= '<div class="dropdown-menu">';
         foreach ($data->buttons_group as $btn) {
             $attr = isset($btn["onclick"]) ? ' onclick="' . $btn["onclick"] . '" ' : "";
