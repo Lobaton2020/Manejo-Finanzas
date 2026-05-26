@@ -93,6 +93,7 @@ async function initinitChartistPie() {
 
 document.addEventListener("DOMContentLoaded", () => {
     const route = getCurrentRoute();
+    console.log('Current route:', route);
 
     if (route === 'investment') {
         initinitChartistPie();
@@ -103,9 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
         formatPrice({
             target: document.querySelector("#real_retribution")
         }, "#number-format-2");
-
-        initGroupInlineEdit();
     }
+
+    initGroupInlineEdit();
 });
 
 function initGroupInlineEdit() {
