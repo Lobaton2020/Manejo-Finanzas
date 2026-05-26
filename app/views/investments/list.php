@@ -109,7 +109,7 @@ if (!empty($groupedData)) {
     foreach ($groupedData as $groupName => $groupInfo) {
         $isSinGrupo = ($groupName === 'sin_grupo');
         $displayName = $isSinGrupo ? 'Sin Grupo' : $groupName;
-        $collapseId = 'collapse_' . ($isSinGrupo ? 'none' : md5($groupName));
+        $collapseId = 'collapse_' . ($isSinGrupo ? 'none' : preg_replace('/[^a-zA-Z0-9]/', '', $groupName));
         $expanded = $first ? 'show' : '';
         
         $card_body .= '<div class="card mb-2">';
@@ -251,7 +251,11 @@ echo wrapper_html($config, $card_body);
 </div>
 
 <script>
+$(document).ready(function() {
+console.log('Groups modal loaded');
+
 $(document).on('click', '.btn-edit', function() {
+    console.log('Edit clicked');
     var row = $(this).closest('tr');
     row.find('.display-value').addClass('d-none');
     row.find('.edit-input').removeClass('d-none');
@@ -272,11 +276,15 @@ $(document).on('click', '.btn-save', function() {
     var id = $(this).data('id');
     var name = row.find('input[name="name"]').val();
     var description = row.find('input[name="description"]').val();
+    console.log('Saving:', id, name, description);
     
     $.post('<?= route("investment/groupsUpdateInline") ?>/' + id, { name: name, description: description }, function(response) {
+        console.log('Response:', response);
         location.reload();
-    }).fail(function() {
+    }).fail(function(err) {
+        console.error('Error:', err);
         alert('Error al guardar');
     });
+});
 });
 </script>
