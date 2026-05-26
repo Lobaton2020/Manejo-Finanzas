@@ -117,18 +117,22 @@ if (!empty($groupedData)) {
         $card_body .= '<div class="card-header" id="heading_' . $collapseId . '">';
         $card_body .= '<h5 class="mb-0">';
         if (!$isSinGrupo) {
+            $percentage = $groupInfo['total'] > 0 ? round(($groupInfo['ganancia'] / $groupInfo['total']) * 100, 1) : 0;
             $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
             $card_body .= '<i class="mdi mdi-folder-outline mr-1"></i> ' . htmlspecialchars($displayName);
             $card_body .= ' <span class="badge badge-primary">' . count($groupInfo['inversiones']) . '</span>';
-            $card_body .= ' <span class="badge badge-success ml-2 font-weight-bold font-20">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
-            $card_body .= ' <span class="badge badge-info ml-1 font-weight-bold font-20">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-success ml-2 font-weight-bold font-16">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-warning ml-1 font-14">↑' . $percentage . '%</span>';
+            $card_body .= ' <span class="badge badge-info ml-1 font-16">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
             $card_body .= '</button>';
         } else {
+            $percentage = $groupInfo['total'] > 0 ? round(($groupInfo['ganancia'] / $groupInfo['total']) * 100, 1) : 0;
             $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
             $card_body .= '<i class="mdi mdi-folder-off-outline mr-1"></i> Sin Asignar';
             $card_body .= ' <span class="badge badge-secondary">' . count($groupInfo['inversiones']) . '</span>';
-            $card_body .= ' <span class="badge badge-warning ml-2 font-weight-bold font-20">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
-            $card_body .= ' <span class="badge badge-info ml-1 font-weight-bold font-20">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-warning ml-2 font-weight-bold font-16">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-secondary ml-1 font-14">↑' . $percentage . '%</span>';
+            $card_body .= ' <span class="badge badge-light ml-1 font-16 text-dark">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
             $card_body .= '</button>';
         }
         $card_body .= '</h5>';
