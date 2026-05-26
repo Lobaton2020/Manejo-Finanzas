@@ -68,7 +68,7 @@
             <li class="dropdown notification-list list-inline-item">
                 <div class="dropdown notification-list nav-pro-img">
                     <a class="dropdown-toggle nav-link arrow-none nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <span class="pr-2"><?php echo $self["name"] ?></span><img src="https://icon-library.com/images/default-user-icon/default-user-icon-4.jpg" alt="user" class="rounded-circle">
+                        <span class="pr-2"><?php echo $self["name"] ?></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                         <!-- item-->
