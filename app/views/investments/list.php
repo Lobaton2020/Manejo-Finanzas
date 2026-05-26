@@ -122,10 +122,10 @@ if (!empty($groupedData)) {
             $card_body .= '<i class="mdi mdi-folder-outline mr-1"></i> ' . htmlspecialchars($displayName);
             $card_body .= ' <span class="badge badge-primary">' . count($groupInfo['inversiones']) . '</span>';
             $card_body .= ' <span class="ml-2 text-muted small">Inv:</span> ';
-            $card_body .= '<span class="font-weight-bold text-success">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= '<span class="font-weight-bold">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
             $card_body .= ' <span class="ml-1 text-muted small">Gan:</span> ';
-            $card_body .= '<span class="font-weight-bold text-info">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
-            $card_body .= ' <span class="badge badge-warning ml-1 font-weight-bold">' . $percentage . '%</span>';
+            $card_body .= '<span class="font-weight-bold">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-secondary ml-1 font-weight-bold">' . $percentage . '%</span>';
             $card_body .= '</button>';
         } else {
             $percentage = $groupInfo['total'] > 0 ? round(($groupInfo['ganancia'] / $groupInfo['total']) * 100, 1) : 0;
@@ -133,9 +133,9 @@ if (!empty($groupedData)) {
             $card_body .= '<i class="mdi mdi-folder-off-outline mr-1"></i> Sin Asignar';
             $card_body .= ' <span class="badge badge-secondary">' . count($groupInfo['inversiones']) . '</span>';
             $card_body .= ' <span class="ml-2 text-muted small">Inversion:</span> ';
-            $card_body .= '<span class="font-weight-bold text-secondary">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= '<span class="font-weight-bold">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
             $card_body .= ' <span class="ml-1 text-muted small">Ganancia:</span> ';
-            $card_body .= '<span class="font-weight-bold text-info">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
+            $card_body .= '<span class="font-weight-bold">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
             $card_body .= '</button>';
         }
         $card_body .= '</h5>';
