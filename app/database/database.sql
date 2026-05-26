@@ -356,6 +356,8 @@ FROM
     investments i
     INNER JOIN outflows o ON o.id_outflow = i.id_outflow
     INNER JOIN users u ON u.id_user = o.id_user
+    INNER JOIN users u ON u.id_user = o.id_user
+
 INNER JOIN categories c ON o.id_category = c.id_category
 LEFT JOIN (
     SELECT

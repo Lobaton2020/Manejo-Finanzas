@@ -21,8 +21,8 @@ class InvestmentController extends Controller
     public function index()
     {
 
-        $dataRaw = $this->investmentView->select("*", ["id_user[=]" => $this->id])->array();
-        $data = array_filter($dataRaw, function($item) {
+        $data = $this->investmentView->select("*", ["id_user[=]" => $this->id])->array();
+        $data = array_filter($data, function($item) {
             return $item->state !== Investment::$InvestmentState["HIDDED"] 
                 && $item->state !== Investment::$InvestmentState["COMPLETED"];
         });
@@ -31,19 +31,13 @@ class InvestmentController extends Controller
         $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
 
         $allGroups = $this->groupInvestment->select("*", ["id_user[=]" => $this->id])->array();
-        $groupsMap = [];
-        foreach ($allGroups as $g) {
-            $groupsMap[$g->id_group_investment] = $g->name;
-        }
 
         foreach ($data as &$item) {
             if ($item->state !== Investment::$InvestmentState["ACTIVED"]) {
                 $item->amount = $item->original_amount;
                 $item->earn_amount = $item->earn_amount_all;
             }
-            $item->group_name = isset($item->id_group_investment) && isset($groupsMap[$item->id_group_investment]) 
-                ? $groupsMap[$item->id_group_investment] 
-                : '-';
+            $item->group_name = !empty($item->group_investment_name) ? $item->group_investment_name : '-';
         }
 
 

@@ -73,7 +73,7 @@ usort($data, function($a, $b) {
 $groupedData = [];
 $hasGroup = false;
 foreach ($data as $item) {
-    $key = ($item->group_name === '-' || empty($item->group_name)) ? 'sin_grupo' : $item->group_name;
+    $key = (empty($item->group_investment_name)) ? 'sin_grupo' : $item->group_investment_name;
     if (!isset($groupedData[$key])) {
         $groupedData[$key] = ['inversiones' => [], 'total' => 0, 'ganancia' => 0];
     }
