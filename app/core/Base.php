@@ -39,6 +39,13 @@ class Base extends PDO
         $this->stmt = self::$connection->prepare($query);
     }
 
+    protected function closeCursor()
+    {
+        if (isset($this->stmt)) {
+            $this->stmt->closeCursor();
+        }
+    }
+
     protected function bind($param, $value, $type = null)
     {
         if (is_null($type)) {

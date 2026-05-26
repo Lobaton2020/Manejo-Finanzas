@@ -277,7 +277,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -303,7 +303,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -319,7 +319,7 @@ class Orm extends Base
             $this->table = $classTable;
             return new JSON($result);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     public function getByTable($table, $select = "*", $where = null, $limit = 20, $type = "asc")
@@ -331,7 +331,7 @@ class Orm extends Base
             $this->table = $classTable;
             return new JSON($result);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -354,7 +354,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch()->max);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -377,7 +377,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch()->min);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     /**
@@ -400,7 +400,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch()->sum);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
     public function sum_group_by($column, $where, $group_by)
@@ -419,7 +419,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch()->sum);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -464,7 +464,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetch()->avg);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -478,7 +478,7 @@ class Orm extends Base
             $this->table = $classTable;
             return new JSON($result);
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -498,7 +498,7 @@ class Orm extends Base
             $this->execute();
             return new JSON($this->fetchAll());
         } catch (Exception $e) {
-            return $e->getMessage();
+            throw new ErrorException($e->getMessage());
         }
     }
 
@@ -523,15 +523,15 @@ class Orm extends Base
                 $sign = substr($key, strpos($key, "[") + 1, -1);
                 $column = str_replace(substr($key, strpos($key, "[")), "", $key);
                 $columnQuoted = "`" . $column . "`";
-                
+
                 $value = $where[$key];
                 $fieldName = $column;
-                
+
                 if (is_array($value) && isset($value["alias"])) {
                     $fieldName = $value["alias"];
                     $value = $value["value"];
                 }
-                
+
                 if (strpos($key, "[[]]") !== false) {
                     $values = is_array($value) ? $value : [$value];
                     $placeholders = [];

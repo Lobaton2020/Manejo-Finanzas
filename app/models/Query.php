@@ -12,6 +12,8 @@ class Query extends Orm
         $this->querye($sql);
         $this->bind(":id_user", $id_user);
         $this->execute();
-        return new JSON($this->fetchAll());
+        $data = $this->fetchAll();
+        $this->closeCursor();
+        return new JSON($data);
     }
 }
