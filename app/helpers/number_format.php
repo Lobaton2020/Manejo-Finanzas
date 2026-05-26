@@ -8,7 +8,6 @@ function number_price($num = 0, $small = false)
         if ($small) {
             $htmlvalue = '$ ' . number_format($num, 0, ".", ",") . " <small class='text-muted'>COP</small>";
         }
-        $htmlvalue = "<span class='font-weight-bold font-18'>" . $htmlvalue . "</span>";
         if ($num < 0) {
             return "<span class='text-danger'>" . $htmlvalue . "</span>";
         }
