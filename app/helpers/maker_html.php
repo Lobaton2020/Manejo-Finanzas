@@ -298,10 +298,12 @@ function make_table($head, $fillable, $data, $extra = null)
                 case "created_at":
                     $string .= "<td>" . format_datetime($data[$i]->{$fillable[$k]}) . "</td>";
                     break;
-                case "set_date":
                 case "init_date":
                 case "end_date":
-                    if (isset($extra["verify-date-before"])) {
+                    if (isset($extra["show-months-in-enddate"]) && $fillable[$k] == "end_date") {
+                        $x = date_diff_in_months($data[$i]->{$fillable[$k]}, $data[$i]->{$fillable[$k - 1]});
+                        $string .= "<td><small class='text-muted'>{$x} mes".($x != 1 ? 'es' : '')."</small><br>" . format_date($data[$i]->{$fillable[$k]}) . "</td>";
+                    } elseif (isset($extra["verify-date-before"])) {
                         $fecha_actual = strtotime(date("d-m-Y H:i:00", time()));
                         $fecha_entrada = strtotime("{$data[$i]->{$fillable[$k]}} 00:00:00");
                         $bg_expire = $fecha_actual > $fecha_entrada ? "alert-danger" : "alert-success";

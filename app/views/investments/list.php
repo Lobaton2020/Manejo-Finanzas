@@ -34,7 +34,7 @@ $fillable = [
 
 $configTable = [
     "use" => "custom",
-    "simple-date-enddate" => true,
+    "show-months-in-enddate" => true,
     "html" => ' <a class="dropdown-item "  href="' . route("investment/retirement/:id_investment") . '" "> Retiro parcial </a>
                 <a class="dropdown-item "  href="' . route("investment/retiremnetList/:id_investment") . '" "> Ver retiros </a>
                 <a class="dropdown-item "  href="' . route("investment/edit/:id_investment") . '" "> Editar </a>
