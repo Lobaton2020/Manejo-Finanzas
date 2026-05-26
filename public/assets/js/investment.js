@@ -110,12 +110,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initGroupInlineEdit() {
-    console.log('initGroupInlineEdit loaded (vanilla)');
+    console.log('[GroupEdit] Init loaded');
 
     document.addEventListener('click', function(e) {
         const btnEdit = e.target.closest('.group-edit-btn');
         if (btnEdit) {
             e.preventDefault();
+            const id = btnEdit.dataset.id;
+            console.log('[GroupEdit] Edit clicked, ID:', id);
             const row = btnEdit.closest('tr');
             row.querySelectorAll('.group-display-value').forEach(el => el.classList.add('d-none'));
             row.querySelectorAll('.group-edit-input').forEach(el => el.classList.remove('d-none'));
@@ -126,6 +128,7 @@ function initGroupInlineEdit() {
 
         const btnCancel = e.target.closest('.group-cancel-btn');
         if (btnCancel) {
+            console.log('[GroupEdit] Cancel clicked');
             const row = btnCancel.closest('tr');
             row.querySelectorAll('.group-display-value').forEach(el => el.classList.remove('d-none'));
             row.querySelectorAll('.group-edit-input').forEach(el => el.classList.add('d-none'));
@@ -141,21 +144,24 @@ function initGroupInlineEdit() {
             const id = btnSave.dataset.id;
             const name = row.querySelector('.group-name-input').value;
             const description = row.querySelector('.group-desc-input').value;
+            console.log('[GroupEdit] Save clicked, ID:', id, 'name:', name, 'description:', description);
 
             const formData = new FormData();
             formData.append('name', name);
             formData.append('description', description);
 
+            console.log('[GroupEdit] Saving...');
             fetch(URL_PROJECT + 'investment/groupsUpdateInline/' + id, {
                 method: 'POST',
                 body: formData
             })
             .then(res => res.json())
             .then(data => {
+                console.log('[GroupEdit] Saved:', data);
                 location.reload();
             })
             .catch(err => {
-                console.error('Error:', err);
+                console.error('[GroupEdit] Error:', err);
                 alert('Error al guardar');
             });
             return;
