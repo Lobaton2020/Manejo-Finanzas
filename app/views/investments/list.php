@@ -180,5 +180,3 @@ echo wrapper_html($config, $card_body);
         </div>
     </div>
 </div>
-
-<script>
