@@ -26,11 +26,20 @@ class InvestmentController extends Controller
         $actived = $this->investmentView->getResumeByState(Investment::$InvestmentState["ACTIVED"])->object();
         $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
 
+        $allGroups = $this->groupInvestment->select("*", ["id_user[=]" => $this->id])->array();
+        $groupsMap = [];
+        foreach ($allGroups as $g) {
+            $groupsMap[$g->id_group_investment] = $g->name;
+        }
+
         foreach ($data as &$item) {
             if ($item->state !== Investment::$InvestmentState["ACTIVED"]) {
                 $item->amount = $item->original_amount;
                 $item->earn_amount = $item->earn_amount_all;
             }
+            $item->group_name = isset($item->id_group_investment) && isset($groupsMap[$item->id_group_investment]) 
+                ? $groupsMap[$item->id_group_investment] 
+                : '-';
         }
 
 
@@ -42,7 +51,7 @@ class InvestmentController extends Controller
             "completed" => $completed,
             "actived" => $actived,
             "lost" => $lost,
-            "groups" => $this->groupInvestment->select("*", ["id_user[=]" => $this->id], " created_at DESC")->array()
+            "groups" => $allGroups
         ];
         return view("investments.list", $options, true);
     }

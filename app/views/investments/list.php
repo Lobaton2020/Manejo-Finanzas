@@ -4,6 +4,7 @@ $head = [
     "#",
     "Descripcion",
     "Categoria",
+    "Grupo",
     "Inversion",
     "Fecha Inicio",
     "Fecha Final",
@@ -19,6 +20,7 @@ $fillable = [
     "id_investment",
     "description",
     "name",
+    "group_name",
     "amount",
     "init_date",
     "end_date",
@@ -64,6 +66,23 @@ $card_body .= renderMessage("info");
 $card_body .= renderMessage("error");
 $card_body .= renderJumbotron($data, "Parece que no hay ninguna inversion actualmente.");
 
+usort($data, function($a, $b) {
+    return ($b->group_name === '-' || $b->group_name === '-') ? 1 : strcmp($a->group_name ?? '', $b->group_name ?? '');
+});
+
+$groupedData = [];
+$hasGroup = false;
+foreach ($data as $item) {
+    $key = ($item->group_name === '-' || empty($item->group_name)) ? 'sin_grupo' : $item->group_name;
+    if (!isset($groupedData[$key])) {
+        $groupedData[$key] = ['inversiones' => [], 'total' => 0, 'ganancia' => 0];
+    }
+    $groupedData[$key]['inversiones'][] = $item;
+    $groupedData[$key]['total'] += intval($item->amount);
+    $groupedData[$key]['ganancia'] += intval($item->earn_amount);
+    if ($key !== 'sin_grupo') $hasGroup = true;
+}
+
 function pie_charts(){
     return ' <div class="col-xl-6">
         <div class="card m-b-30">
@@ -84,7 +103,48 @@ function pie_charts(){
     ';
 }
 
-$card_body .= make_table($head, $fillable, $data, $configTable);
+if (!empty($groupedData)) {
+    $card_body .= '<div id="investmentsTable" class="accordion">';
+    $first = true;
+    foreach ($groupedData as $groupName => $groupInfo) {
+        $isSinGrupo = ($groupName === 'sin_grupo');
+        $displayName = $isSinGrupo ? 'Sin Grupo' : $groupName;
+        $collapseId = 'collapse_' . ($isSinGrupo ? 'none' : md5($groupName));
+        $expanded = $first ? 'show' : '';
+        
+        $card_body .= '<div class="card mb-2">';
+        $card_body .= '<div class="card-header" id="heading_' . $collapseId . '">';
+        $card_body .= '<h5 class="mb-0">';
+        if (!$isSinGrupo) {
+            $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
+            $card_body .= '<i class="mdi mdi-folder-outline mr-1"></i> ' . htmlspecialchars($displayName);
+            $card_body .= ' <span class="badge badge-primary">' . count($groupInfo['inversiones']) . '</span>';
+            $card_body .= ' <span class="badge badge-success ml-2">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= '</button>';
+        } else {
+            $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
+            $card_body .= '<i class="mdi mdi-folder-off-outline mr-1"></i> Sin Asignar';
+            $card_body .= ' <span class="badge badge-secondary">' . count($groupInfo['inversiones']) . '</span>';
+            $card_body .= ' <span class="badge badge-warning ml-2">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= '</button>';
+        }
+        $card_body .= '</h5>';
+        $card_body .= '</div>';
+        
+        $card_body .= '<div id="' . $collapseId . '" class="collapse ' . $expanded . '" data-parent="#investmentsTable">';
+        $card_body .= '<div class="card-body p-0">';
+        $card_body .= make_table($head, $fillable, $groupInfo['inversiones'], $configTable);
+        $card_body .= '</div>';
+        $card_body .= '</div>';
+        
+        $card_body .= '</div>';
+        $first = false;
+    }
+    $card_body .= '</div>';
+} else {
+    $card_body .= make_table($head, $fillable, $data, $configTable);
+}
+
 $config = [
     "title" => "Listado de inversiones hechos",
     "subtitle" => "Inversiones",
