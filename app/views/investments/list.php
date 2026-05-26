@@ -224,9 +224,9 @@ echo wrapper_html($config, $card_body);
                                     <input type="text" name="description" class="form-control group-edit-input d-none group-desc-input" value="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary group-edit-btn" data-id="<?= $g->id_group_investment ?>">Editar</button>
-                                    <button type="button" class="btn btn-sm btn-success group-save-btn d-none" data-id="<?= $g->id_group_investment ?>">Guardar</button>
-                                    <button type="button" class="btn btn-sm btn-secondary group-cancel-btn d-none">Cancelar</button>
+                                    <button type="button" class="btn btn-sm btn-primary group-edit-btn" data-id="<?= $g->id_group_investment ?>" onclick="groupEditClick(this)">Editar</button>
+                                    <button type="button" class="btn btn-sm btn-success group-save-btn d-none" data-id="<?= $g->id_group_investment ?>" onclick="groupSaveClick(this)">Guardar</button>
+                                    <button type="button" class="btn btn-sm btn-secondary group-cancel-btn d-none" onclick="groupCancelClick(this)">Cancelar</button>
                                     <a href="<?= route("investment/groupsDelete/{$g->id_group_investment}") ?>" class="btn btn-sm btn-danger group-delete-btn" onclick="return confirm('¿Eliminar grupo?')">Eliminar</a>
                                 </td>
                             </tr>
