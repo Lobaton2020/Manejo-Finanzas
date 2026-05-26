@@ -217,7 +217,7 @@ echo wrapper_html($config, $card_body);
                                 <td><?= htmlspecialchars($g->name) ?></td>
                                 <td><?= htmlspecialchars($g->description ?? '-') ?></td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editGroupModal" data-id="<?= $g->id_group_investment ?>" data-name="<?= htmlspecialchars($g->name) ?>" data-description="<?= htmlspecialchars($g->description ?? '') ?>">Editar</button>
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editGroupModal" data-id="<?= $g->id_group_investment ?>" data-name="<?= htmlspecialchars($g->name, ENT_QUOTES) ?>" data-description="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">Editar</button>
                                     <a href="<?= route("investment/groupsDelete/{$g->id_group_investment}") ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar grupo?')">Eliminar</a>
                                 </td>
                             </tr>
