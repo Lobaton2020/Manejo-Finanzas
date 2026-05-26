@@ -561,9 +561,9 @@ function card_statistic_component($title, $amount1, $amount2, $amount3 = [], $ms
                     ' . $title . '
                 </h5>
             </div>
-            <h6 class="mt-4">
+            <h4 class="mt-3">
                 <span data-toggle="tooltip" data-placement="top" title="' . $amount1[0] . '">' . number_price($amount1[1]) . $renderItem2 . (count($amount3) > 0 ? ' - <small data-toggle="tooltip" data-placement="top" title="' . $amount3[0] . '">' . number_price($amount3[1]) . ' ' . $percentage . '</small>' : '') . '
-            </h6>
+            </h4>
             <small class="text-muted">' . $msg_detail . '</small>
         </div>
     </div>
