@@ -59,10 +59,10 @@ class OutflowServie
         ];
         if ($this->model->insert($data)->array()) {
             $this->notification->insert([$id_user, "egress"]);
-            // Mecanismo de revision si el tipo de egreso es una inversion
             $outflow_type_name = $this->outflowType->get(["name"], ["id_outflow_type[=]" => $request->id_outflow_type]);
             if ($outflow_type_name->object() && strpos(strtolower($outflow_type_name->object()->name), 'inversion') !== false) {
-                $this->investment->create($this->model->id());
+                $groupId = isset($request->id_group_investment) && !empty($request->id_group_investment) ? $request->id_group_investment : null;
+                $this->investment->create($this->model->id(), $groupId);
             }
             return "OK";
         } else {

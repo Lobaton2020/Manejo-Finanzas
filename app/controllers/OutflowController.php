@@ -10,6 +10,8 @@ class OutflowController extends Controller
     private $category;
     private $outflowService;
     private $investment;
+    private $groupInvestment;
+    
     public function __construct()
     {
         parent::__construct();
@@ -21,6 +23,7 @@ class OutflowController extends Controller
         $this->outflow_type = $this->model("outflowType");
         $this->category = $this->model("category");
         $this->investment = $this->model("investment");
+        $this->groupInvestment = $this->model("groupInvestment");
         $this->outflowService = new OutflowServie(
             $this->model,
             $this->notification,
@@ -143,7 +146,7 @@ class OutflowController extends Controller
 
         return ['conditions' => $conditions, 'activeFilters' => $activeFilters];
     }
-    public function create()
+public function create()
     {
         $max_porcents = $this->outflowService->get_amounts_disponible();
         $porcents = $this->porcent->select("*", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array();
@@ -152,11 +155,13 @@ class OutflowController extends Controller
         }
         $is_budget = isset($_GET["is_budget"]) && $_GET["is_budget"] == "true";
         $id = isset($_GET["id_temporal_budget"]) ? $_GET["id_temporal_budget"] : "";
+        $groups = $this->groupInvestment->select("*", ["id_user[=]" => $this->id], " name ASC")->array();
         $data = [
             "porcents" => $porcents,
             "outflow_types" => $this->outflow_type->select("*", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array(),
             "controller_uri" => $is_budget ? "budget/store_element/" . $id : "outflow/store",
-            "is_budget" => $is_budget
+            "is_budget" => $is_budget,
+            "groups" => $groups
         ];
         return view("outflows.create", $data);
     }

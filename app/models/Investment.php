@@ -20,15 +20,19 @@ class Investment extends Orm
         parent::__construct("investments");
     }
 
-    public function create($outflowId)
+    public function create($outflowId, $groupId = null)
     {
-        $this->insert([
+        $data = [
             "id_outflow" => $outflowId,
             "state" => Investment::$InvestmentState["CREATED"],
             "risk_level" => Investment::$levelRisk["LOW"],
             "created_at" => getCurrentDatetime(),
             "updated_at" => getCurrentDatetime()
-        ]);
+        ];
+        if ($groupId !== null) {
+            $data["id_group_investment"] = $groupId;
+        }
+        $this->insert($data);
     }
 
     public function updateExpirationState()

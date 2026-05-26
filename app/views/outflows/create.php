@@ -35,12 +35,24 @@
                                             <div id=""></div>
                                             <div class="form-group">
                                                 <label for="inflow_type">Tipo de salida del dinero <span class="text-danger">*</span></label>
-                                                <select onchange="renderCategories(event)" class="form-control" name="id_outflow_type" id="inflow_type" required>
+                                                <select onchange="renderCategories(event); showGroupSelect(this)" class="form-control" name="id_outflow_type" id="inflow_type" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($outflow_types  as $outflow_type) : ?>
                                                         <option value="<?php echo $outflow_type->id_outflow_type ?>"><?php echo $outflow_type->name ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
+                                            </div>
+                                            <div id="group_investment_section" class="form-group d-none">
+                                                <label for="id_group_investment">Grupo de Inversión</label>
+                                                <select class="form-control" name="id_group_investment" id="id_group_investment">
+                                                    <option value="">--Sin grupo--</option>
+                                                    <?php if (!empty($groups)): ?>
+                                                        <?php foreach ($groups as $g): ?>
+                                                            <option value="<?= $g->id_group_investment ?>"><?= htmlspecialchars($g->name) ?></option>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </select>
+                                                <small class="text-muted">Opcional: selecciona un grupo para organizar esta inversión</small>
                                             </div>
                                         <?php endif; ?>
 
@@ -176,3 +188,16 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script>
+function showGroupSelect(selectElement) {
+    var selectedText = selectElement.options[selectElement.selectedIndex].text.toLowerCase();
+    var groupSection = document.getElementById('group_investment_section');
+    if (selectedText.indexOf('inversion') !== -1) {
+        groupSection.classList.remove('d-none');
+    } else {
+        groupSection.classList.add('d-none');
+        document.getElementById('id_group_investment').value = '';
+    }
+}
+</script>
