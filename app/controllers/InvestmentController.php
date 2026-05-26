@@ -236,6 +236,7 @@ class InvestmentController extends Controller
 
     public function groupsUpdateInline($id)
     {
+        header('Content-Type: application/json');
         return execute_post(function ($request) use ($id) {
             if (arrayEmpty(["name"], $request)) {
                 echo json_encode(["success" => false, "error" => "El nombre es requerido"]);

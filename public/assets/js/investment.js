@@ -110,35 +110,55 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initGroupInlineEdit() {
-    console.log('initGroupInlineEdit loaded');
+    console.log('initGroupInlineEdit loaded (vanilla)');
 
-    $(document).on('click', '.group-edit-btn', function() {
-        const row = $(this).closest('tr');
-        row.find('.group-display-value').addClass('d-none');
-        row.find('.group-edit-input').removeClass('d-none');
-        row.find('.group-edit-btn, .group-delete-btn').addClass('d-none');
-        row.find('.group-save-btn, .group-cancel-btn').removeClass('d-none');
-    });
+    document.addEventListener('click', function(e) {
+        const btnEdit = e.target.closest('.group-edit-btn');
+        if (btnEdit) {
+            e.preventDefault();
+            const row = btnEdit.closest('tr');
+            row.querySelectorAll('.group-display-value').forEach(el => el.classList.add('d-none'));
+            row.querySelectorAll('.group-edit-input').forEach(el => el.classList.remove('d-none'));
+            row.querySelectorAll('.group-edit-btn, .group-delete-btn').forEach(el => el.classList.add('d-none'));
+            row.querySelectorAll('.group-save-btn, .group-cancel-btn').forEach(el => el.classList.remove('d-none'));
+            return;
+        }
 
-    $(document).on('click', '.group-cancel-btn', function() {
-        const row = $(this).closest('tr');
-        row.find('.group-display-value').removeClass('d-none');
-        row.find('.group-edit-input').addClass('d-none');
-        row.find('.group-edit-btn, .group-delete-btn').removeClass('d-none');
-        row.find('.group-save-btn, .group-cancel-btn').addClass('d-none');
-    });
+        const btnCancel = e.target.closest('.group-cancel-btn');
+        if (btnCancel) {
+            const row = btnCancel.closest('tr');
+            row.querySelectorAll('.group-display-value').forEach(el => el.classList.remove('d-none'));
+            row.querySelectorAll('.group-edit-input').forEach(el => el.classList.add('d-none'));
+            row.querySelectorAll('.group-edit-btn, .group-delete-btn').forEach(el => el.classList.remove('d-none'));
+            row.querySelectorAll('.group-save-btn, .group-cancel-btn').forEach(el => el.classList.add('d-none'));
+            return;
+        }
 
-    $(document).on('click', '.group-save-btn', function() {
-        const row = $(this).closest('tr');
-        const id = $(this).data('id');
-        const name = row.find('.group-name-input').val();
-        const description = row.find('.group-desc-input').val();
+        const btnSave = e.target.closest('.group-save-btn');
+        if (btnSave) {
+            e.preventDefault();
+            const row = btnSave.closest('tr');
+            const id = btnSave.dataset.id;
+            const name = row.querySelector('.group-name-input').value;
+            const description = row.querySelector('.group-desc-input').value;
 
-        $.post(URL_PROJECT + 'investment/groupsUpdateInline/' + id,
-            { name: name, description: description },
-            function(response) {
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', description);
+
+            fetch(URL_PROJECT + 'investment/groupsUpdateInline/' + id, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
                 location.reload();
-            }
-        ).fail(() => alert('Error al guardar'));
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error al guardar');
+            });
+            return;
+        }
     });
 }
