@@ -21,7 +21,11 @@ class InvestmentController extends Controller
     public function index()
     {
 
-        $data = $this->investmentView->select("*", ["id_user[=]" => $this->id, "state[!=]" => Investment::$InvestmentState["HIDDED"], "AND"], " state ASC")->array();
+        $dataRaw = $this->investmentView->select("*", ["id_user[=]" => $this->id])->array();
+        $data = array_filter($dataRaw, function($item) {
+            return $item->state !== Investment::$InvestmentState["HIDDED"] 
+                && $item->state !== Investment::$InvestmentState["COMPLETED"];
+        });
         $completed = $this->investmentView->getResumeByState(Investment::$InvestmentState["COMPLETED"])->object();
         $actived = $this->investmentView->getResumeByState(Investment::$InvestmentState["ACTIVED"])->object();
         $lost = $this->investmentView->getResumeByState(Investment::$InvestmentState["LOST"])->object();
