@@ -378,10 +378,10 @@ function make_table($head, $fillable, $data, $extra = null)
 
             $string .= "<td>";
             $string .= '  <div class="dropdown mo-mb-2 show mx-auto text-center">';
-            $string .= "       <a class='btn btn-outline-secondary btn-sm' href='#' id='detail-{$data[$i]->{$fillable[0]}}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>";
+            $string .= "       <button class='btn btn-outline-secondary btn-sm' type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='true'>";
             $string .= "          <i class='mdi mdi-settings' style='font-size:20px'></i>";
-            $string .= "       </a>";
-            $string .= "    <div class='dropdown-menu' aria-labelledby='detail-{$data[$i]->{$fillable[0]}}' x-placement='bottom-start' style='position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 33px, 0px);'>";
+            $string .= "       </button>";
+            $string .= "    <div class='dropdown-menu dropdown-menu-right' aria-labelledby='detail-{$data[$i]->{$fillable[0]}}'>";
             if ($html) {
                 $replacers = [];
                 foreach ($extra["html-replace"] ?? [] as $item) {
