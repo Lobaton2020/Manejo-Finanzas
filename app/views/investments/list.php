@@ -120,13 +120,13 @@ if (!empty($groupedData)) {
             $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
             $card_body .= '<i class="mdi mdi-folder-outline mr-1"></i> ' . htmlspecialchars($displayName);
             $card_body .= ' <span class="badge badge-primary">' . count($groupInfo['inversiones']) . '</span>';
-            $card_body .= ' <span class="badge badge-success ml-2">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-success ml-2 font-weight-bold font-16">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
             $card_body .= '</button>';
         } else {
             $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
             $card_body .= '<i class="mdi mdi-folder-off-outline mr-1"></i> Sin Asignar';
             $card_body .= ' <span class="badge badge-secondary">' . count($groupInfo['inversiones']) . '</span>';
-            $card_body .= ' <span class="badge badge-warning ml-2">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
+            $card_body .= ' <span class="badge badge-warning ml-2 font-weight-bold font-16">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
             $card_body .= '</button>';
         }
         $card_body .= '</h5>';
