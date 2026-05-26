@@ -216,18 +216,18 @@ echo wrapper_html($config, $card_body);
                             <tr>
                                 <td><?= $g->id_group_investment ?></td>
                                 <td>
-                                    <span class="display-value"><?= htmlspecialchars($g->name) ?></span>
-                                    <input type="text" name="name" class="form-control edit-input d-none" value="<?= htmlspecialchars($g->name, ENT_QUOTES) ?>">
+                                    <span class="group-display-value"><?= htmlspecialchars($g->name) ?></span>
+                                    <input type="text" name="name" class="form-control group-edit-input d-none group-name-input" value="<?= htmlspecialchars($g->name, ENT_QUOTES) ?>">
                                 </td>
                                 <td>
-                                    <span class="display-value"><?= htmlspecialchars($g->description ?? '-') ?></span>
-                                    <input type="text" name="description" class="form-control edit-input d-none" value="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">
+                                    <span class="group-display-value"><?= htmlspecialchars($g->description ?? '-') ?></span>
+                                    <input type="text" name="description" class="form-control group-edit-input d-none group-desc-input" value="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary btn-edit" data-id="<?= $g->id_group_investment ?>">Editar</button>
-                                    <button type="button" class="btn btn-sm btn-success btn-save d-none" data-id="<?= $g->id_group_investment ?>">Guardar</button>
-                                    <button type="button" class="btn btn-sm btn-secondary btn-cancel d-none">Cancelar</button>
-                                    <a href="<?= route("investment/groupsDelete/{$g->id_group_investment}") ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar grupo?')">Eliminar</a>
+                                    <button type="button" class="btn btn-sm btn-primary group-edit-btn" data-id="<?= $g->id_group_investment ?>">Editar</button>
+                                    <button type="button" class="btn btn-sm btn-success group-save-btn d-none" data-id="<?= $g->id_group_investment ?>">Guardar</button>
+                                    <button type="button" class="btn btn-sm btn-secondary group-cancel-btn d-none">Cancelar</button>
+                                    <a href="<?= route("investment/groupsDelete/{$g->id_group_investment}") ?>" class="btn btn-sm btn-danger group-delete-btn" onclick="return confirm('¿Eliminar grupo?')">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -250,42 +250,3 @@ echo wrapper_html($config, $card_body);
         </div>
     </div>
 </div>
-
-<script>
-$(document).ready(function() {
-console.log('Groups modal loaded');
-
-$(document).on('click', '.btn-edit', function() {
-    console.log('Edit clicked');
-    var row = $(this).closest('tr');
-    row.find('.display-value').addClass('d-none');
-    row.find('.edit-input').removeClass('d-none');
-    row.find('.btn-edit, .btn-danger').addClass('d-none');
-    row.find('.btn-save, .btn-cancel').removeClass('d-none');
-});
-
-$(document).on('click', '.btn-cancel', function() {
-    var row = $(this).closest('tr');
-    row.find('.display-value').removeClass('d-none');
-    row.find('.edit-input').addClass('d-none');
-    row.find('.btn-edit, .btn-danger').removeClass('d-none');
-    row.find('.btn-save, .btn-cancel').addClass('d-none');
-});
-
-$(document).on('click', '.btn-save', function() {
-    var row = $(this).closest('tr');
-    var id = $(this).data('id');
-    var name = row.find('input[name="name"]').val();
-    var description = row.find('input[name="description"]').val();
-    console.log('Saving:', id, name, description);
-    
-    $.post('<?= route("investment/groupsUpdateInline") ?>/' + id, { name: name, description: description }, function(response) {
-        console.log('Response:', response);
-        location.reload();
-    }).fail(function(err) {
-        console.error('Error:', err);
-        alert('Error al guardar');
-    });
-});
-});
-</script>

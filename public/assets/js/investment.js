@@ -103,5 +103,41 @@ document.addEventListener("DOMContentLoaded", () => {
         formatPrice({
             target: document.querySelector("#real_retribution")
         }, "#number-format-2");
+
+        initGroupInlineEdit();
     }
 });
+
+function initGroupInlineEdit() {
+    console.log('initGroupInlineEdit loaded');
+
+    $(document).on('click', '.group-edit-btn', function() {
+        const row = $(this).closest('tr');
+        row.find('.group-display-value').addClass('d-none');
+        row.find('.group-edit-input').removeClass('d-none');
+        row.find('.group-edit-btn, .group-delete-btn').addClass('d-none');
+        row.find('.group-save-btn, .group-cancel-btn').removeClass('d-none');
+    });
+
+    $(document).on('click', '.group-cancel-btn', function() {
+        const row = $(this).closest('tr');
+        row.find('.group-display-value').removeClass('d-none');
+        row.find('.group-edit-input').addClass('d-none');
+        row.find('.group-edit-btn, .group-delete-btn').removeClass('d-none');
+        row.find('.group-save-btn, .group-cancel-btn').addClass('d-none');
+    });
+
+    $(document).on('click', '.group-save-btn', function() {
+        const row = $(this).closest('tr');
+        const id = $(this).data('id');
+        const name = row.find('.group-name-input').val();
+        const description = row.find('.group-desc-input').val();
+
+        $.post(URL_PROJECT + 'investment/groupsUpdateInline/' + id,
+            { name: name, description: description },
+            function(response) {
+                location.reload();
+            }
+        ).fail(() => alert('Error al guardar'));
+    });
+}
