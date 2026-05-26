@@ -466,6 +466,21 @@ function wrapper_html($data, $card_body, $is_modal = false)
             $string .= '</div>';
         }
     }
+    if (isset($data->buttons_group)) {
+        $string .= '<div class="btn-group float-right mr-2" role="group">';
+        $string .= '<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mdi mdi-folder-outline"></i>Grupos</button>';
+        $string .= '<div class="dropdown-menu">';
+        foreach ($data->buttons_group as $btn) {
+            $attr = isset($btn["onclick"]) ? ' onclick="' . $btn["onclick"] . '" ' : "";
+            $icon = isset($btn["icon"]) ? $btn["icon"] : 'mdi mdi-plus';
+            if (isset($btn["data-toggle"]) && isset($btn["data-target"])) {
+                $attr .= ' data-toggle="' . $btn["data-toggle"] . '" data-target="' . $btn["data-target"] . '" ';
+            }
+            $string .= "<a {$attr} href='{$btn["path"]}' class='dropdown-item'><i class='{$icon}'></i> {$btn["title"]}</a>";
+        }
+        $string .= '</div>';
+        $string .= '</div>';
+    }
     $string .= '</div>';
     $string .= '<div class="card-body">';
     $string .= $card_body;

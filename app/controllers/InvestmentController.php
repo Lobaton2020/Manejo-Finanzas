@@ -6,6 +6,8 @@ class InvestmentController extends Controller
     private InvestmentView $investmentView;
     private $investment;
     private $investmentRetirement;
+    private $groupInvestment;
+    
     public function __construct()
     {
         parent::__construct();
@@ -14,6 +16,7 @@ class InvestmentController extends Controller
         $this->investmentView = $this->model("investmentView");
         $this->investment = $this->model("investment");
         $this->investmentRetirement = $this->model("investmentRetirement");
+        $this->groupInvestment = $this->model("groupInvestment");
     }
     public function index()
     {
@@ -39,6 +42,7 @@ class InvestmentController extends Controller
             "completed" => $completed,
             "actived" => $actived,
             "lost" => $lost,
+            "groups" => $this->groupInvestment->select("*", ["id_user[=]" => $this->id], " created_at DESC")->array()
         ];
         return view("investments.list", $options, true);
     }
@@ -170,5 +174,56 @@ class InvestmentController extends Controller
         } catch (Exception $e) {
             return redirect("investment")->with("error", $e->getMessage());
         }
+    }
+
+    public function groupsIndex()
+    {
+        $groups = $this->groupInvestment->select("*", ["id_user[=]" => $this->id], " created_at DESC")->array();
+        return view("investments.groupsList", ["groups" => $groups]);
+    }
+
+    public function groupsStore()
+    {
+        return execute_post(function ($request) {
+            if (arrayEmpty(["name"], $request)) {
+                return redirect("investment/groups")->with("error", "El nombre es requerido");
+            }
+            $data = [
+                "id_user" => $this->id,
+                "name" => $request->name,
+                "description" => $request->description ?? null
+            ];
+            $this->groupInvestment->insert($data);
+            return redirect("investment/groups")->with("success", "Grupo creado exitosamente");
+        });
+    }
+
+    public function groupsUpdate($id)
+    {
+        return execute_post(function ($request) use ($id) {
+            if (arrayEmpty(["name"], $request)) {
+                return redirect("investment/groups")->with("error", "El nombre es requerido");
+            }
+            $where = ["id_group_investment[=]" => $id, "id_user[=]" => $this->id, "AND"];
+            if (!$this->groupInvestment->has($where)->array()) {
+                return redirect("investment/groups")->with("error", "No tienes permiso para editar este grupo");
+            }
+            $data = [
+                "name" => $request->name,
+                "description" => $request->description ?? null
+            ];
+            $this->groupInvestment->update($data, $where);
+            return redirect("investment/groups")->with("success", "Grupo actualizado exitosamente");
+        });
+    }
+
+    public function groupsDelete($id)
+    {
+        $where = ["id_group_investment[=]" => $id, "id_user[=]" => $this->id, "AND"];
+        if ($this->groupInvestment->has($where)->array()) {
+            $this->groupInvestment->delete($where);
+            return redirect("investment/groups")->with("success", "Grupo eliminado exitosamente");
+        }
+        return redirect("investment/groups")->with("error", "No tienes permiso para eliminar este grupo");
     }
 }
