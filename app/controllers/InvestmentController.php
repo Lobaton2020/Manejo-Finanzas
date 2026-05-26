@@ -201,7 +201,7 @@ class InvestmentController extends Controller
                 "description" => $request->description ?? null
             ];
             $this->groupInvestment->insert($data);
-            return redirect("investment/groups")->with("success", "Grupo creado exitosamente");
+            return redirect("investment")->with("success", "Grupo creado exitosamente");
         });
     }
 
@@ -209,18 +209,18 @@ class InvestmentController extends Controller
     {
         return execute_post(function ($request) use ($id) {
             if (arrayEmpty(["name"], $request)) {
-                return redirect("investment/groups")->with("error", "El nombre es requerido");
+                return redirect("investment")->with("error", "El nombre es requerido");
             }
             $where = ["id_group_investment[=]" => $id, "id_user[=]" => $this->id, "AND"];
             if (!$this->groupInvestment->has($where)->array()) {
-                return redirect("investment/groups")->with("error", "No tienes permiso para editar este grupo");
+                return redirect("investment")->with("error", "No tienes permiso para editar este grupo");
             }
             $data = [
                 "name" => $request->name,
                 "description" => $request->description ?? null
             ];
             $this->groupInvestment->update($data, $where);
-            return redirect("investment/groups")->with("success", "Grupo actualizado exitosamente");
+            return redirect("investment")->with("success", "Grupo actualizado exitosamente");
         });
     }
 
@@ -229,8 +229,29 @@ class InvestmentController extends Controller
         $where = ["id_group_investment[=]" => $id, "id_user[=]" => $this->id, "AND"];
         if ($this->groupInvestment->has($where)->array()) {
             $this->groupInvestment->delete($where);
-            return redirect("investment/groups")->with("success", "Grupo eliminado exitosamente");
+            return redirect("investment")->with("success", "Grupo eliminado exitosamente");
         }
-        return redirect("investment/groups")->with("error", "No tienes permiso para eliminar este grupo");
+        return redirect("investment")->with("error", "No tienes permiso para eliminar este grupo");
+    }
+
+    public function groupsUpdateInline($id)
+    {
+        return execute_post(function ($request) use ($id) {
+            if (arrayEmpty(["name"], $request)) {
+                echo json_encode(["success" => false, "error" => "El nombre es requerido"]);
+                return;
+            }
+            $where = ["id_group_investment[=]" => $id, "id_user[=]" => $this->id, "AND"];
+            if (!$this->groupInvestment->has($where)->array()) {
+                echo json_encode(["success" => false, "error" => "No tienes permiso"]);
+                return;
+            }
+            $data = [
+                "name" => $request->name,
+                "description" => $request->description ?? null
+            ];
+            $this->groupInvestment->update($data, $where);
+            echo json_encode(["success" => true]);
+        });
     }
 }

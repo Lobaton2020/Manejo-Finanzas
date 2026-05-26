@@ -214,10 +214,18 @@ echo wrapper_html($config, $card_body);
                             <?php foreach ($groups as $g): ?>
                             <tr>
                                 <td><?= $g->id_group_investment ?></td>
-                                <td><?= htmlspecialchars($g->name) ?></td>
-                                <td><?= htmlspecialchars($g->description ?? '-') ?></td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editGroupModal" data-id="<?= $g->id_group_investment ?>" data-name="<?= htmlspecialchars($g->name, ENT_QUOTES) ?>" data-description="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">Editar</button>
+                                    <span class="display-value"><?= htmlspecialchars($g->name) ?></span>
+                                    <input type="text" name="name" class="form-control edit-input d-none" value="<?= htmlspecialchars($g->name, ENT_QUOTES) ?>">
+                                </td>
+                                <td>
+                                    <span class="display-value"><?= htmlspecialchars($g->description ?? '-') ?></span>
+                                    <input type="text" name="description" class="form-control edit-input d-none" value="<?= htmlspecialchars($g->description ?? '', ENT_QUOTES) ?>">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary btn-edit" data-id="<?= $g->id_group_investment ?>">Editar</button>
+                                    <button type="button" class="btn btn-sm btn-success btn-save d-none" data-id="<?= $g->id_group_investment ?>">Guardar</button>
+                                    <button type="button" class="btn btn-sm btn-secondary btn-cancel d-none">Cancelar</button>
                                     <a href="<?= route("investment/groupsDelete/{$g->id_group_investment}") ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar grupo?')">Eliminar</a>
                                 </td>
                             </tr>
@@ -242,42 +250,33 @@ echo wrapper_html($config, $card_body);
     </div>
 </div>
 
-<div class="modal fade" id="editGroupModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Grupo</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <form action="" method="POST" id="editGroupForm">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" name="name" id="groupName" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Descripcion</label>
-                        <textarea name="description" id="groupDescription" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
-$('#editGroupModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    var id = button.data('id');
-    var name = button.data('name');
-    var description = button.data('description');
-    var modal = $(this);
-    modal.find('#groupName').val(name);
-    modal.find('#groupDescription').val(description);
-    modal.find('#editGroupForm').attr('action', '<?php echo route("investment/groupsUpdate") ?>/' + id);
+$(document).on('click', '.btn-edit', function() {
+    var row = $(this).closest('tr');
+    row.find('.display-value').addClass('d-none');
+    row.find('.edit-input').removeClass('d-none');
+    row.find('.btn-edit, .btn-danger').addClass('d-none');
+    row.find('.btn-save, .btn-cancel').removeClass('d-none');
+});
+
+$(document).on('click', '.btn-cancel', function() {
+    var row = $(this).closest('tr');
+    row.find('.display-value').removeClass('d-none');
+    row.find('.edit-input').addClass('d-none');
+    row.find('.btn-edit, .btn-danger').removeClass('d-none');
+    row.find('.btn-save, .btn-cancel').addClass('d-none');
+});
+
+$(document).on('click', '.btn-save', function() {
+    var row = $(this).closest('tr');
+    var id = $(this).data('id');
+    var name = row.find('input[name="name"]').val();
+    var description = row.find('input[name="description"]').val();
+    
+    $.post('<?= route("investment/groupsUpdateInline") ?>/' + id, { name: name, description: description }, function(response) {
+        location.reload();
+    }).fail(function() {
+        alert('Error al guardar');
+    });
 });
 </script>
