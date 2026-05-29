@@ -22,10 +22,6 @@ spec:
               mountPath: /var/www/html/.env
               subPath: .env
               readOnly: true
-      volumes:
-        - name: env-file
-          secret:
-            secretName: manejo-finanzas-secrets
           resources:
             requests:
               cpu: "100m"
@@ -45,6 +41,10 @@ spec:
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
+      volumes:
+        - name: env-file
+          secret:
+            secretName: manejo-finanzas-secrets
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
