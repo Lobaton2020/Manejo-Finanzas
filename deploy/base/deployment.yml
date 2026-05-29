@@ -22,6 +22,10 @@ spec:
               mountPath: /var/www/html/.env
               subPath: .env
               readOnly: true
+            - name: php-config
+              mountPath: /usr/local/etc/php/php.ini
+              subPath: php.ini
+              readOnly: true
           resources:
             requests:
               cpu: "100m"
@@ -45,6 +49,12 @@ spec:
         - name: env-file
           secret:
             secretName: manejo-finanzas-secrets
+        - name: php-config
+          configMap:
+            name: php-config
+            items:
+              - key: php.ini
+                path: php.ini
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
