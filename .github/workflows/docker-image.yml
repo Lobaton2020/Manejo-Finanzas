@@ -9,7 +9,7 @@ on:
       - master
 
 env:
-  IMAGE_NAME: lobaton2020/manejo-finanzas
+  IMAGE_NAME: aflobaton/manejo-finanzas
 
 jobs:
   docker:
