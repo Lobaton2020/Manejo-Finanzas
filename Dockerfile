@@ -1,4 +1,4 @@
-FROM php:8.2-apache-bookworm
+FROM php:8.2.31-apache
 
 WORKDIR /var/www/html
 
@@ -6,6 +6,7 @@ COPY --chown=www-data:www-data . /var/www/html/
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql \
     && a2enmod rewrite \
+    && chmod -R 755 /var/www/html \
     && chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
