@@ -6,6 +6,8 @@ spec:
   selector:
     app: manejo-finanzas
   ports:
-    - port: 80
+    - port: 3001
       targetPort: 80
-  type: ClusterIP
+      protocol: TCP
+      name: http
+  type: LoadBalancer
