@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev
+
+resources:
+  - ../../base
+
+patches:
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: manejo-finanzas
+      spec:
+        replicas: 1
+        template:
+          spec:
+            containers:
+              - name: php-apache
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "128Mi"
+                  limits:
+                    cpu: "250m"
+                    memory: "256Mi"
+    target:
+      kind: Deployment
+  - patch: |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: manejo-finanzas
+      spec:
+        rules:
+          - host: dev.manejo-finanzas.example.com
+    target:
+      kind: Ingress
+
+images:
+  - name: TODO_IMAGE
+    newTag: latest
