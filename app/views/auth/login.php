@@ -7,7 +7,7 @@
                 <img width="40" src="<?php echo URL_ASSETS ?>assets/img/logo.png"" alt=""> <h5 class=" d-inline">Mis Finanzas</h5></a>
         </div>
         <hr class="mt-n1 mb-n1">
-        <h5 class=" font-19 text-center">Iniciar Sesión</h5>
+        <h5 class=" font-19 text-center">Iniciar Sesión-</h5>
         <form method="POST" class="form-horizontal m-t-30" action="<?php echo route("auth/login") ?>">
             <div class="form-group">
                 <?php echo renderMessage("error") ?>
@@ -25,7 +25,7 @@
                     <input class="form-control" name="password" type="password"="" placeholder="***********">
                 </div>
             </div>
-            <!-- 
+            <!--
             <div class="form-group">
                 <div class="col-12">
                     <div class="checkbox checkbox-primary">
