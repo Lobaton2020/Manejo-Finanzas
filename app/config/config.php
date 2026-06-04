@@ -19,10 +19,17 @@ define("DBUSER", trim($_ENV["DB_USER"]));
 define("DBPASWORD", trim($_ENV["DB_PASWORD"]));
 define("DBDRIVER",  trim($_ENV["DB_DRIVER"]));
 define("DBCHARSET", trim($_ENV["DB_CHARSET"]));
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 // datos del servidor
+$scheme = "http";
+if (
+    (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ||
+    (!empty($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] === "https") ||
+    (!empty($_SERVER["HTTP_X_FORWARDED_SSL"]) && $_SERVER["HTTP_X_FORWARDED_SSL"] === "on")
+) {
+    $scheme = "https";
+}
 define("SEPARATOR", "/");
 define("DOMAIN", $_SERVER["HTTP_HOST"]);
 define("URL_APP",  dirname(dirname(__FILE__)) . SEPARATOR);
-define("URL_PROJECT",  $protocol . '://' . $_SERVER["HTTP_HOST"]. SEPARATOR);
-define("URL_ASSETS",  $protocol . '://' . $_SERVER["HTTP_HOST"] . SEPARATOR . "public" . SEPARATOR);
+define("URL_PROJECT",  $scheme . '://' . $_SERVER["HTTP_HOST"]. SEPARATOR);
+define("URL_ASSETS",  $scheme . '://' . $_SERVER["HTTP_HOST"] . SEPARATOR . "public" . SEPARATOR);
