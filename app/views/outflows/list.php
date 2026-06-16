@@ -115,9 +115,20 @@
                                 <?php endif; ?>
                             </div>
                             <?php
+                            $sortableHeads = [
+                                ['key' => 'id_outflow', 'label' => 'ID'],
+                                ['key' => 'id_outflow_type', 'label' => 'Tipo Egreso'],
+                                ['key' => 'id_category', 'label' => 'Categoria'],
+                                ['key' => 'id_porcent', 'label' => 'Deposito'],
+                                ['key' => 'amount', 'label' => 'Monto'],
+                                ['key' => 'description', 'label' => 'Descripcion'],
+                                ['key' => 'is_in_budget', 'label' => 'En Presupuesto'],
+                                ['key' => 'set_date', 'label' => 'Fecha'],
+                            ];
+                            
                             $head = ["#","ID", "Tipo Egreso", "Categoria", "Deposito", "Monto", "Descripcion","Esta en presupuesto", "Fecha"];
                             $fillable = ["id_outflow","id_outflow", "outfow_type", "category", "porcent", "amount", "description","is_in_budget", "set_date"];
-                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "btn_delete_delete", "btn_delete_delete" => "delete", "datatable" => false]);
+                            echo make_table($head, $fillable, $outflows, ["redirect" => "outflow", "use" => "btn_delete_delete", "btn_delete_delete" => "delete", "datatable" => false, "sortable" => $sortableHeads, "currentSort" => $sort, "currentOrder" => $order]);
                             ?>
                             <?php if (isset($pagination)): ?>
                                 <?php echo make_pagination($pagination['current'], $pagination['total'], route("outflow"), $pagination['perPage'], $pagination['totalRecords']); ?>

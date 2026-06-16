@@ -257,6 +257,9 @@ function make_table($head, $fillable, $data, $extra = null)
     $reditection = $reditections["delete"];
     $useDatatable = !isset($extra["datatable"]) || $extra["datatable"] !== false;
     $tableId = $useDatatable ? "datatable" : "table-basic";
+    $sortableHeads = $extra["sortable"] ?? null;
+    $currentSort = $extra["currentSort"] ?? 'id';
+    $currentOrder = $extra["currentOrder"] ?? 'desc';
     $attributes = array_merge([
         "id" => $tableId,
         "class" => "table table-striped table-bordered dt-responsive nowrap",
@@ -275,7 +278,27 @@ function make_table($head, $fillable, $data, $extra = null)
             if ($show_id && $k == 0) {
                 continue;
             }
-            $string .= "<th>{$head[$k]}</th>";
+            if ($sortableHeads && isset($sortableHeads[$k - 1])) {
+                $sortKey = $sortableHeads[$k - 1]['key'];
+                $sortLabel = $sortableHeads[$k - 1]['label'];
+                $newOrder = ($currentSort === $sortKey && $currentOrder === 'desc') ? 'asc' : 'desc';
+                $icon = '';
+                if ($currentSort === $sortKey) {
+                    $icon = $currentOrder === 'desc' ? ' <i class="mdi mdi-arrow-down"></i>' : ' <i class="mdi mdi-arrow-up"></i>';
+                }
+                $baseUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+                if (empty($baseUrl)) {
+                    $baseUrl = '/';
+                }
+                $queryParams = $_GET;
+                unset($queryParams['page']);
+                $queryParams['sort'] = $sortKey;
+                $queryParams['order'] = $newOrder;
+                $sortUrl = $baseUrl . '?' . http_build_query($queryParams);
+                $string .= "<th><a href=\"{$sortUrl}\" class=\"text-decoration-none text-dark\" style=\"cursor:pointer;\">{$sortLabel}{$icon}</a></th>";
+            } else {
+                $string .= "<th>{$head[$k]}</th>";
+            }
         }
         if ($actions) {
             $string .= "<th>Actions</th>";

@@ -41,6 +41,14 @@ class OutflowController extends Controller
         $length = in_array($length, [10, 25, 50, 100]) ? $length : 50;
         $offset = ($page - 1) * $length;
 
+        $sort = $_GET['sort'] ?? 'id_outflow';
+        $order = isset($_GET['order']) && strtoupper($_GET['order']) === 'ASC' ? 'ASC' : 'DESC';
+
+        $allowedSorts = ['id_outflow', 'id_outflow_type', 'id_category', 'id_porcent', 'amount', 'description', 'is_in_budget', 'set_date'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'id_outflow';
+        }
+
         $filters = $this->buildFilters($_GET);
 
         $conditions = ["id_user[=]" => $this->id];
@@ -51,7 +59,7 @@ class OutflowController extends Controller
 
         $total = intval($this->model->count($conditions)->array());
 
-        $outflows = $this->model->select("*", $conditions, "id_outflow DESC", $length, $offset)->array();
+        $outflows = $this->model->select("*", $conditions, "{$sort} {$order}", $length, $offset)->array();
 
         $totalPages = $total > 0 ? ceil($total / $length) : 1;
 
@@ -85,7 +93,9 @@ class OutflowController extends Controller
             "totalAmount" => $totalAmount,
             "outflowTypes" => $outflowTypes,
             "categories" => $categories,
-            "porcents" => $porcents
+            "porcents" => $porcents,
+            "sort" => $sort,
+            "order" => $order
         ]);
     }
 
