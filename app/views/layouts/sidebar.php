@@ -49,6 +49,9 @@
                         <a href="<?php echo route("query") ?>" class=""><i class="size-icon mdi mdi mdi-database-edit"></i><span>SQL<span class="float-right menu-arrow"> </span></a>
                     </li>
                     <li>
+                        <a href="<?php echo route("sharedFound") ?>" class=""><i class="size-icon mdi mdi-hand-coin"></i><span>Fondo Compartido<span class="float-right menu-arrow"> </span></a>
+                    </li>
+                    <li>
                         <a href="javascript:void(0);" class="waves-effect"><i class="size-icon mdi mdi-flash-auto"></i><span> Administracion <span class="float-right menu-arrow"><i class="mdi mdi-chevron-right"></i></span> </span></a>
                         <ul class="submenu">
                             <li><a href="<?php echo route("admin/users") ?>">Usuarios</a></li>
