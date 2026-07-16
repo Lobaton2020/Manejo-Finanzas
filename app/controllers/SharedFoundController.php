@@ -6,15 +6,37 @@ class SharedFoundController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->authentication();
-        $this->only_access_admin();
+        // $this->authentication();
+        // $this->only_access_admin();
         $this->model = $this->model("sharedFound");
     }
 
     public function index()
     {
-        $records = $this->model->select("*", [], "ORDER BY `year` DESC, `month` DESC")->array();
-        return view("sharedFound.list", ["records" => $records]);
+        $records = $this->model->select("*", [], "`year` DESC, `month` DESC")->array();
+
+        $totalAndres = 0;
+        $totalIvan = 0;
+        foreach ($records as $r) {
+            $totalAndres += $r->amount_andres;
+            $totalIvan += $r->amount_ivan;
+        }
+        $total = $totalAndres + $totalIvan;
+        return view("sharedFound.list", ["records" => $records, "totalAndres" => $totalAndres, "totalIvan" => $totalIvan, "total" => $total]);
+    }
+
+    public function public()
+    {
+        $records = $this->model->select("*", [], "`year` DESC, `month` DESC")->array();
+
+        $totalAndres = 0;
+        $totalIvan = 0;
+        foreach ($records as $r) {
+            $totalAndres += $r->amount_andres;
+            $totalIvan += $r->amount_ivan;
+        }
+        $total = $totalAndres + $totalIvan;
+        return view("sharedFound.public", ["records" => $records, "totalAndres" => $totalAndres, "totalIvan" => $totalIvan, "total" => $total], false, false);
     }
 
     public function create()
@@ -32,7 +54,7 @@ class SharedFoundController extends Controller
     {
         return execute_post(function ($request) {
             if (arrayEmpty(["year", "month", "amount_andres", "amount_ivan"], $request)) {
-                return redirect("sharedFound/create")->with("error", "Llena todos los campos");
+                return redirect("sharedFound/public")->with("error", "Llena todos los campos");
             }
 
             $year = (int)$request->year;
@@ -40,17 +62,7 @@ class SharedFoundController extends Controller
             $amountAndres = (float)$request->amount_andres;
             $amountIvan = (float)$request->amount_ivan;
 
-            $exists = $this->model->get("id, amount_andres, amount_ivan", ["year[=]" => $year, "month[=]" => $month])->array();
-            if ($exists && !empty($exists->id)) {
-                $newAndres = $exists->amount_andres + $amountAndres;
-                $newIvan = $exists->amount_ivan + $amountIvan;
-                $data = [
-                    "amount_andres" => $newAndres,
-                    "amount_ivan" => $newIvan,
-                    "total" => $newAndres + $newIvan
-                ];
-                $this->model->update($data, ["id[=]" => $exists->id]);
-            } else {
+            if (!empty($request->id)) {
                 $data = [
                     "year" => $year,
                     "month" => $month,
@@ -58,10 +70,31 @@ class SharedFoundController extends Controller
                     "amount_ivan" => $amountIvan,
                     "total" => $amountAndres + $amountIvan
                 ];
-                $this->model->insert($data);
+                $this->model->update($data, ["id[=]" => $request->id]);
+            } else {
+                $exists = $this->model->get("id, amount_andres, amount_ivan", ["year[=]" => $year, "month[=]" => $month])->array();
+                if ($exists && !empty($exists->id)) {
+                    $newAndres = $exists->amount_andres + $amountAndres;
+                    $newIvan = $exists->amount_ivan + $amountIvan;
+                    $data = [
+                        "amount_andres" => $newAndres,
+                        "amount_ivan" => $newIvan,
+                        "total" => $newAndres + $newIvan
+                    ];
+                    $this->model->update($data, ["id[=]" => $exists->id]);
+                } else {
+                    $data = [
+                        "year" => $year,
+                        "month" => $month,
+                        "amount_andres" => $amountAndres,
+                        "amount_ivan" => $amountIvan,
+                        "total" => $amountAndres + $amountIvan
+                    ];
+                    $this->model->insert($data);
+                }
             }
 
-            return redirect("sharedFound")->with("success", "Registro guardado correctamente");
+            return redirect("sharedFound/public")->with("success", "Registro guardado correctamente");
         });
     }
 

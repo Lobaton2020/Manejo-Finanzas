@@ -24,7 +24,7 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $st
     if (empty($columns) || count($listData) == 0) {
         return '';
     }
-    
+
     if ($statusColumn) {
         $totalsActivo = array_fill_keys($columns, 0);
         $totalsInactivo = array_fill_keys($columns, 0);
@@ -39,9 +39,9 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $st
                 }
             }
         }
-        
+
         $tfoot = "<tfoot>";
-        
+
         // Fila sumatoria activos
         $tfoot .= "<tr class=\"table-success\">";
         $counter = 0;
@@ -59,7 +59,7 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $st
             $counter++;
         }
         $tfoot .= "</tr>";
-        
+
         // Fila sumatoria inactivos
         $tfoot .= "<tr class=\"table-secondary\">";
         $counter = 0;
@@ -77,7 +77,7 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $st
             $counter++;
         }
         $tfoot .= "</tr>";
-        
+
         // Fila consolidado total
         $tfoot .= "<tr class=\"table-primary\">";
         $counter = 0;
@@ -99,11 +99,11 @@ function make_table_tfoot($listData, $columns, $fillable, $allowConsolidado, $st
             $counter++;
         }
         $tfoot .= "</tr>";
-        
+
         $tfoot .= "</tfoot>";
         return $tfoot;
     }
-    
+
     $totals = array_fill_keys($columns, 0);
     foreach ($listData as $data) {
         foreach ($columns as $column) {
@@ -201,6 +201,9 @@ function make_table($head, $fillable, $data, $extra = null)
     $param_extra = "";
 
     if ($extra != null) {
+        if (isset($extra["show_id"])) {
+            $show_id = $extra["show_id"];
+        }
         if (isset($extra["use"])) {
 
             switch ($extra["use"]) {
