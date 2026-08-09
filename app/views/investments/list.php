@@ -44,6 +44,7 @@ $configTable = [
     "redirect" => "investment",
     "verify-state-color-before" => true,
     "verify-risk-color-before" => true,
+    "verify-end-date-expired" => true,
     "state_colors" => [
         "Creado" => "info",
         "Expirado" => "danger",
@@ -73,14 +74,24 @@ usort($data, function($a, $b) {
 
 $groupedData = [];
 $hasGroup = false;
+$bogota_now = new DateTime('now', new DateTimeZone('America/Bogota'));
 foreach ($data as $item) {
     $key = (empty($item->group_investment_name)) ? 'sin_grupo' : $item->group_investment_name;
     if (!isset($groupedData[$key])) {
-        $groupedData[$key] = ['inversiones' => [], 'total' => 0, 'ganancia' => 0];
+        $groupedData[$key] = ['inversiones' => [], 'total' => 0, 'ganancia' => 0, 'has_expired' => false];
     }
     $groupedData[$key]['inversiones'][] = $item;
     $groupedData[$key]['total'] += intval($item->amount);
     $groupedData[$key]['ganancia'] += intval($item->earn_amount);
+    if (!empty($item->end_date)) {
+        try {
+            $end_date = new DateTime($item->end_date, new DateTimeZone('America/Bogota'));
+            if ($end_date <= $bogota_now) {
+                $groupedData[$key]['has_expired'] = true;
+            }
+        } catch (Exception $e) {
+        }
+    }
     if ($key !== 'sin_grupo') $hasGroup = true;
 }
 
@@ -116,6 +127,9 @@ if (!empty($groupedData)) {
         $card_body .= '<div class="card mb-2">';
         $card_body .= '<div class="card-header" id="heading_' . $collapseId . '">';
         $card_body .= '<h5 class="mb-0">';
+        $expired_indicator = $groupInfo['has_expired']
+            ? ' <span class="expired-indicator ml-2" title="Una o mas inversiones del grupo ya superaron o estan en su fecha final"></span>'
+            : '';
         if (!$isSinGrupo) {
             $percentage = $groupInfo['total'] > 0 ? round(($groupInfo['ganancia'] / $groupInfo['total']) * 100, 1) : 0;
             $card_body .= '<button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#' . $collapseId . '">';
@@ -126,6 +140,7 @@ if (!empty($groupedData)) {
             $card_body .= ' <span class="ml-1 text-muted small">Gan:</span> ';
             $card_body .= '<span class="font-weight-bold">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
             $card_body .= ' <span class="badge badge-secondary ml-1 font-weight-bold">' . $percentage . '%</span>';
+            $card_body .= $expired_indicator;
             $card_body .= '</button>';
         } else {
             $percentage = $groupInfo['total'] > 0 ? round(($groupInfo['ganancia'] / $groupInfo['total']) * 100, 1) : 0;
@@ -136,6 +151,7 @@ if (!empty($groupedData)) {
             $card_body .= '<span class="font-weight-bold">$' . number_format($groupInfo['total'], 0, ',', '.') . '</span>';
             $card_body .= ' <span class="ml-1 text-muted small">Ganancia:</span> ';
             $card_body .= '<span class="font-weight-bold">+$' . number_format($groupInfo['ganancia'], 0, ',', '.') . '</span>';
+            $card_body .= $expired_indicator;
             $card_body .= '</button>';
         }
         $card_body .= '</h5>';

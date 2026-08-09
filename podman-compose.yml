@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile.dev
+    container_name: manejo-finanzas-dev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    userns_mode: "keep-id"
+    environment:
+      APACHE_RUN_USER: "app"
+      APACHE_RUN_GROUP: "app"
+      APACHE_DOCUMENT_ROOT: "/var/www/html"
+      APACHE_LOG_DIR: "/var/log/apache2"
+    volumes:
+      - ./app:/var/www/html/app:U
+      - ./public:/var/www/html/public:U
+      - ./index.php:/var/www/html/index.php:U
+      - ./.htaccess:/var/www/html/.htaccess:U
+      - ./php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
+      - ./.env:/var/www/html/.env:ro

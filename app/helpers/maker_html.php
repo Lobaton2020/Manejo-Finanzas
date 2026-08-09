@@ -310,9 +310,23 @@ function make_table($head, $fillable, $data, $extra = null)
     }
     $string .= "</thead>";
     $string .= "<tbody>";
+    $bogota_now = null;
+    if (isset($extra["verify-end-date-expired"])) {
+        $bogota_now = new DateTime('now', new DateTimeZone('America/Bogota'));
+    }
     for ($i = 0; $i < count($data); $i++) {
         $data[$i] = (object) $data[$i];
-        $string .= "<tr>";
+        $row_expired = false;
+        if (isset($extra["verify-end-date-expired"]) && !empty($data[$i]->end_date)) {
+            try {
+                $end_date = new DateTime($data[$i]->end_date, new DateTimeZone('America/Bogota'));
+                $row_expired = ($end_date <= $bogota_now);
+            } catch (Exception $e) {
+                $row_expired = false;
+            }
+        }
+        $tr_class = $row_expired ? " class=\"tr-end-date-expired\"" : "";
+        $string .= "<tr{$tr_class}>";
         for ($k = 0; $k < count($head); $k++) {
             if ($show_id && $k == 0) {
                 continue;
