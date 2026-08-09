@@ -11,13 +11,19 @@ const formatPrice = (e, id = "#number-format") => {
 const saveInflow = (e) => {
     e.preventDefault();
     let porcents = document.querySelectorAll(".porcents"),
-        sum = 0;
+        sum = 0,
+        hasNegative = false;
     [...porcents].forEach((elem) => {
-        if (parseFloat(elem.value) >= 0) {
-            sum += parseFloat(elem.value);
+        if (elem.value && elem.value.trim() !== "") {
+            const value = parseFloat(elem.value);
+            if (value < 0) {
+                hasNegative = true;
+            } else {
+                sum += value;
+            }
         }
     });
-    if (sum < 100) {
+    if (hasNegative) {
         Swal.fire("Numeros negativos!", "Los porcentajes deben ser mayor o igual 0", "error");
         return;
     }
@@ -25,6 +31,11 @@ const saveInflow = (e) => {
         if (preventSendForm()) {
             Swal.fire("Hey!", "Faltan datos por agregar", "info");
         } else {
+            [...porcents].forEach((elem) => {
+                if (!elem.value || elem.value.trim() === "") {
+                    elem.disabled = true;
+                }
+            });
             e.target.submit();
         }
         return;

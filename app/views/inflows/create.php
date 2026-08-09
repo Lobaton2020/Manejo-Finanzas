@@ -83,9 +83,9 @@
                                             <?php foreach ($porcents as $porcent) : ?>
                                                 <div class="row">
                                                     <div class="form-group col-6">
-                                                        <label for="total"><?php echo $porcent->name ?> <span class="text-danger">*</span></label>
+                                                        <label for="total"><?php echo $porcent->name ?></label>
                                                         <input type="number" onkeyup="handleKeyUp(event)" name="porcents[<?php echo $porcent->id_porcent ?>]"
-                                                                class="porcents form-control porcent-forms-ref" required="" parsley-type="email"
+                                                                class="porcents form-control porcent-forms-ref"
                                                                 placeholder="ej: <?php echo rand(1, 60) ?>">
                                                         </div>
                                                         <div class="form-group col-6">
@@ -106,8 +106,8 @@
                                         </ul>
                                         <template id="template-porcent">
                                             <div class="form-group">
-                                                <label for="total" class="name"><span class="text-danger">*</span></label>
-                                                <input type="number" class="porcents form-control value" required="" placeholder="ej: <?php echo rand(1, 60) ?>">
+                                                <label for="total" class="name"></label>
+                                                <input type="number" class="porcents form-control value" placeholder="ej: <?php echo rand(1, 60) ?>">
                                             </div>
                                         </template>
                                     </div>
