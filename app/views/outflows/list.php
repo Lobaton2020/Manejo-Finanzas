@@ -32,6 +32,16 @@
                                         <span class="badge badge-light ml-1"><?php echo count($filters); ?></span>
                                     <?php endif; ?>
                                 </button>
+                                <?php
+                                $exportParams = $filters ?? [];
+                                if (isset($_GET['sort'])) $exportParams['sort'] = $_GET['sort'];
+                                if (isset($_GET['order'])) $exportParams['order'] = $_GET['order'];
+                                $exportUrl = route('outflow/exportCsv');
+                                if (!empty($exportParams)) {
+                                    $exportUrl .= '?' . http_build_query($exportParams);
+                                }
+                                ?>
+                                <a href="<?php echo htmlspecialchars($exportUrl); ?>" class="btn btn-info mr-2"><i class="mdi mdi-download"></i> Exportar CSV</a>
                                 <a href="<?php echo route("outflow/create") ?>" class="btn btn-success"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
                             </div>
                         </div>

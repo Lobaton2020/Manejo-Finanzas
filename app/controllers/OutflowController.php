@@ -99,6 +99,62 @@ class OutflowController extends Controller
         ]);
     }
 
+    public function exportCsv()
+    {
+        $filters = $this->buildFilters($_GET);
+        $conditions = ["id_user[=]" => $this->id];
+        if (!empty($filters['conditions'])) {
+            $conditions = array_merge($conditions, $filters['conditions']);
+        }
+
+        $sort = $_GET['sort'] ?? 'id_outflow';
+        $order = isset($_GET['order']) && strtoupper($_GET['order']) === 'ASC' ? 'ASC' : 'DESC';
+        $allowedSorts = ['id_outflow', 'id_outflow_type', 'id_category', 'id_porcent', 'amount', 'description', 'is_in_budget', 'set_date'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'id_outflow';
+        }
+
+        $outflows = $this->model->select("*", $conditions, "{$sort} {$order}")->array();
+
+        foreach ($outflows as $outflow) {
+            $outflow->outfow_type = $this->outflow_type->get("*", ["id_outflow_type[=]" => $outflow->id_outflow_type, "id_user[=]" => $this->id, "AND"])->array()->name ?? '';
+            $outflow->porcent = $this->porcent->get("*", ["id_porcent[=]" => $outflow->id_porcent, "id_user[=]" => $this->id, "AND"])->array()->name ?? '';
+            $outflow->category = $this->category->get("*", ["id_category[=]" => $outflow->id_category, "id_user[=]" => $this->id, "AND"])->array()->name ?? '';
+            $outflow->is_in_budget = boolval($outflow->is_in_budget) ? "Si" : "No";
+        }
+
+        $filename = 'egresos-' . date('Y-m-d-His') . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+
+        $output = fopen('php://output', 'w');
+        fwrite($output, "\xEF\xBB\xBF");
+
+        fputcsv($output, [
+            'ID', 'Tipo Egreso', 'Categoria', 'Deposito', 'Monto',
+            'Descripcion', 'En Presupuesto', 'Fecha'
+        ], ';');
+
+        foreach ($outflows as $outflow) {
+            fputcsv($output, [
+                $outflow->id_outflow,
+                $outflow->outfow_type ?? '',
+                $outflow->category ?? '',
+                $outflow->porcent ?? '',
+                $outflow->amount,
+                $outflow->description ?? '',
+                $outflow->is_in_budget,
+                $outflow->set_date
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
+    }
+
     private function buildFilters(array $get): array
     {
         $conditions = [];
