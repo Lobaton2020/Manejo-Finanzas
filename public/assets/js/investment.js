@@ -17,6 +17,36 @@ const fNumber = (number) => {
         minimumFractionDigits: 0
     });
 }
+// Agrupa slices con porcentaje menor a `threshold`% en un único segmento "Otros (N)"
+// para que Chartist.Pie no los descarte al redondear la serie a enteros (#35).
+function groupSmallSlices(items, total, threshold = 1) {
+    const result = [];
+    let smallAmount = 0;
+    let smallCount = 0;
+    for (const item of items) {
+        const amount = parseFloat(item.amount);
+        const pct = (amount * 100) / total;
+        if (pct < threshold) {
+            smallAmount += amount;
+            smallCount += 1;
+        } else {
+            result.push({
+                name: item.name,
+                amount: amount,
+                percentage: Math.round(pct)
+            });
+        }
+    }
+    if (smallCount > 0) {
+        result.push({
+            name: `Otros (${smallCount})`,
+            amount: smallAmount,
+            percentage: Math.round((smallAmount * 100) / total)
+        });
+    }
+    return result;
+}
+
 async function initinitChartistPie() {
     try {
         const portfolio = fetch(`${URL_PROJECT}query/sql/SELECT-iv.name,-sum(iv.amount)-as-amount-FROM-investments_view-AS-iv-WHERE-state-=-'Activo'-GROUP-BY-iv.name`, {
@@ -34,13 +64,7 @@ async function initinitChartistPie() {
         const [{ data: portfolioData }, { data: riskData }] = await Promise.all([portfolio, risk]);
 
         const totalPortfolio = portfolioData.reduce((total, item) => total + parseFloat(item.amount), 0);
-        const mapPortfolio = portfolioData.map(item => {
-            return {
-                name: item.name,
-                amount: parseFloat(item.amount),
-                percentage: Math.round((parseFloat(item.amount) * 100) / totalPortfolio)
-            }
-        })
+        const mapPortfolio = groupSmallSlices(portfolioData, totalPortfolio);
         const chartPortfolio = new Chartist.Pie('#simple-pie-porfolio', {
             labels: mapPortfolio.map(item => item.name),
             series: mapPortfolio.map(item => item.percentage),
@@ -63,13 +87,7 @@ async function initinitChartistPie() {
         });
 
         const totalRisk = riskData.reduce((total, item) => total + parseFloat(item.amount), 0);
-        const mapRisk = riskData.map(item => {
-            return {
-                name: item.name,
-                amount: parseFloat(item.amount),
-                percentage: Math.round((parseFloat(item.amount) * 100) / totalRisk)
-            }
-        })
+        const mapRisk = groupSmallSlices(riskData, totalRisk);
         const chartRisk = new Chartist.Pie('#simple-pie-risk', {
             labels: mapRisk.map(item => item.name),
             series: mapRisk.map(item => item.percentage)

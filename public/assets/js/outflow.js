@@ -475,8 +475,50 @@ function initRemoveFilterChips() {
 
 window.addEventListener("DOMContentLoaded", () => {
     const route = getCurrentRoute();
-    
+
     if (route === 'outflow') {
         initOutflowFilters();
+        initCopyToClipboard();
     }
 });
+
+async function copyOutflowsToClipboard() {
+    const params = new URLSearchParams(window.location.search);
+    const url = OUTFLOW_URL + '/exportCsv' + (params.toString() ? '?' + params.toString() : '');
+    const btn = document.getElementById('btnCopyCsv');
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i> Copiando...';
+
+    try {
+        const response = await fetch(url, { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+
+        const csvText = await response.text();
+        await navigator.clipboard.writeText(csvText);
+
+        const lines = csvText.split('\n').filter(l => l.trim()).length - 1;
+        Swal.fire({
+            icon: 'success',
+            title: '¡Copiado!',
+            text: `${lines} registros copiados al portapapeles. Pegá directo en el chat de IA.`,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'No se pudo copiar',
+            text: 'Verificá que el navegador tenga permiso de clipboard. Error: ' + err.message
+        });
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    }
+}
+
+function initCopyToClipboard() {
+    const btn = document.getElementById('btnCopyCsv');
+    if (!btn) return;
+    btn.addEventListener('click', copyOutflowsToClipboard);
+}
