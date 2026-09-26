@@ -42,6 +42,9 @@
                                 }
                                 ?>
                                 <a href="<?php echo htmlspecialchars($exportUrl); ?>" class="btn btn-info mr-2"><i class="mdi mdi-download"></i> Exportar CSV</a>
+                                <button type="button" class="btn btn-warning mr-2" id="btnCopyCsv" title="Copia los mismos registros filtrados al portapapeles para pegar en un chat de IA">
+                                    <i class="mdi mdi-content-copy"></i> Copiar al portapapeles
+                                </button>
                                 <a href="<?php echo route("outflow/create") ?>" class="btn btn-success"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
                             </div>
                         </div>
