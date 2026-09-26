@@ -46,7 +46,7 @@ $configTable = [
     "verify-risk-color-before" => true,
     "verify-end-date-expired" => true,
     "state_colors" => [
-        "Creado" => "info",
+        "Creado" => "estado-creado",
         "Expirado" => "danger",
         "Cancelado" => "secondary",
         "Activo" => "primary",
@@ -215,6 +215,15 @@ $config = [
 
 echo wrapper_html($config, $card_body);
 ?>
+
+<style>
+    /* Color azulado claro para el estado 'Creado' de inversiones (#33) */
+    .alert.alert-estado-creado {
+        background-color: #cfe2ff;
+        color: #052c65;
+        border-color: #9ec5fe;
+    }
+</style>
 
 <div class="modal fade" id="groupsModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
