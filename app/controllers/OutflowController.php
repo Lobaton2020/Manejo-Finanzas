@@ -114,7 +114,7 @@ class OutflowController extends Controller
             $sort = 'id_outflow';
         }
 
-        $outflows = $this->model->select("*", $conditions, "{$sort} {$order}")->array();
+        $outflows = $this->model->select("*", $conditions, "{$sort} {$order}", PHP_INT_MAX)->array();
 
         foreach ($outflows as $outflow) {
             $outflow->outfow_type = $this->outflow_type->get("*", ["id_outflow_type[=]" => $outflow->id_outflow_type, "id_user[=]" => $this->id, "AND"])->array()->name ?? '';

@@ -482,6 +482,58 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+async function writeToClipboard(text) {
+    if (typeof navigator !== 'undefined'
+        && navigator.clipboard
+        && typeof navigator.clipboard.writeText === 'function') {
+        try {
+            await navigator.clipboard.writeText(text);
+            return;
+        } catch (err) {
+            console.warn('Clipboard API rechazada, usando fallback:', err);
+        }
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    textarea.style.left = '-1000px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+
+    const selection = document.getSelection();
+    const savedRanges = [];
+    if (selection) {
+        for (let i = 0; i < selection.rangeCount; i++) {
+            savedRanges.push(selection.getRangeAt(i));
+        }
+    }
+
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+
+    let ok = false;
+    try {
+        ok = document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback de copy falló:', err);
+    }
+
+    document.body.removeChild(textarea);
+
+    if (selection && savedRanges.length) {
+        selection.removeAllRanges();
+        savedRanges.forEach(r => selection.addRange(r));
+    }
+
+    if (!ok) {
+        throw new Error('Clipboard no disponible (HTTPS requerido o permiso denegado)');
+    }
+}
+
 async function copyOutflowsToClipboard() {
     const params = new URLSearchParams(window.location.search);
     const url = OUTFLOW_URL + '/exportCsv' + (params.toString() ? '?' + params.toString() : '');
@@ -495,7 +547,7 @@ async function copyOutflowsToClipboard() {
         if (!response.ok) throw new Error('HTTP ' + response.status);
 
         const csvText = await response.text();
-        await navigator.clipboard.writeText(csvText);
+        await writeToClipboard(csvText);
 
         const lines = csvText.split('\n').filter(l => l.trim()).length - 1;
         Swal.fire({
