@@ -138,14 +138,16 @@ class OutflowController extends Controller
             'Descripcion', 'En Presupuesto', 'Fecha'
         ], ';');
 
+        $normalize = fn($s) => preg_replace('/\s+/', ' ', (string)($s ?? ''));
+
         foreach ($outflows as $outflow) {
             fputcsv($output, [
                 $outflow->id_outflow,
-                $outflow->outfow_type ?? '',
-                $outflow->category ?? '',
-                $outflow->porcent ?? '',
+                $normalize($outflow->outfow_type ?? ''),
+                $normalize($outflow->category ?? ''),
+                $normalize($outflow->porcent ?? ''),
                 $outflow->amount,
-                $outflow->description ?? '',
+                $normalize($outflow->description ?? ''),
                 $outflow->is_in_budget,
                 $outflow->set_date
             ], ';');
