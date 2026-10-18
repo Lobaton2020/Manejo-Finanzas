@@ -20,3 +20,5 @@ services:
       - ./.htaccess:/var/www/html/.htaccess:U
       - ./php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
       - ./.env:/var/www/html/.env:ro
+    extra_hosts:
+      - "db-host:192.168.20.240"

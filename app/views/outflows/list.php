@@ -26,8 +26,8 @@
                                 <?php if (!empty($filters)): ?>
                                     <a href="javascript:void(0)" class="btn btn-link text-danger btn-sm mr-2 clear-all-filters" style="text-decoration: none;">Limpiar</a>
                                 <?php endif; ?>
-                                <button type="button" class="btn btn-secondary mr-2" id="btnFilters" data-toggle="modal" data-target="#filterModal">
-                                    <i class="mdi mdi-filter"></i> Filtros
+                                <button type="button" class="btn btn-secondary mr-2" id="btnFilters" data-toggle="modal" data-target="#filterModal" title="Filtros">
+                                    <i class="mdi mdi-filter"></i>
                                     <?php if (!empty($filters)): ?>
                                         <span class="badge badge-light ml-1"><?php echo count($filters); ?></span>
                                     <?php endif; ?>
@@ -41,9 +41,9 @@
                                     $exportUrl .= '?' . http_build_query($exportParams);
                                 }
                                 ?>
-                                <a href="<?php echo htmlspecialchars($exportUrl); ?>" class="btn btn-info mr-2"><i class="mdi mdi-download"></i> Exportar CSV</a>
+                                <a href="<?php echo htmlspecialchars($exportUrl); ?>" class="btn btn-info mr-2" title="Exportar CSV"><i class="mdi mdi-download"></i></a>
                                 <button type="button" class="btn btn-warning mr-2" id="btnCopyCsv" title="Copia los mismos registros filtrados al portapapeles para pegar en un chat de IA">
-                                    <i class="mdi mdi-content-copy"></i> Copiar al portapapeles
+                                    <i class="mdi mdi-content-copy"></i>
                                 </button>
                                 <a href="<?php echo route("outflow/create") ?>" class="btn btn-success"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
                             </div>

@@ -304,6 +304,30 @@ create table retirement_investments(
     created_at datetime not null default CURRENT_TIMESTAMP,
     foreign key(id_investment) references investments (id_investment)
 );
+
+CREATE TABLE notifications_transactions (
+            id              VARCHAR(36)  NOT NULL PRIMARY KEY,
+            client_id       VARCHAR(64)  NOT NULL,
+            batch_id        VARCHAR(128) NOT NULL,
+            amount          DECIMAL(18, 2) NOT NULL,
+            currency        CHAR(3)      NOT NULL,
+            merchant        VARCHAR(255) NOT NULL,
+            category        VARCHAR(64)  NOT NULL,
+            bank            VARCHAR(64)  NOT NULL,
+            card_brand      VARCHAR(64)  NULL,
+            card_last_four  VARCHAR(4)   NULL,
+            payment_method  VARCHAR(255) NOT NULL,
+            datetime        BIGINT       NOT NULL,
+            captured_at     BIGINT       NOT NULL,
+            received_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            sources         TEXT            NOT NULL,
+            raw_text        TEXT            NOT NULL,
+            INDEX idx_notif_tx_datetime (datetime DESC),
+            INDEX idx_notif_tx_merchant  (merchant),
+            INDEX idx_notif_tx_batch     (batch_id),
+            INDEX idx_notif_tx_received  (received_at DESC)
+        );
+
 create or replace view investments_view as
 SELECT
     i.*,
