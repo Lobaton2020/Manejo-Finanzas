@@ -1,4 +1,5 @@
 <?php
+require_once URL_APP . 'services/NotificationsSyncValidator.php';
 
 /**
  * Controller del proceso de sync de transacciones capturadas desde notificaciones.
