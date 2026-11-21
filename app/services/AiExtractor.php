@@ -22,6 +22,96 @@ class AiExtractor
         "confidence", "fields_missing",
     ];
 
+    /**
+     * Palabras que delatan un tipo de egreso (ademas de las del propio nombre).
+     */
+    private const TYPE_KEYWORDS = [
+        "inversion" => [
+            "inversion", "invertir", "inverti", "bitcoin", "crypto", "acciones",
+            "cedula", "finca", "ursi", "etf", "renta4", "alpaca", "binance",
+            "mercado de valores", "bolsa",
+        ],
+    ];
+
+    /**
+     * Palabras que delatan una categoria (ademas de las del propio nombre).
+     * La clave es un fragmento en minusculas del nombre de la categoria.
+     */
+    private const CATEGORY_KEYWORDS = [
+        "mercado"   => ["supermercado", "tienda", "comercio", "plaza", "exito", "almacen"],
+        "comida"    => ["almuerzo", "cena", "restaurante", "comida", "domicilio", "rapida", "hamburgues", "pizza", "hamburguesa"],
+        "gasolina"  => ["gasolina", "bencina", "combustible", "cargador", "eds", "terpel", "petrobras", "primus", "copia"],
+        "pasaje"    => ["transmilenio", "pasaje", "bus", "taxi", "metro", "sitp", "buseta"],
+        "salud"     => ["doctor", "medico", "medicina", "salud", "farmacia", "dental", "odontologo", "hospital", "psicolog"],
+        "educacion" => ["universidad", "colegio", "matricula", "educacion", "curso", "semestre", "universitario"],
+        "viajes"    => ["viaje", "vuelo", "hotel", "airbnb", "pasajes", "aviacion", "aerolinea", "tiquete"],
+        "transporte" => ["uber", "taxi", "mensajeria", "envio a domicilio", "domicilio"],
+        "deudas"    => ["deuda", "prestamo", "cuota", "credito", "financiacion"],
+        "arriendo"  => ["arriendo", "renta", "alquiler", "vivienda", "apartamento", "canon"],
+        "servicios" => ["servicio", "luz", "agua", "internet", "energia", "telefono", "factura", "gas domiciliario"],
+        "ropa"      => ["ropa", "zapato", "camisa", "pantalon", "vestido", "calzado", "zapatilla"],
+        "fitness"   => ["gimnasio", "gym", "fitness", "entrenamiento", "crossfit"],
+        "electrodomesticos" => ["nevera", "lavadora", "televisor", "electrodomestico", "aspiradora", "horno"],
+        "suscripciones" => ["netflix", "spotify", "amazon", "disney", "youtube", "suscripcion", "membership", "hbo", "prime video"],
+        "tecnologia" => ["computador", "laptop", "celular", "teclado", "monitor", "tecnolog", "audifonos", "mouse", "tablet"],
+        "regalos"   => ["regalo", "gift", "obsequio"],
+        "terapia"   => ["terapia", "psicologo", "consulta medica"],
+        "trabajo"   => ["trabajo", "servicio prestado", "horas extra"],
+        "electro"   => ["electrodomestico", "electrodomesticos"],
+    ];
+
+    /**
+     * Palabras de la notificacion que apuntan a una categoria "generica".
+     * Se usa cuando el mensaje no menciona ninguna categoria concreta pero
+     * si es claramente un pago o una transferencia.
+     */
+    private const CATEGORY_HINTS = [
+        "envio"        => ["otros", "otro", "transferencia", "transferencias", "envio", "envios"],
+        "transferencia" => ["transferencia", "transferencias", "otros", "otro", "envio", "envios"],
+        "bre-b"        => ["transferencia", "otros", "otro"],
+        "breb"         => ["transferencia", "otros", "otro"],
+        "nequi"        => ["transferencia", "otros", "otro", "recarga"],
+        "llave"        => ["transferencia", "otros", "otro"],
+        "consignacion" => ["transferencia", "otros", "otro"],
+        "pago"         => ["otros", "otro", "pago", "pagos"],
+        "compra"       => ["mercado", "compras", "otros"],
+        "retiro"       => ["retiro", "retiros", "caja", "otros"],
+    ];
+
+    /**
+     * Palabras que delatan un deposito (ademas de las del propio nombre).
+     */
+    private const DEPOSIT_KEYWORDS = [
+        "ahorro"    => ["ahorro", "ahorros", "ahorrar", "cedula", "ahorro en dolares"],
+        "viajes"    => ["viaje", "vuelo", "hotel", "pasajes", "turismo"],
+        "educacion" => ["universidad", "colegio", "matricula", "universidad"],
+        "inversion" => ["inversion", "invertir", "bitcoin", "crypto"],
+        "donativos" => ["donacion", "donativo", "ayuda", "donar"],
+        "comida"    => ["mercado", "supermercado", "comida", "groceries"],
+        "moto"      => ["moto", "motocicleta"],
+        "finca"     => ["finca", "granja", "siembra", "cosecha"],
+        "diversion" => ["diversion", "fiesta", "cine", "paseo", "vacaciones"],
+    ];
+
+    /**
+     * Palabras del nombre de una categoria que describen el MEDIO de pago y
+     * no el motivo del gasto: no sirven como evidencia de categoria.
+     */
+    private const CATEGORY_NAME_STOPWORDS = [
+        "tarjeta", "tarjetas", "mastercard", "visa", "debito", "credito",
+        "efectivo", "consignacion", "transferencia", "transferencias",
+        "compra", "compras", "pago", "pagos", "envio", "envios",
+    ];
+
+    /**
+     * Palabras que no sirven como evidencia: aparecen en cualquier lado.
+     */
+    private const GENERIC_WORDS = [
+        "compra", "compras", "compra y", "otros", "otro", "pago", "pagos",
+        "gasto", "gastos", "salida", "egreso", "movimiento", "transaccion",
+        "me", "no", "aplica", "varios",
+    ];
+
     private $client;
     private $outflowType;
     private $category;
@@ -94,6 +184,23 @@ class AiExtractor
         $data = $this->normalizeData($parsed);
         $ids = $this->resolveIds($data, $catalogue);
 
+        // Si el modelo no resolvio tipo o categoria, se completan con
+        // heuristicas por palabras clave del mensaje: la sugerencia llega con
+        // una opcion por defecto en lugar de vacia.
+        $heuristic = $this->inferByKeywords($rawText, $catalogue);
+        if ($ids["id_outflow_type"] === null && $heuristic["id_outflow_type"] !== null) {
+            $ids["id_outflow_type"] = $heuristic["id_outflow_type"];
+            $data["outflow_type_name"] = $heuristic["outflow_type_name"];
+        }
+        if ($ids["id_category"] === null && $heuristic["id_category"] !== null) {
+            $ids["id_category"] = $heuristic["id_category"];
+            $data["category_name"] = $heuristic["category_name"];
+        }
+        if ($ids["id_porcent"] === null && $heuristic["id_porcent"] !== null) {
+            $ids["id_porcent"] = $heuristic["id_porcent"];
+            $data["deposit_name"] = $heuristic["deposit_name"];
+        }
+
         // Si el modelo no pudo resolver tipo o categoria, la sugerencia queda
         // para revision manual: el usuario los elige en el formulario.
         $needsReview = false;
@@ -104,6 +211,10 @@ class AiExtractor
             $needsReview = true;
         }
         if ($data["amount"] === null || $data["amount"] <= 0) {
+            $needsReview = true;
+        }
+        // El deposito decide de que plata sale: sin evidencia no se presume.
+        if ($ids["id_porcent"] === null) {
             $needsReview = true;
         }
 
@@ -176,6 +287,7 @@ class AiExtractor
         $lines[] = "- La fecha puede venir como \"2026/11/19 21:46\" (yyyy/MM/dd HH:mm). Devuelve event_datetime en formato \"YYYY-MM-DDTHH:MM:SS\".";
         $lines[] = "- Si el texto describe una compra con tarjeta, un pago o una transferencia (Bre-B, Nequi, llave, consignacion), NO es una inversion: usa el tipo de egreso normal.";
         $lines[] = "- deposit_name: solo si el texto da evidencia (por ejemplo \"Cuenta origen *****5913\"). Si no hay evidencia clara, null y el usuario lo elige.";
+        $lines[] = "- Si el mensaje da pistas para decidir un tipo, una categoria o un deposito, elige SIEMPRE la opcion mas probable del catalogo: esa es la que el usuario va a ver preseleccionada. Solo deja null cuando el texto no de ninguna pista.";
         $lines[] = "- description: maximo 120 caracteres, en español, describiendo el pago (comercio o proposito).";
         $lines[] = "- confidence: numero entre 0 y 1 con tu certeza en la extraccion.";
         $lines[] = "- fields_missing: arreglo con los nombres de los campos que no pudiste extraer.";
@@ -428,6 +540,185 @@ class AiExtractor
     }
 
     /**
+     * Elige tipo, categoria y deposito por palabras clave del mensaje.
+     *
+     * Es la version determinista de lo que hace el LLM: sirve cuando la IA no
+     * esta disponible y como red de seguridad cuando el modelo no resuelve
+     * algo. El deposito es el mas estricto (exige palabras de 5+ letras)
+     * porque decide de que plata sale el dinero.
+     *
+     * @return array{id_outflow_type: ?int, id_category: ?int, id_porcent: ?int,
+     *               outflow_type_name: ?string, category_name: ?string, deposit_name: ?string}
+     */
+    private function inferByKeywords(string $rawText, array $catalogue): array
+    {
+        $text = $this->normalize($rawText);
+        $result = [
+            "id_outflow_type"   => null,
+            "id_category"       => null,
+            "id_porcent"        => null,
+            "outflow_type_name" => null,
+            "category_name"     => null,
+            "deposit_name"      => null,
+        ];
+
+        // 1) Tipo de egreso: se decide PRIMERO y no lo puede cambiar la
+        //    categoria. Sin pistas de inversion, el tipo normal.
+        $type = $this->pickType($text, $catalogue["outflow_types"]);
+        if ($type !== null) {
+            $result["id_outflow_type"] = $type["id"];
+            $result["outflow_type_name"] = $type["name"];
+        }
+
+        // 2) Categoria: solo dentro del tipo elegido.
+        $pool = $type !== null ? ($type["categories"] ?? []) : [];
+        $match = $this->bestCategory($text, $pool);
+        if ($match === null) {
+            $match = $this->hintedCategory($text, $pool);
+        }
+        if ($match !== null) {
+            $result["id_category"] = $match["id"];
+            $result["category_name"] = $match["name"];
+        }
+
+        // 4) Deposito: evidencia mas estricta (palabras de 5+ letras).
+        $bestDeposit = null;
+        $bestDepositScore = 0;
+        foreach ($catalogue["deposits"] as $deposit) {
+            $score = $this->scoreKeywords($text, $this->keywordsFor($deposit["name"], self::DEPOSIT_KEYWORDS), 5);
+            if ($score > $bestDepositScore) {
+                $bestDepositScore = $score;
+                $bestDeposit = $deposit;
+            }
+        }
+        if ($bestDeposit !== null) {
+            $result["id_porcent"] = $bestDeposit["id"];
+            $result["deposit_name"] = $bestDeposit["name"];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Tipo de egreso mas probable. Sin pistas de inversion se elige el tipo
+     * normal (el que no es "Inversion"), no el primero de la lista.
+     */
+    private function pickType(string $text, array $types): ?array
+    {
+        $best = null;
+        $bestScore = 0;
+        foreach ($types as $type) {
+            $score = $this->scoreKeywords($text, $this->keywordsFor($type["name"], self::TYPE_KEYWORDS));
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $best = $type;
+            }
+        }
+        if ($best !== null) {
+            return $best;
+        }
+
+        foreach ($types as $type) {
+            if (strpos($this->normalize($type["name"]), "inversion") === false) {
+                return $type;
+            }
+        }
+        return $types[0] ?? null;
+    }
+
+    /**
+     * Palabras que identifican un elemento del catalogo: las de su propio
+     * nombre (4+ letras) mas las de la tabla de sinonimos.
+     */
+    private function keywordsFor(string $name, array $table): array
+    {
+        $keywords = [];
+        $normalized = $this->normalize($name);
+        foreach (explode(" ", $normalized) as $word) {
+            if (strlen($word) >= 4 && !in_array($word, self::CATEGORY_NAME_STOPWORDS, true)) {
+                $keywords[] = $word;
+            }
+        }
+        foreach ($table as $fragment => $words) {
+            if (strpos($normalized, $fragment) !== false) {
+                foreach ($words as $word) {
+                    $keywords[] = $word;
+                }
+            }
+        }
+        return array_values(array_unique($keywords));
+    }
+
+    /**
+     * Palabras clave que aparecen en el texto.
+     */
+    private function matchKeywords(string $text, array $keywords, int $minLength = 4): array
+    {
+        $haystack = " " . $text . " ";
+        $matched = [];
+        foreach ($keywords as $keyword) {
+            $keyword = trim($keyword);
+            if (strlen($keyword) < $minLength) {
+                continue;
+            }
+            if (strpos($haystack, " " . $keyword . " ") !== false) {
+                $matched[] = $keyword;
+            }
+        }
+        return $matched;
+    }
+
+    /**
+     * Cuenta cuantas palabras clave aparecen en el texto.
+     */
+    private function scoreKeywords(string $text, array $keywords, int $minLength = 4): int
+    {
+        return count($this->matchKeywords($text, $keywords, $minLength));
+    }
+
+    /**
+     * Categoria con mejor coincidencia dentro de un conjunto.
+     *
+     * Las palabras genericas ("compra", "gastos", "pago") no cuentan como
+     * evidencia: si solo hay coincidencia generica, la categoria no se elige.
+     */
+    private function bestCategory(string $text, array $pool): ?array
+    {
+        $best = null;
+        $bestScore = 0;
+        foreach ($pool as $category) {
+            $matched = $this->matchKeywords($text, $this->keywordsFor($category["name"], self::CATEGORY_KEYWORDS), 3);
+            $matched = array_values(array_filter($matched, fn($word) => !in_array($word, self::GENERIC_WORDS, true)));
+            if (count($matched) > $bestScore) {
+                $bestScore = count($matched);
+                $best = $category;
+            }
+        }
+        return $best;
+    }
+
+    /**
+     * Categoria sugerida por el tipo de operacion (pago, envio, transferencia).
+     */
+    private function hintedCategory(string $text, array $pool): ?array
+    {
+        foreach (self::CATEGORY_HINTS as $hint => $nameFragments) {
+            if (strpos(" " . $text . " ", " " . $hint . " ") === false) {
+                continue;
+            }
+            foreach ($pool as $category) {
+                $normalized = $this->normalize($category["name"]);
+                foreach ($nameFragments as $fragment) {
+                    if (strpos($normalized, $fragment) !== false) {
+                        return $category;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Fallback determinista por regex cuando el LLM no esta disponible.
      */
     private function fallback(string $rawText, array $catalogue): array
@@ -466,7 +757,27 @@ class AiExtractor
         $lines = array_values(array_filter(array_map('trim', preg_split('/\R/u', $rawText))));
         $data["description"] = mb_substr($lines[0] ?? "Notificacion sin descripcion", 0, 120, "UTF-8");
 
-        return ["data" => $data, "ids" => ["id_outflow_type" => null, "id_category" => null, "id_porcent" => null]];
+        // Tipo, categoria y deposito por palabras clave del mensaje.
+        $inferred = $this->inferByKeywords($rawText, $catalogue);
+        $data["outflow_type_name"] = $inferred["outflow_type_name"];
+        $data["category_name"] = $inferred["category_name"];
+        $data["deposit_name"] = $inferred["deposit_name"];
+        $data["fields_missing"] = [];
+        foreach (["outflow_type_name", "category_name", "deposit_name"] as $field) {
+            if (empty($data[$field])) {
+                $data["fields_missing"][] = $field;
+            }
+        }
+        $data["confidence"] = empty($data["fields_missing"]) ? 0.4 : 0.2;
+
+        return [
+            "data" => $data,
+            "ids" => [
+                "id_outflow_type" => $inferred["id_outflow_type"],
+                "id_category"     => $inferred["id_category"],
+                "id_porcent"      => $inferred["id_porcent"],
+            ],
+        ];
     }
 
     /**

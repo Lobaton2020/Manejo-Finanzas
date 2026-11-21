@@ -62,8 +62,17 @@ $extractor = new AiExtractor(
 
 $idUser = intval(SUGGESTION_USER_ID);
 
-echo "=== Catalogo del usuario {$idUser} ===\n";
+echo "=== Catalogo del usuario {$idUser} (lo que ve el modelo) ===\n";
 echo json_encode($extractor->catalogue($idUser), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), "\n\n";
+
+// Modo --prompt: imprime el prompt exacto que se le manda al modelo y sale.
+if (in_array("--prompt", $argv, true)) {
+    $reflection = new ReflectionMethod($extractor, "buildPrompt");
+    $reflection->setAccessible(true);
+    echo "=== Prompt que se envia al modelo ===\n";
+    echo $reflection->invoke($extractor, $extractor->catalogue($idUser)), "\n";
+    exit(0);
+}
 
 $start = microtime(true);
 $result = $extractor->extract($idUser, $text);
