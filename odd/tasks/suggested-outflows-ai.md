@@ -66,7 +66,8 @@ un correo del banco y nadie lo estructura.
 
 | Decisión | Valor |
 |---|---|
-| Proveedor de IA | MiniMax, `MiniMax-M3`, `POST https://api.minimax.io/v1/chat/completions` |
+| Proveedor de IA (primario) | MiniMax, `MiniMax-M3`, `POST https://api.minimax.io/v1/chat/completions` |
+| Proveedor de IA (fallback) | Gemini `gemini-3.5-flash` si MiniMax falla (402/caído/sin key) |
 | Pipeline de entrada | Solo el nuevo (Gmail → MacroDroid → webhook crudo) |
 | Destino al aprobar | Egreso real directo (`perform_egress()`) |
 | Depósito `id_porcent` | La IA lo sugiere por nombre, el usuario confirma |
@@ -107,6 +108,24 @@ un correo del banco y nadie lo estructura.
    1004 auth, 1002 rate limit, 1001 timeout, 1027 output inválido.
 7. `input_sensitive` / `output_sensitive` → si el modelo marca el contenido
    como sensible, la sugerencia se guarda con `needs_review = 1`.
+
+## Gotchas de Gemini (fallback, verificados contra la API real)
+
+1. `gemini-2.5-flash` y `gemini-2.0-flash` responden **404 "no longer
+   available to new users"** aunque aparezcan en `ListModels`. El modelo
+   vigente verificado es **`gemini-3.5-flash`** (`gemini-3.8-flash` hizo
+   timeout; `gemini-flash-latest` dio 503 por demanda).
+2. Gemini 3.x **razona por defecto** y ese razonamiento consume
+   `maxOutputTokens` y ensucia el `text` (en una prueba con 80 tokens solo
+   salió `"{"`). Se apaga con
+   `generationConfig.thinkingConfig.thinkingBudget = 0`.
+3. `responseMimeType: "application/json"` fuerza JSON puro, pero igual se
+   reutiliza `parseJson()` por robustez.
+4. La API key va en el header **`x-goog-api-key`**, nunca en la query string,
+   para no dejarla en logs.
+5. La respuesta útil está en `candidates[0].content.parts[*].text` (los parts
+   pueden traer `thoughtSignature`; se ignoran). `finishReason` distinto de
+   `STOP` (`MAX_TOKENS`, `SAFETY`, `RECITATION`) se trata como fallo.
 
 ## Tasks
 
@@ -149,6 +168,9 @@ Commits en `feature/suggested-outflows`:
 | `8e0dba1` | T6 (endpoint) |
 | `bc8b929` | T7-T10 (UI, prefill, botón) |
 | `fc8c809` | Feature doc |
+| `1571bf5` | Servidor embebido de PHP para probar en local |
+| `47bfdb4` | Heurísticas: opción por defecto según contexto |
+| `3565cce` | Fallback de IA a Gemini + heurísticas de contexto negativo |
 
 Evidencia de las pruebas (servidor embebido PHP + `curl` con sesión):
 
@@ -164,20 +186,25 @@ Evidencia de las pruebas (servidor embebido PHP + `curl` con sesión):
 | `POST outflow/store` con `id_suggestion` | 200, egreso creado + sugerencia aprobada |
 | `php -l` en 11 archivos | sin errores |
 
-### Checks pendientes (bloqueados por la cuenta de MiniMax)
+### Estado de los checks de IA
 
-**La API key de MiniMax responde `HTTP 402 insufficient_balance_error
-(1008)`**: la cuenta no tiene saldo. Consecuencias:
+**MiniMax sigue respondiendo `HTTP 402 insufficient_balance_error (1008)`**:
+la cuenta no tiene saldo. Por eso se agregó **Gemini como fallback**.
 
-- La vía con IA **no se pudo validar end-to-end**. El prompt, el parseo del
-  JSON del modelo y la resolución de ids están escritos y revisados, pero
-  nunca se ejecutaron contra una respuesta real de MiniMax.
-- Lo que sí quedó verificado es la **vía degradada**: el fallback por regex
-  extrae monto y fecha, y el flujo completo (sugerir → aprobar → egreso real)
-  funciona con esos datos.
-- Al topping la cuenta: `POST ?url=suggestion/reprocess/{id}` reprocesa las
-  sugerencias pendientes, y `scripts/extract_probe.php` permite iterar el
-  prompt sin levantar la app.
+- La vía con IA **quedó validada end-to-end con Gemini** (`gemini-3.5-flash`):
+  `scripts/extract_probe.php` con los 4 textos de prueba devolvió `provider:
+  gemini` y los datos correctos (ver tabla abajo). El flujo degradado por
+  regex sigue existiendo si ambos proveedores fallan.
+- Cuando MiniMax recupere saldo, `chat()` lo vuelve a intentar primero sin
+  cambiar nada. `POST ?url=suggestion/reprocess/{id}` reprocesa pendientes.
+- Evidencia (probe, `php -d extension=pdo_mysql -d opcache.enable=0`):
+
+| Texto | Tipo | Categoría | Depósito | Monto |
+|---|---|---|---|---|
+| Bre-B / Nequi (original) | Gasto | Otros | — | 100 |
+| Compra EDS ENGATIVA | Gasto | Gasolina moto | — | 35.127 |
+| Compra de bitcoin | Inversion | Bitcoin (BTC) | Inversion | 500.000 |
+| "Número de celular" (transferencia) | Gasto | Otros (no Tecnología) | — | — |
 
 ### Deuda técnica conocida
 
@@ -261,7 +288,7 @@ session_write_close();'
 
 ## Relevant files
 
-- `app/services/AiClient.php` — cliente MiniMax
+- `app/services/AiClient.php` — cliente IA: MiniMax primario + Gemini fallback
 - `app/services/AiExtractor.php` — prompt + parseo + resolve ids
 - `app/models/NotificationSuggestion.php` — staging de sugerencias
 - `app/controllers/SuggestionController.php` — UI listar/aprobar/descartar
