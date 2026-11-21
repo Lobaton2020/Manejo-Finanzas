@@ -1,3 +1,4 @@
 .env
 .opencode/skills
-.atl/.codegraph/
+.atl/
+.codegraph/
