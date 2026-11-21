@@ -215,6 +215,50 @@ Evidencia de las pruebas (servidor embebido PHP + `curl` con sesión):
 - UI: `?url=suggestion` → aprobar → fila nueva en `?url=outflow` y saldo del
   depósito actualizado.
 
+## Cómo probar en local
+
+El container (`podman-compose`) **no levanta en esta máquina**: con
+`userns_mode: keep-id` el root del container es el uid 1000 del host y Apache
+no puede hacer bind del puerto 80 (`ip_unprivileged_port_start = 1024`, sin
+`CAP_NET_BIND_SERVICE`). Además los volúmenes con `:U` fallaban con
+"failed to chown recursively host path" sobre `/mnt/disco2`.
+
+La vía local es el **servidor embebido de PHP** con un router que emula el
+rewrite del `.htaccess`:
+
+```bash
+./scripts/dev-server.sh          # http://127.0.0.1:8124
+./scripts/dev-server.sh 9000     # otro puerto
+```
+
+- Carga `pdo_mysql` si el PHP del sistema no lo trae (Arch: `php -d
+  extension=pdo_mysql`).
+- Desactiva opcache en CLI: si no, el server sirve código viejo durante 180 s
+  (`opcache.revalidate_freq`) y los cambios no se ven.
+- `scripts/dev-router.php` traduce `/outflow` → `index.php?url=outflow`, igual
+  que el `.htaccess`, así que las URLs de la app funcionan igual que en
+  producción.
+
+Prueba del webhook:
+
+```bash
+curl -X POST 'http://127.0.0.1:8124/api/suggestions/inbox' \
+  -H 'Content-Type: application/json' \
+  -d '{"raw_text":"Compra Exitosa\nEDS ENGATIVA FR\n$ 35.127,00\n19/11/2026 18:30","source_ref":"demo-1"}'
+```
+
+Y para probar la UI sin contraseña (solo en desarrollo), se puede forjar una
+sesión por CLI:
+
+```bash
+php -r 'session_id("sugtest"); session_start();
+$_SESSION["activeSession"]=true;
+$_SESSION["credentials"]=["id"=>1,"rol"=>["name"=>"Administrador"],"name"=>"Andres",
+"email"=>"andrespipe021028@gmail.com","image"=>null,"document"=>"1"];
+session_write_close();'
+# luego: curl -b "PHPSESSID=sugtest" http://127.0.0.1:8124/suggestion
+```
+
 ## Relevant files
 
 - `app/services/AiClient.php` — cliente MiniMax

@@ -14,11 +14,14 @@ services:
       APACHE_DOCUMENT_ROOT: "/var/www/html"
       APACHE_LOG_DIR: "/var/log/apache2"
     volumes:
-      - ./app:/var/www/html/app:U
-      - ./public:/var/www/html/public:U
-      - ./scripts:/var/www/html/scripts:U
-      - ./index.php:/var/www/html/index.php:U
-      - ./.htaccess:/var/www/html/.htaccess:U
+      # Sin el sufijo ":U" (uid/gid mapping): en filesystems donde chown no
+      # esta permitido (ej. /mnt/disco2) el container no arranca. El usuario
+      # del host es el mismo uid 1000 que el usuario "app" de la imagen.
+      - ./app:/var/www/html/app
+      - ./public:/var/www/html/public
+      - ./scripts:/var/www/html/scripts
+      - ./index.php:/var/www/html/index.php
+      - ./.htaccess:/var/www/html/.htaccess
       - ./php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
       - ./.env:/var/www/html/.env:ro
     extra_hosts:
