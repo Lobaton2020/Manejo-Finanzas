@@ -105,6 +105,7 @@ class ApiController extends Controller
             require_once URL_APP . "models/Porcent.php";
             require_once URL_APP . "services/AiClient.php";
             require_once URL_APP . "services/AiExtractor.php";
+            require_once URL_APP . "services/NotificationPayload.php";
             require_once URL_APP . "services/SuggestionIngest.php";
 
             $ingest = new SuggestionIngest(
@@ -121,6 +122,15 @@ class ApiController extends Controller
         } catch (Throwable $e) {
             error_log("[api/suggestions] error: " . $e->getMessage());
             return $this->respond(500, ["error" => "ingest_failed"]);
+        }
+
+        // Sin monto o con el pago rechazado: no es un egreso. Se responde 200
+        // para que el celular NO reintente.
+        if (!empty($result["skipped"])) {
+            return $this->respond(200, [
+                "status" => "skipped",
+                "reason" => $result["reason"] ?? null,
+            ]);
         }
 
         if (!$result["ok"]) {

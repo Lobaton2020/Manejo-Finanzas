@@ -1,5 +1,7 @@
 <?php
 
+require_once URL_APP . "services/NotificationPayload.php";
+
 /**
  * Extrae datos estructurados de una notificacion bancaria en texto crudo
  * usando un LLM (MiniMax-M3).
@@ -147,21 +149,30 @@ class AiExtractor
      *
      * @param int    $idUser
      * @param string $rawText
+     * @param array  $previous  Sugerencias pendientes previas del usuario
+     *                          ("valores previos" que se le pasan al modelo).
      * @return array{
      *   ok: bool, data: array, ids: array, needs_review: bool,
      *   source: string, error: ?string, raw_response: string
      * }
      */
-    public function extract(int $idUser, string $rawText): array
+    public function extract(int $idUser, string $rawText, array $previous = []): array
     {
         $rawText = trim($rawText);
         if ($rawText === "") {
             return $this->result([], [], true, "none", "El texto de la notificacion esta vacio.", "");
         }
 
+        // El texto puede venir como dump de MacroDroid ("|"): se deja solo el
+        // contenido real, sin metadatos del dispositivo ni epoch pegado.
+        $payload = NotificationPayload::parse($rawText);
+        if ($payload["text"] !== "") {
+            $rawText = $payload["text"];
+        }
+
         $catalogue = $this->catalogue($idUser);
         $messages = [
-            ["role" => "system", "content" => $this->buildPrompt($catalogue)],
+            ["role" => "system", "content" => $this->buildPrompt($catalogue, $previous)],
             ["role" => "user", "content" => $rawText],
         ];
 
@@ -169,26 +180,30 @@ class AiExtractor
         if (!$response["ok"]) {
             // El LLM fallo: fallback determinista para no perder la sugerencia.
             $fallback = $this->fallback($rawText, $catalogue);
-            return $this->result(
+            return $this->finish(
                 $fallback["data"],
                 $fallback["ids"],
                 true,
                 "fallback",
                 $response["error"],
-                ""
+                "",
+                $catalogue,
+                $rawText
             );
         }
 
         $parsed = $this->parseJson($response["content"]);
         if ($parsed === null) {
             $fallback = $this->fallback($rawText, $catalogue);
-            return $this->result(
+            return $this->finish(
                 $fallback["data"],
                 $fallback["ids"],
                 true,
                 "fallback",
                 "MiniMax no devolvio un JSON utilizable.",
-                $response["content"]
+                $response["content"],
+                $catalogue,
+                $rawText
             );
         }
 
@@ -212,24 +227,99 @@ class AiExtractor
             $data["deposit_name"] = $heuristic["deposit_name"];
         }
 
-        // Si el modelo no pudo resolver tipo o categoria, la sugerencia queda
-        // para revision manual: el usuario los elige en el formulario.
-        $needsReview = false;
-        if ($ids["id_outflow_type"] === null || $ids["id_category"] === null) {
-            $needsReview = true;
-        }
-        if (!empty($data["fields_missing"])) {
-            $needsReview = true;
-        }
-        if ($data["amount"] === null || $data["amount"] <= 0) {
-            $needsReview = true;
-        }
-        // El deposito decide de que plata sale: sin evidencia no se presume.
-        if ($ids["id_porcent"] === null) {
-            $needsReview = true;
+        return $this->finish($data, $ids, false, "ai", null, $response["content"], $catalogue, $rawText);
+    }
+
+    /**
+     * Deja la extraccion lista para guardarse: descripcion limpia, fecha por
+     * defecto y deposito por defecto.
+     *
+     * @param bool $forceReview Fuerza la revision manual (fallback sin IA).
+     */
+    private function finish(
+        array $data,
+        array $ids,
+        bool $forceReview,
+        string $source,
+        ?string $error,
+        string $rawResponse,
+        array $catalogue,
+        string $rawText = ""
+    ): array {
+        // Descripcion limpia: sin "|", sin epoch y sin metadatos.
+        if (!empty($data["description"])) {
+            $data["description"] = NotificationPayload::cleanDescription((string) $data["description"]);
+        } elseif ($rawText !== "") {
+            // El modelo no devolvio descripcion: se usa la del texto limpio.
+            $data["description"] = NotificationPayload::cleanDescription($rawText);
         }
 
-        return $this->result($data, $ids, $needsReview, "ai", null, $response["content"]);
+        // Fecha por defecto: si el mensaje no trae fecha, se usa la del evento
+        // generado (hoy, America/Bogota).
+        if (empty($data["event_date"])) {
+            $now = getCurrentDatetime();
+            $data["event_datetime"] = $now;
+            $data["event_date"] = substr($now, 0, 10);
+        }
+
+        // Deposito por defecto: "Inversion" para el tipo de egreso
+        // inversion, "Gastos en general" para el resto.
+        if ($ids["id_porcent"] === null) {
+            $default = $this->defaultDeposit($data, $catalogue);
+            if ($default !== null) {
+                $ids["id_porcent"] = $default["id"];
+                $data["deposit_name"] = $default["name"];
+                // El deposito ya quedo preseleccionado: no falta.
+                $data["fields_missing"] = array_values(array_filter(
+                    (array) $data["fields_missing"],
+                    fn($field) => $field !== "deposit_name"
+                ));
+            }
+        }
+
+        // Si el modelo no pudo resolver tipo o categoria, la sugerencia queda
+        // para revision manual: el usuario los elige en el formulario.
+        $needsReview = $forceReview;
+        if (!$needsReview) {
+            if ($ids["id_outflow_type"] === null || $ids["id_category"] === null) {
+                $needsReview = true;
+            }
+            if (!empty($data["fields_missing"])) {
+                $needsReview = true;
+            }
+            if ($data["amount"] === null || $data["amount"] <= 0) {
+                $needsReview = true;
+            }
+            // El deposito decide de que plata sale: sin evidencia se presume
+            // el deposito por defecto, asi que esto no marca revision.
+            if ($ids["id_porcent"] === null) {
+                $needsReview = true;
+            }
+        }
+
+        return $this->result($data, $ids, $needsReview, $source, $error, $rawResponse);
+    }
+
+    /**
+     * Deposito por defecto del usuario (resuelto por NOMBRE en el catalogo).
+     */
+    private function defaultDeposit(array $data, array $catalogue): ?array
+    {
+        if (empty($catalogue["deposits"])) {
+            return null;
+        }
+
+        $typeName = mb_strtolower((string) ($data["outflow_type_name"] ?? ""));
+        $wanted = (strpos($typeName, "inversion") !== false) ? "Inversion" : "Gastos en general";
+
+        foreach ($catalogue["deposits"] as $deposit) {
+            if (mb_strtolower(trim($deposit["name"])) === mb_strtolower($wanted)) {
+                return $deposit;
+            }
+        }
+
+        // Si el usuario no tiene ese deposito: el primero activo del catalogo.
+        return $catalogue["deposits"][0];
     }
 
     /**
@@ -285,8 +375,11 @@ class AiExtractor
 
     /**
      * Arma el system prompt con el catalogo y el schema de salida.
+     *
+     * @param array $catalogue Catalogo del usuario.
+     * @param array $previous  Sugerencias pendientes previas ("valores previos").
      */
-    private function buildPrompt(array $catalogue): string
+    private function buildPrompt(array $catalogue, array $previous = []): string
     {
         $lines = [];
         $lines[] = "Eres un extractor de datos de notificaciones bancarias para una app de finanzas personales en Colombia.";
@@ -299,7 +392,7 @@ class AiExtractor
         $lines[] = "- Si el texto describe una compra con tarjeta, un pago o una transferencia (Bre-B, Nequi, llave, consignacion), NO es una inversion: usa el tipo de egreso normal.";
         $lines[] = "- deposit_name: solo si el texto da evidencia (por ejemplo \"Cuenta origen *****5913\"). Si no hay evidencia clara, null y el usuario lo elige.";
         $lines[] = "- Si el mensaje da pistas para decidir un tipo, una categoria o un deposito, elige SIEMPRE la opcion mas probable del catalogo: esa es la que el usuario va a ver preseleccionada. Solo deja null cuando el texto no de ninguna pista.";
-        $lines[] = "- description: maximo 120 caracteres, en español, describiendo el pago (comercio o proposito).";
+        $lines[] = "- description: maximo 120 caracteres, en español, empezando por el comercio o el proposito del gasto (sin \"Compra en\", \"Pago en\" ni preposiciones de relleno), para poder compararla con otras notificaciones.";
         $lines[] = "- confidence: numero entre 0 y 1 con tu certeza en la extraccion.";
         $lines[] = "- fields_missing: arreglo con los nombres de los campos que no pudiste extraer.";
         $lines[] = "";
@@ -318,6 +411,21 @@ class AiExtractor
         $depositNames = array_map(fn($d) => "\"{$d["name"]}\"", $catalogue["deposits"]);
         $lines[] = "  " . (empty($depositNames) ? "(sin depositos)" : implode(", ", $depositNames));
         $lines[] = "";
+
+        // Valores previos: los pendientes recientes del usuario. La misma
+        // compra puede llegar por otro canal (correo del banco, Wallet).
+        if (!empty($previous)) {
+            $lines[] = "VALORES PREVIOS (sugerencias pendientes del usuario, pueden ser la MISMA compra por otro canal: no dupliques):";
+            foreach (array_slice($previous, 0, 5) as $item) {
+                $date = !empty($item["event_date"]) ? (string) $item["event_date"] : "sin fecha";
+                $amount = ($item["amount"] ?? null) !== null
+                    ? number_format((float) $item["amount"], 2, ".", "")
+                    : "sin monto";
+                $description = trim((string) ($item["description"] ?? ""));
+                $lines[] = "{$date} | {$amount} | {$description}";
+            }
+            $lines[] = "";
+        }
 
         $lines[] = "Responde EXCLUSIVAMENTE con el objeto JSON, sin texto antes ni despues, sin ```json y sin comentarios.";
         $lines[] = "Este es el formato exacto de la respuesta:";
@@ -783,8 +891,9 @@ class AiExtractor
             "fields_missing"    => ["outflow_type_name", "category_name", "deposit_name"],
         ];
 
-        if (preg_match('/\$\s*([\d.,]+)/u', $rawText, $m)) {
-            $data["amount"] = $this->parseColombianAmount($m[1]);
+        $amount = NotificationPayload::parseAmount($rawText);
+        if ($amount !== null) {
+            $data["amount"] = $amount;
         }
         if (preg_match('/(\d{4})\/(\d{2})\/(\d{2})[ T]?(\d{2}):(\d{2})/u', $rawText, $m)) {
             $data["event_datetime"] = sprintf("%s-%s-%s %s:%s:00", $m[1], $m[2], $m[3], $m[4], $m[5]);
@@ -798,7 +907,7 @@ class AiExtractor
             $data["event_date"] = "{$m[1]}-{$m[2]}-{$m[3]}";
         }
 
-        $data["description"] = $this->cleanDescription($rawText);
+        $data["description"] = NotificationPayload::cleanDescription($rawText);
 
         // Tipo, categoria y deposito por palabras clave del mensaje.
         $inferred = $this->inferByKeywords($rawText, $catalogue);
@@ -821,98 +930,6 @@ class AiExtractor
                 "id_porcent"      => $inferred["id_porcent"],
             ],
         ];
-    }
-
-    /**
-     * Descripcion legible a partir del texto crudo.
-     *
-     * El template de MacroDroid envuelve la notificacion real asi:
-     *   {not_title} - {not_sub_text} - {notification} {not_timestamp} - {not_text_big} - ...
-     * Eso mete emails, ids y paquetes dentro del texto. Se limpian y, si el
-     * titulo aparece repetido (not_title == not_text_big), se deja una vez.
-     */
-    private function cleanDescription(string $rawText): string
-    {
-        $lines = array_values(array_filter(array_map('trim', preg_split('/\R/u', $rawText))));
-        if (empty($lines)) {
-            return "Notificacion sin descripcion";
-        }
-
-        $line = $lines[0];
-        $parts = array_map('trim', explode(" - ", $line));
-        $clean = [];
-        foreach ($parts as $part) {
-            $part = trim(preg_replace('/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/u', '', $part));
-            // Ids largos (timestamp de la notificacion, codigos de operacion).
-            $part = trim(preg_replace('/\b\d{7,}\b/u', '', $part));
-            $part = trim($part, " - \t");
-            if ($part === "") {
-                continue;
-            }
-            // Paquetes de android y metadatos del dispositivo.
-            if (preg_match('/^[a-z0-9]+(\.[a-z0-9_]+){2,}$/i', $part)) {
-                continue;
-            }
-            if (preg_match('/^\d+([.,]\d+)?\s*(gb|mb|kb|%)$/i', $part)) {
-                continue;
-            }
-            $key = mb_strtolower($part);
-            $already = false;
-            foreach ($clean as $kept) {
-                if (mb_strtolower($kept) === $key) {
-                    $already = true;
-                    break;
-                }
-            }
-            if (!$already) {
-                $clean[] = $part;
-            }
-        }
-
-        if (empty($clean)) {
-            $clean[] = $lines[0];
-        }
-
-        return mb_substr(implode(" - ", $clean), 0, 120, "UTF-8");
-    }
-
-    /**
-     * Interpreta un monto colombiano: "1.234.567,89" -> 1234567.89
-     */
-    private function parseColombianAmount(string $value): ?float
-    {
-        $value = trim(str_replace(" ", "", $value));
-        if ($value === "") {
-            return null;
-        }
-
-        $lastComma = strrpos($value, ",");
-        $lastDot = strrpos($value, ".");
-
-        if ($lastComma !== false && $lastDot !== false) {
-            // El ultimo separador es el decimal.
-            if ($lastComma > $lastDot) {
-                $value = str_replace(".", "", $value);
-                $value = str_replace(",", ".", $value);
-            } else {
-                $value = str_replace(",", "", $value);
-            }
-        } elseif ($lastComma !== false) {
-            // Solo coma: decimal (100,00) o miles (1,000)? En Colombia la coma es decimal.
-            $decimals = strlen($value) - $lastComma - 1;
-            $value = $decimals === 3 && strlen(substr($value, 0, $lastComma)) > 0 && substr_count($value, ",") === 1
-                ? str_replace(",", "", $value)
-                : str_replace(",", ".", $value);
-        } elseif ($lastDot !== false) {
-            // Solo punto: decimal (100.50) o miles (1.000.000).
-            if (substr_count($value, ".") > 1) {
-                $value = str_replace(".", "", $value);
-            } elseif (strlen($value) - $lastDot - 1 === 3) {
-                $value = str_replace(".", "", $value);
-            }
-        }
-
-        return is_numeric($value) ? round((float) $value, 2) : null;
     }
 
     /**
