@@ -16,6 +16,7 @@ services:
     volumes:
       - ./app:/var/www/html/app:U
       - ./public:/var/www/html/public:U
+      - ./scripts:/var/www/html/scripts:U
       - ./index.php:/var/www/html/index.php:U
       - ./.htaccess:/var/www/html/.htaccess:U
       - ./php.dev.ini:/usr/local/etc/php/conf.d/zz-dev.ini:ro
