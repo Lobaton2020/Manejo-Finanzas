@@ -32,6 +32,16 @@ define("MINIMAX_TIMEOUT", intval($_ENV["MINIMAX_TIMEOUT"] ?? 30));
 define("MINIMAX_THINKING", trim($_ENV["MINIMAX_THINKING"] ?? "disabled"));
 define("MINIMAX_MAX_TOKENS", intval($_ENV["MINIMAX_MAX_TOKENS"] ?? 4096));
 
+// --- Fallback de IA (Google Gemini) ---
+// Se usa solo cuando MiniMax falla (sin saldo, caido, sin key). Ver AiClient.php.
+define("GEMINI_API_KEY", trim($_ENV["GEMINI_API_KEY"] ?? ""));
+define("GEMINI_MODEL", trim($_ENV["GEMINI_MODEL"] ?? "gemini-3.5-flash"));
+define("GEMINI_BASE_URL", rtrim(trim($_ENV["GEMINI_BASE_URL"] ?? "https://generativelanguage.googleapis.com"), "/"));
+define("GEMINI_TIMEOUT", intval($_ENV["GEMINI_TIMEOUT"] ?? 40));
+define("GEMINI_MAX_TOKENS", intval($_ENV["GEMINI_MAX_TOKENS"] ?? 4096));
+// 0 apaga el razonamiento: no consume tokens ni ensucia la salida.
+define("GEMINI_THINKING_BUDGET", intval($_ENV["GEMINI_THINKING_BUDGET"] ?? 0));
+
 // Usuario dueño de las sugerencias que llegan por el webhook (sin auth).
 define("SUGGESTION_USER_ID", intval($_ENV["SUGGESTION_USER_ID"] ?? 1));
 // datos del servidor

@@ -110,6 +110,17 @@ class AiExtractor
         "compra", "compras", "compra y", "otros", "otro", "pago", "pagos",
         "gasto", "gastos", "salida", "egreso", "movimiento", "transaccion",
         "me", "no", "aplica", "varios",
+        "inversion", "inversiones", "fondo", "cuenta", "llave", "operacion",
+        "persona", "entidad", "codigo", "detalle", "detalles", "atencion",
+        "linea", "oficinas", "establecimiento", "banco", "valor",
+    ];
+
+    /**
+     * Contextos negativos: "numero de celular" no es evidencia de una compra
+     * de celular, es el tipo de llave de una transferencia.
+     */
+    private const NEGATIVE_CONTEXT = [
+        "numero de", "tipo de", "cuenta de", "clave de", "llave de", "codigo de",
     ];
 
     private $client;
@@ -499,10 +510,21 @@ class AiExtractor
 
     /**
      * Normaliza texto para comparar: minusculas, sin tildes, sin signos.
+     *
+     * OJO: las tildes y la enye.spanolas son letras PRECOMPUESTAS (U+00F1,
+     * U+00F3...), no marcas combinantes, asi que `\p{Mn}` NO las quita:
+     * "Acompanar" terminaba en "acompa ar" y "acompanamos" en "acompa amos",
+     * lo que hacia coincidir dos palabras que no tienen nada que ver. Por eso
+     * se transliteran explicitamente antes de limpiar.
      */
     private function normalize(string $text): string
     {
         $text = mb_strtolower(trim($text), "UTF-8");
+        $text = strtr($text, [
+            "á" => "a", "é" => "e", "í" => "i", "ó" => "o", "ú" => "u",
+            "ü" => "u", "ñ" => "n", "â" => "a", "ê" => "e", "î" => "i",
+            "ô" => "o", "û" => "u", "ç" => "c",
+        ]);
         $text = preg_replace('/\p{Mn}/u', '', $text);
         if ($text === null) {
             $text = mb_strtolower(trim($text), "UTF-8");
@@ -661,11 +683,33 @@ class AiExtractor
             if (strlen($keyword) < $minLength) {
                 continue;
             }
-            if (strpos($haystack, " " . $keyword . " ") !== false) {
-                $matched[] = $keyword;
+            $pos = strpos($haystack, " " . $keyword . " ");
+            if ($pos === false) {
+                continue;
             }
+            // "numero de celular" no es evidencia de una compra de celular:
+            // es el tipo de llave de una transferencia.
+            if ($this->inNegativeContext($haystack, $pos)) {
+                continue;
+            }
+            $matched[] = $keyword;
         }
         return $matched;
+    }
+
+    /**
+     * Indica si la aparicion de una palabra clave (en $pos) esta precedida
+     * por un contexto negativo como "numero de", "tipo de" o "codigo de".
+     */
+    private function inNegativeContext(string $haystack, int $pos): bool
+    {
+        $before = rtrim(substr($haystack, 0, $pos));
+        foreach (self::NEGATIVE_CONTEXT as $negative) {
+            if (substr($before, -strlen($negative)) === $negative) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -754,8 +798,7 @@ class AiExtractor
             $data["event_date"] = "{$m[1]}-{$m[2]}-{$m[3]}";
         }
 
-        $lines = array_values(array_filter(array_map('trim', preg_split('/\R/u', $rawText))));
-        $data["description"] = mb_substr($lines[0] ?? "Notificacion sin descripcion", 0, 120, "UTF-8");
+        $data["description"] = $this->cleanDescription($rawText);
 
         // Tipo, categoria y deposito por palabras clave del mensaje.
         $inferred = $this->inferByKeywords($rawText, $catalogue);
@@ -778,6 +821,59 @@ class AiExtractor
                 "id_porcent"      => $inferred["id_porcent"],
             ],
         ];
+    }
+
+    /**
+     * Descripcion legible a partir del texto crudo.
+     *
+     * El template de MacroDroid envuelve la notificacion real asi:
+     *   {not_title} - {not_sub_text} - {notification} {not_timestamp} - {not_text_big} - ...
+     * Eso mete emails, ids y paquetes dentro del texto. Se limpian y, si el
+     * titulo aparece repetido (not_title == not_text_big), se deja una vez.
+     */
+    private function cleanDescription(string $rawText): string
+    {
+        $lines = array_values(array_filter(array_map('trim', preg_split('/\R/u', $rawText))));
+        if (empty($lines)) {
+            return "Notificacion sin descripcion";
+        }
+
+        $line = $lines[0];
+        $parts = array_map('trim', explode(" - ", $line));
+        $clean = [];
+        foreach ($parts as $part) {
+            $part = trim(preg_replace('/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/u', '', $part));
+            // Ids largos (timestamp de la notificacion, codigos de operacion).
+            $part = trim(preg_replace('/\b\d{7,}\b/u', '', $part));
+            $part = trim($part, " - \t");
+            if ($part === "") {
+                continue;
+            }
+            // Paquetes de android y metadatos del dispositivo.
+            if (preg_match('/^[a-z0-9]+(\.[a-z0-9_]+){2,}$/i', $part)) {
+                continue;
+            }
+            if (preg_match('/^\d+([.,]\d+)?\s*(gb|mb|kb|%)$/i', $part)) {
+                continue;
+            }
+            $key = mb_strtolower($part);
+            $already = false;
+            foreach ($clean as $kept) {
+                if (mb_strtolower($kept) === $key) {
+                    $already = true;
+                    break;
+                }
+            }
+            if (!$already) {
+                $clean[] = $part;
+            }
+        }
+
+        if (empty($clean)) {
+            $clean[] = $lines[0];
+        }
+
+        return mb_substr(implode(" - ", $clean), 0, 120, "UTF-8");
     }
 
     /**
@@ -824,6 +920,8 @@ class AiExtractor
      */
     private function result(array $data, array $ids, bool $needsReview, string $source, ?string $error, string $rawResponse): array
     {
+        $provider = $this->client->provider();
+
         return [
             "ok"           => true,
             "data"         => $data,
@@ -832,6 +930,9 @@ class AiExtractor
             "source"       => $source,
             "error"        => $error,
             "raw_response" => $rawResponse,
+            // Que proveedor respondio realmente (MiniMax o el fallback Gemini).
+            "provider"     => $provider,
+            "ai_model"     => $provider === "none" ? null : $this->client->model(),
         ];
     }
 }

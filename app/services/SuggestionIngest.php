@@ -68,8 +68,8 @@ class SuggestionIngest
         }
 
         $idSuggestion = (int) $ingest["id_suggestion"];
+        // AiExtractor ya informa `ai_model` segun el proveedor que respondio.
         $extraction = $this->extractor->extract($idUser, $text);
-        $extraction["ai_model"] = defined("MINIMAX_MODEL") ? MINIMAX_MODEL : null;
 
         $this->model->applyExtraction($idSuggestion, $extraction);
 

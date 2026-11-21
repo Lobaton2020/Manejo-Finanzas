@@ -6,9 +6,9 @@
  *   php scripts/extract_probe.php                 # usa la notificacion BBVA de ejemplo
  *   php scripts/extract_probe.php /ruta/texto.txt # usa un archivo con el texto crudo
  *
- * Llama a la API real de MiniMax y muestra el JSON que devuelve el modelo,
- * el parseo, los ids resueltos y el fallback. Sirve para iterar el prompt
- * sin levantar la app.
+ * Llama a la API real (MiniMax y, si falla, el fallback Gemini) y muestra el
+ * JSON que devuelve el modelo, el parseo, los ids resueltos y el fallback.
+ * Sirve para iterar el prompt sin levantar la app.
  */
 
 if (PHP_SAPI !== "cli") {
@@ -81,6 +81,8 @@ $elapsed = round((microtime(true) - $start) * 1000);
 echo "=== Resultado ({$elapsed} ms) ===\n";
 echo json_encode([
     "source"       => $result["source"],
+    "provider"     => $result["provider"] ?? null,
+    "ai_model"     => $result["ai_model"] ?? null,
     "needs_review" => $result["needs_review"],
     "error"        => $result["error"],
     "data"         => $result["data"],

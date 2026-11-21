@@ -142,8 +142,8 @@ class SuggestionController extends Controller
                     $this->category,
                     $this->porcent
                 );
+                // AiExtractor ya informa `ai_model` segun el proveedor que respondio.
                 $extraction = $extractor->extract($this->id, (string) $suggestion->raw_text);
-                $extraction["ai_model"] = defined("MINIMAX_MODEL") ? MINIMAX_MODEL : null;
                 $this->model->applyExtraction((int) $id, $extraction);
 
                 if (!empty($extraction["error"])) {
