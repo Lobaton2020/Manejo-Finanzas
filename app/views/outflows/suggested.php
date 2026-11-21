@@ -1,3 +1,9 @@
+<?php
+$probeExample = json_encode([
+    "source"   => "macrodroid",
+    "raw_text" => "Compra Exitosa\nTarjeta Mastercard Black ****2849\nEDS ENGATIVA FR\n\$ 35.127,00\n19/11/2026 18:30",
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+?>
 <div class="content-page">
     <div class="content">
         <div class="container-fluid">
@@ -27,6 +33,10 @@
                                 </p>
                             </div>
                             <div class="float-right">
+                                <button type="button" class="btn btn-outline-primary mr-2" data-toggle="modal"
+                                    data-target="#probeModal" title="Probar POST /api/suggestions/inbox">
+                                    <i class="mdi mdi-flask-outline"></i> Probar endpoint
+                                </button>
                                 <a href="<?php echo route("outflow") ?>" class="btn btn-secondary">
                                     <i class="mdi mdi-arrow-left"></i> Volver a Egresos
                                 </a>
@@ -118,6 +128,133 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="probeModal" tabindex="-1" role="dialog"
+            aria-labelledby="probeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="probeModalLabel">Probar endpoint de sugerencias</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-2">
+                            Envia un payload a <code>POST <?php echo route("api/suggestions/inbox") ?></code>.
+                            Si el texto ya existe, el endpoint responde <code>duplicate</code> y no crea otra sugerencia.
+                        </p>
+                        <label for="probePayload" class="font-weight-bold">Payload JSON</label>
+                        <textarea id="probePayload" class="form-control font-monospace" rows="8"
+                            style="font-size: 0.8rem;"><?php echo htmlspecialchars($probeExample, ENT_QUOTES) ?></textarea>
+                        <div id="probeResult" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" id="probeSend" class="btn btn-primary">
+                            <i class="mdi mdi-send"></i> Enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        (function () {
+            // JS puro a proposito: esta vista se renderiza ANTES que footer.php,
+            // donde se cargan jQuery y Bootstrap. No depender de ninguno para
+            // que el handler exista; el modal se abre por data-* de Bootstrap.
+            var resultEl = document.getElementById('probeResult');
+            var sendBtn = document.getElementById('probeSend');
+            var payloadEl = document.getElementById('probePayload');
+            var endpoint = '<?php echo route("api/suggestions/inbox") ?>';
+
+            sendBtn.addEventListener('click', function () {
+                var raw = payloadEl.value.trim();
+
+                if (raw.charAt(0) === '{') {
+                    try {
+                        JSON.parse(raw);
+                    } catch (e) {
+                        resultEl.innerHTML = '<div class="alert alert-danger mb-0">JSON invalido: ' + esc(e.message) + '</div>';
+                        return;
+                    }
+                }
+
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<i class="mdi mdi-loading mdi-spin"></i> Enviando...';
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: raw
+                })
+                    .then(function (res) {
+                        return res.json()
+                            .catch(function () { return null; })
+                            .then(function (data) { return { status: res.status, data: data }; });
+                    })
+                    .then(function (r) {
+                        renderProbeResult(r.status, r.data);
+                    })
+                    .catch(function (e) {
+                        resultEl.innerHTML = '<div class="alert alert-danger mb-0">Error de red: ' + esc(e.message) + '</div>';
+                    })
+                    .finally(function () {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<i class="mdi mdi-send"></i> Enviar';
+                    });
+            });
+
+            function renderProbeResult(status, data) {
+                if (!data) {
+                    resultEl.innerHTML = '<div class="alert alert-warning mb-0">HTTP ' + status + ' sin JSON legible.</div>';
+                    return;
+                }
+
+                var alertClass = data.error
+                    ? 'alert-danger'
+                    : (data.status === 'created' ? 'alert-success' : 'alert-info');
+
+                var html = '<div class="alert ' + alertClass + ' mb-2"><strong>HTTP ' + status +
+                    '</strong> &middot; status: <code>' + esc(data.status || '-') + '</code></div>';
+
+                html += '<table class="table table-sm table-bordered mb-2">';
+                [
+                    ['id_suggestion', data.id_suggestion],
+                    ['amount', data.amount != null ? ((data.currency ? data.currency + ' ' : '') + data.amount) : null],
+                    ['description', data.description],
+                    ['event_date', data.event_date],
+                    ['outflow_type_name', data.outflow_type_name],
+                    ['category_name', data.category_name],
+                    ['deposit_name', data.deposit_name],
+                    ['confidence', data.confidence],
+                    ['needs_review', data.needs_review],
+                    ['source', data.source],
+                    ['error', data.error]
+                ].forEach(function (row) {
+                    if (row[1] === null || row[1] === undefined || row[1] === '') {
+                        return;
+                    }
+                    html += '<tr><th style="width: 180px;">' + row[0] + '</th><td>' +
+                        esc(String(row[1])) + '</td></tr>';
+                });
+                html += '</table>';
+
+                html += '<details><summary class="text-muted" style="cursor:pointer;">Ver JSON completo</summary>' +
+                    '<pre class="mt-2 mb-0 p-2 bg-light" style="font-size:0.75rem; white-space:pre-wrap;">' +
+                    esc(JSON.stringify(data, null, 2)) + '</pre></details>';
+
+                resultEl.innerHTML = html;
+            }
+
+            function esc(value) {
+                var div = document.createElement('div');
+                div.textContent = String(value);
+                return div.innerHTML;
+            }
+        })();
+        </script>
+
         <?php include_document("layouts.footerbar") ?>
     </div>
 </div>
