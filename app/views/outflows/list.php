@@ -45,6 +45,12 @@
                                 <button type="button" class="btn btn-warning mr-2" id="btnCopyCsv" title="Copia los mismos registros filtrados al portapapeles para pegar en un chat de IA">
                                     <i class="mdi mdi-content-copy"></i>
                                 </button>
+                                <a href="<?php echo route("suggestion") ?>" class="btn btn-warning mr-2" title="Sugerencias de egresos detectadas en tus notificaciones">
+                                    <i class="mdi mdi-lightbulb"></i> Suggested
+                                    <?php if (!empty($pendingSuggestions)) : ?>
+                                        <span class="badge badge-light ml-1"><?php echo (int) $pendingSuggestions ?></span>
+                                    <?php endif; ?>
+                                </a>
                                 <a href="<?php echo route("outflow/create") ?>" class="btn btn-success"><i class="mdi mdi-plus "></i> Añadir Egresos</a>
                             </div>
                         </div>

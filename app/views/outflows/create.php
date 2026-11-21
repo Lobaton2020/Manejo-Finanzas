@@ -1,3 +1,9 @@
+<?php
+$prefill = isset($prefill) && is_array($prefill) ? $prefill : [];
+$prefillId = function (string $field) use ($prefill) {
+    return isset($prefill[$field]) ? (int) $prefill[$field] : 0;
+};
+?>
 <div class="content-page">
     <div class="content">
         <div class="container-fluid">
@@ -38,7 +44,7 @@
                                                 <select onchange="renderCategories(event); showGroupSelect(this)" class="form-control" name="id_outflow_type" id="inflow_type" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($outflow_types  as $outflow_type) : ?>
-                                                        <option value="<?php echo $outflow_type->id_outflow_type ?>"><?php echo $outflow_type->name ?></option>
+                                                        <option value="<?php echo $outflow_type->id_outflow_type ?>" <?php echo $prefillId("id_outflow_type") === (int) $outflow_type->id_outflow_type ? "selected" : "" ?>><?php echo $outflow_type->name ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -69,7 +75,7 @@
                                                 <select class="form-control" name="id_porcent" id="id_porcent" required>
                                                     <option value="">--Seleccione--</option>
                                                     <?php foreach ($porcents  as $porcent) : ?>
-                                                        <option value="<?php echo $porcent->id_porcent ?>"><?php echo $porcent->name ?></option>
+                                                        <option value="<?php echo $porcent->id_porcent ?>" <?php echo $prefillId("id_porcent") === (int) $porcent->id_porcent ? "selected" : "" ?>><?php echo $porcent->name ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -78,7 +84,7 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <label for="total">Monto a sacar <span class="text-danger">*</span></label>
-                                                    <input onkeyup="formatPrice(event)" type="text" name="amount" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000">
+                                                    <input onkeyup="formatPrice(event)" type="text" name="amount" id="total" class="form-control" required="" parsley-type="email" placeholder="ej: 2000000" value="<?php echo isset($prefill["amount"]) ? htmlspecialchars((string) $prefill["amount"]) : "" ?>">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label>Numero formateado</label>
@@ -89,24 +95,27 @@
                                         <div class="form-group">
                                             <label>Descripcion</label>
                                             <div>
-                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="3"></textarea>
+                                                <textarea name="description" placeholder="Añade una descripcion." class="form-control" rows="3"><?php echo isset($prefill["description"]) ? htmlspecialchars((string) $prefill["description"]) : "" ?></textarea>
                                             </div>
                                         </div>
-                                        <? if (!$is_budget): ?>
+                                        <?php if (!$is_budget): ?>
                                         <div class="form-group">
                                             <label>Registrar la fecha <span class="text-danger">*</span></label>
                                             <div>
-                                                <input type="date" value=<?= date('Y-m-d') ?> class="form-control" name="set_date" required="" placeholder="Pon la fecha">
+                                                <input type="date" value="<?php echo isset($prefill["set_date"]) ? htmlspecialchars((string) $prefill["set_date"]) : date('Y-m-d') ?>" class="form-control" name="set_date" required="" placeholder="Pon la fecha">
                                             </div>
                                         </div>
-                                        <? endif; ?>
+                                        <?php endif; ?>
                                         <div class="form-group">
                                             <label>Esta en el presupuesto? <span class="text-danger">*</span></label>
                                             <select class="form-control" name="is_in_budget" id="is_in_budget" required>
-                                                <option value="1" selected>Si</option>
-                                                <option value="0">No</option>
+                                                <option value="1" <?php echo (!isset($prefill["is_in_budget"]) || (int) $prefill["is_in_budget"] === 1) ? "selected" : "" ?>>Si</option>
+                                                <option value="0" <?php echo (isset($prefill["is_in_budget"]) && (int) $prefill["is_in_budget"] === 0) ? "selected" : "" ?>>No</option>
                                             </select>
                                         </div>
+                                        <?php if (!empty($prefill["id_suggestion"])) : ?>
+                                            <input type="hidden" name="id_suggestion" id="id_suggestion" value="<?php echo (int) $prefill["id_suggestion"] ?>">
+                                        <?php endif; ?>
 
                                     </div>
                                     <div class="col-md-4">
@@ -200,4 +209,25 @@ function showGroupSelect(selectElement) {
         document.getElementById('id_group_investment').value = '';
     }
 }
+
+// Precarga de una sugerencia: marca la categoria que propuso la IA.
+// Las categorias se cargan por JS segun el tipo de egreso, asi que primero
+// se renderizan y despues se marca el radio correspondiente.
+document.addEventListener("DOMContentLoaded", function () {
+    var typeSelect = document.querySelector("#inflow_type");
+    var categoryId = "<?php echo $prefillId("id_category") ?>";
+    if (!typeSelect || !typeSelect.value) {
+        return;
+    }
+    showGroupSelect(typeSelect);
+    if (!categoryId) {
+        return;
+    }
+    renderCategories({ target: typeSelect }).then(function () {
+        var radio = document.querySelector('input[name="id_category"][value="' + categoryId + '"]');
+        if (radio) {
+            radio.checked = true;
+        }
+    });
+});
 </script>

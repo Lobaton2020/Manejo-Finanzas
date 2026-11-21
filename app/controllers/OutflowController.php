@@ -81,6 +81,14 @@ class OutflowController extends Controller
         $categories = $this->category->select("id_category, name", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array();
         $porcents = $this->porcent->select("id_porcent, name", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array();
 
+        // Sugerencias pendientes: badge del boton "Suggested".
+        $pendingSuggestions = 0;
+        try {
+            $pendingSuggestions = $this->model("notificationSuggestion")->countPending($this->id);
+        } catch (Exception $e) {
+            $pendingSuggestions = 0;
+        }
+
         return view("outflows.list", [
             "outflows" => $outflows,
             "pagination" => [
@@ -95,7 +103,8 @@ class OutflowController extends Controller
             "categories" => $categories,
             "porcents" => $porcents,
             "sort" => $sort,
-            "order" => $order
+            "order" => $order,
+            "pendingSuggestions" => $pendingSuggestions
         ]);
     }
 
@@ -229,10 +238,44 @@ public function create()
             "outflow_types" => $this->outflow_type->select("*", ["id_user[=]" => $this->id, "status[=]" => 1, "AND"])->array(),
             "controller_uri" => $is_budget ? "budget/store_element/" . $id : "outflow/store",
             "is_budget" => $is_budget,
-            "groups" => $groups
+            "groups" => $groups,
+            "prefill" => $this->buildPrefill(),
         ];
         return view("outflows.create", $data);
     }
+
+    /**
+     * Datos precargados en el formulario.
+     *
+     * Cuando llega `suggestion` (id), se precarga la sugerencia extraida por
+     * la IA para que el usuario solo tenga que revisar y guardar.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildPrefill(): array
+    {
+        $suggestionId = isset($_GET["suggestion"]) ? intval($_GET["suggestion"]) : 0;
+        if ($suggestionId <= 0) {
+            return [];
+        }
+
+        $suggestion = $this->model("notificationSuggestion")->findOwned($this->id, $suggestionId);
+        if (empty($suggestion)) {
+            return [];
+        }
+
+        return [
+            "id_suggestion"   => $suggestionId,
+            "id_outflow_type" => (int) $suggestion->id_outflow_type,
+            "id_category"     => (int) $suggestion->id_category,
+            "id_porcent"      => (int) $suggestion->id_porcent,
+            "amount"          => $suggestion->amount,
+            "description"     => $suggestion->description,
+            "set_date"        => $suggestion->event_date ? $suggestion->event_date : date("Y-m-d"),
+            "is_in_budget"    => 1,
+        ];
+    }
+
     public function store()
     {
         execute_post(function ($request) {
@@ -241,6 +284,11 @@ public function create()
             }
             try {
                 $this->outflowService->perform_egress($this->id, $request);
+                // Si el egreso nacio de una sugerencia, se marca como aprobada.
+                if (!empty($request->id_suggestion)) {
+                    $this->model("notificationSuggestion")
+                        ->markApproved((int) $request->id_suggestion, (int) $this->model->id());
+                }
                 return redirect("outflow")->with("success", "Egreso agregado correctamente.");
             } catch (Exception $e) {
                 return redirect("outflow/create")->with("error", $e->getMessage());
