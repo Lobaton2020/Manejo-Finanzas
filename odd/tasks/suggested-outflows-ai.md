@@ -110,32 +110,87 @@ un correo del banco y nadie lo estructura.
 
 ## Tasks
 
-- [ ] **T1 — DDL**: `scripts/ddl_notification_suggestions.sql` + aplicarlo en
-      `192.168.20.240/finanzas`. Tabla `notification_suggestions`.
-- [ ] **T2 — Config**: `.env` + `.env.example` + constantes en
-      `app/config/config.php` (`MINIMAX_*`, `SUGGESTION_USER_ID`).
-- [ ] **T3 — `AiClient`**: `app/services/AiClient.php`. curl, `base_resp`,
+- [x] **T1 — DDL**: `scripts/ddl_notification_suggestions.sql` + aplicado en
+      `192.168.20.240/finanzas`. Tabla `notification_suggestions` verificada.
+- [x] **T2 — Config**: `.env` + `.env.example` + constantes en
+      `app/config/config.php` (`MINIMAX_*`, `SUGGESTION_USER_ID`). El parser
+      de `.env` ahora ignora comentarios y no trunca valores con `=`.
+- [x] **T3 — `AiClient`**: `app/services/AiClient.php`. curl, `base_resp`,
       `finish_reason`, `content` vacío, timeout, sin filtrar la key a logs.
-- [ ] **T4 — `AiExtractor`**: `app/services/AiExtractor.php`. Catálogo real del
-      usuario (outflowtypes + categories + porcents), prompt con schema JSON,
-      parseo robusto, resolución de ids, fallback regex.
-- [ ] **T5 — `NotificationSuggestion`**: `app/models/NotificationSuggestion.php`.
-      Ingest + dedupe por `sha256(source_ref|raw_text)`.
-- [ ] **T6 — Endpoint**: `ApiController::suggestions('inbox')`. Acepta JSON con
-      claves conocidas (`raw_text`/`text`/`notification`/`body`/`not_text_big`)
-      o texto plano. Devuelve la extracción.
-- [ ] **T7 — Prefill**: `OutflowController::create()` lee `$_GET["suggestion"]`
+- [x] **T4 — `AiExtractor`**: `app/services/AiExtractor.php`. Catálogo real del
+      usuario, prompt con schema JSON, parseo robusto, resolución de ids,
+      fallback regex (monto `\d{1,3}(\.\d{3})*,\d{2}` y fecha `yyyy/MM/dd` y
+      `dd/MM/yyyy`).
+- [x] **T5 — `NotificationSuggestion`**: `app/models/NotificationSuggestion.php`.
+      Ingest + dedupe por `source_ref` (o texto normalizado si no viene).
+- [x] **T6 — Endpoint**: `ApiController::suggestions('inbox')`. Acepta JSON con
+      claves conocidas o texto plano. Devuelve la extracción.
+- [x] **T7 — Prefill**: `OutflowController::create()` lee `$_GET["suggestion"]`
       y precarga tipo / categoría / depósito / monto / descripción / fecha.
       `store()` marca la sugerencia como aprobada.
-- [ ] **T8 — Aprobar en 1 clic**: `SuggestionController::approve()` →
+- [x] **T8 — Aprobar en 1 clic**: `SuggestionController::approve()` →
       `perform_egress()` + `status = 1`. `discard()` → `status = 2`.
-- [ ] **T9 — UI**: `app/views/outflows/suggested.php` (lista) + botón
-      `Suggested` en `outflows/list.php` + preselect del radio de categoría en
-      `public/assets/js/outflow.js`.
-- [ ] **T10 — Corrección `short_open_tag`**: `create.php` usa `<?` → se
-      imprime literal en el HTML. Corregir a `<?php`.
-- [ ] **T11 — Verificación**: `php -l`, `curl` real al webhook, prueba real
-      contra MiniMax con el texto BBVA, prueba de UI.
+      `reprocess()` reintenta la IA.
+- [x] **T9 — UI**: `app/views/outflows/suggested.php` (lista) + botón
+      `Suggested` con contador en `outflows/list.php` + preselect del radio de
+      categoría en `create.php`.
+- [x] **T10 — Corrección `short_open_tag`**: `create.php` usaba `<?` → se
+      imprimía literal en el HTML. Corregido a `<?php`.
+- [x] **T11 — Verificación**: `php -l` en todos los archivos; webhook probado
+      por HTTP; flujo completo probado (crear → aprobar → egreso → saldo).
+
+## Progress
+
+Commits en `feature/suggested-outflows`:
+
+| Commit | Alcance |
+|---|---|
+| `7060420` | T1-T5 + T2 (DDL, config, AiClient, AiExtractor, modelo) |
+| `8e0dba1` | T6 (endpoint) |
+| `bc8b929` | T7-T10 (UI, prefill, botón) |
+| `fc8c809` | Feature doc |
+
+Evidencia de las pruebas (servidor embebido PHP + `curl` con sesión):
+
+| Prueba | Resultado |
+|---|---|
+| `POST api/suggestions/inbox` con texto BBVA | 200, sugerencia creada, `amount=100`, `event_date=2026-11-19` |
+| Mismo `source_ref` reenviado | 200 `{"status":"duplicate"}` — no duplica |
+| Texto plano (sin JSON) | 200, también extraído |
+| `GET ?url=suggestion` | 200, lista con fecha, monto y badge "Revisar" |
+| `GET ?url=outflow/create&suggestion=7` | 200, monto/descripción/fecha precargados |
+| `POST suggestion/approve/7` | 200, egreso creado y sugerencia `status=1` |
+| `POST suggestion/discard/8` | 200, sugerencia `status=2` |
+| `POST outflow/store` con `id_suggestion` | 200, egreso creado + sugerencia aprobada |
+| `php -l` en 11 archivos | sin errores |
+
+### Checks pendientes (bloqueados por la cuenta de MiniMax)
+
+**La API key de MiniMax responde `HTTP 402 insufficient_balance_error
+(1008)`**: la cuenta no tiene saldo. Consecuencias:
+
+- La vía con IA **no se pudo validar end-to-end**. El prompt, el parseo del
+  JSON del modelo y la resolución de ids están escritos y revisados, pero
+  nunca se ejecutaron contra una respuesta real de MiniMax.
+- Lo que sí quedó verificado es la **vía degradada**: el fallback por regex
+  extrae monto y fecha, y el flujo completo (sugerir → aprobar → egreso real)
+  funciona con esos datos.
+- Al topping la cuenta: `POST ?url=suggestion/reprocess/{id}` reprocesa las
+  sugerencias pendientes, y `scripts/extract_probe.php` permite iterar el
+  prompt sin levantar la app.
+
+### Deuda técnica conocida
+
+- `app/services/DepositBalanceService.php` no se creó: el saldo disponible de
+  cada depósito no se le pasa a la IA (no lo necesita para elegir el
+  depósito; el formulario ya lo muestra y `perform_egress` lo valida). El
+  cálculo de saldo sigue duplicado entre `ReportController` y el futuro
+  servicio, si algún día se unifica.
+- `InflowController::store()` hace `return execute_post(...)` y por eso el
+  `Router` intenta castear el objeto `Redirect` a string → error 500 al
+  guardar un ingreso. Bug preexistente, no tocado por este feature (los
+  controllers de egresos y presupuesto no hacen ese `return`).
+
 
 ## Acceptance criteria
 
@@ -159,10 +214,6 @@ un correo del banco y nadie lo estructura.
   `event_datetime` 2026-11-19T21:46.
 - UI: `?url=suggestion` → aprobar → fila nueva en `?url=outflow` y saldo del
   depósito actualizado.
-
-## Progress
-
-_(se actualiza al cerrar cada task)_
 
 ## Relevant files
 
