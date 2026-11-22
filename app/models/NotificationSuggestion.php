@@ -1,6 +1,7 @@
 <?php
 
 require_once URL_APP . "services/NotificationPayload.php";
+require_once URL_APP . "services/ProcessLog.php";
 
 /**
  * Staging de sugerencias de egreso extraidas de notificaciones (IA).
@@ -45,13 +46,26 @@ class NotificationSuggestion extends Orm
     /**
      * Inserta la sugerencia si no existe todavia.
      *
-     * @return array{created: bool, id_suggestion: ?int}
+     * Si ya existe una fila con el mismo `dedupe_hash` (la misma notificacion
+     * reenviada) NO se omite: se devuelve la fila existente para que el
+     * llamador la reutilice y la devuelva al cliente.
+     *
+     * @return array{created: bool, id_suggestion: ?int, existing: ?object}
+     *         `existing` es la fila previa cuando `created` es false.
      */
     public function ingest(int $idUser, string $source, ?string $sourceRef, string $rawText, string $dedupeHash): array
     {
         $existing = $this->get("*", ["id_user[=]" => $idUser, "dedupe_hash[=]" => $dedupeHash, "AND"])->array();
         if (!empty($existing)) {
-            return ["created" => false, "id_suggestion" => (int) $existing->id_suggestion];
+            ProcessLog::event("suggestion", "dedupe_hit", [
+                "id_suggestion" => (int) $existing->id_suggestion,
+                "hash"          => substr($dedupeHash, 0, 12),
+            ]);
+            return [
+                "created"      => false,
+                "id_suggestion" => (int) $existing->id_suggestion,
+                "existing"     => $existing,
+            ];
         }
 
         $data = [
@@ -66,10 +80,11 @@ class NotificationSuggestion extends Orm
         ];
 
         if (!$this->insert($data)->array()) {
-            return ["created" => false, "id_suggestion" => null];
+            ProcessLog::error("suggestion", "insert_failed", ["hash" => substr($dedupeHash, 0, 12)]);
+            return ["created" => false, "id_suggestion" => null, "existing" => null];
         }
 
-        return ["created" => true, "id_suggestion" => (int) $this->id()];
+        return ["created" => true, "id_suggestion" => (int) $this->id(), "existing" => null];
     }
 
     /**
@@ -95,7 +110,15 @@ class NotificationSuggestion extends Orm
             "ai_error"        => $result["error"] ? mb_substr($result["error"], 0, 250) : null,
         ];
 
-        $this->update($update, ["id_suggestion[=]" => $idSuggestion]);
+        $updated = $this->update($update, ["id_suggestion[=]" => $idSuggestion]);
+        $ok = is_object($updated) ? (bool) $updated->array() : false;
+
+        ProcessLog::event("suggestion", "extraction_saved", [
+            "id_suggestion" => $idSuggestion,
+            "ok"            => $ok,
+            "amount"        => $data["amount"] ?? null,
+            "needs_review"  => (bool) ($result["needs_review"] ?? false),
+        ]);
     }
 
     /**

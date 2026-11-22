@@ -1,5 +1,7 @@
 <?php
 
+require_once URL_APP . "services/ProcessLog.php";
+
 /**
  * Orquestador de la API.
  *
@@ -96,13 +98,38 @@ class ApiController extends Controller
         $rawBody = file_get_contents("php://input");
         $rawBody = $rawBody === false ? "" : $rawBody;
 
+        // Decodificacion del body: se registra de donde salio el payload
+        // (json / form / unparsed / empty) y el error de `json_decode`.
+        // El texto crudo de la notificacion NUNCA se registra.
         $payload = [];
-        $decoded = json_decode($rawBody, true);
-        if (is_array($decoded)) {
-            $payload = $decoded;
-        } elseif (!empty($_POST)) {
-            $payload = $_POST;
+        $payloadSource = "empty";
+        $jsonError = null;
+        $hasBody = trim($rawBody) !== "";
+
+        if ($hasBody) {
+            $decoded = json_decode($rawBody, true);
+            $decodeError = json_last_error();
+            $jsonError = $decodeError === JSON_ERROR_NONE ? null : json_last_error_msg();
+            if ($decodeError === JSON_ERROR_NONE && is_array($decoded)) {
+                $payload = $decoded;
+                $payloadSource = "json";
+            }
         }
+
+        if ($payloadSource !== "json" && !empty($_POST)) {
+            $payload = $_POST;
+            $payloadSource = "form";
+        } elseif ($payloadSource !== "json") {
+            $payloadSource = $hasBody ? "unparsed" : "empty";
+        }
+
+        ProcessLog::event("suggestions", "payload", [
+            "source"       => $payloadSource,
+            "json_error"   => $jsonError,
+            "bytes"        => strlen($rawBody),
+            "content_type" => $_SERVER["CONTENT_TYPE"] ?? "",
+            "keys"         => implode(",", array_keys($payload)),
+        ]);
 
         $idUser = $this->resolveUserId($payload);
 
@@ -138,10 +165,7 @@ class ApiController extends Controller
             ProcessLog::event("suggestions", "ingest_call", ["user_id" => $idUser]);
             $result = $ingest->ingest($payload, $rawBody, $idUser);
         } catch (Throwable $e) {
-            ProcessLog::event("suggestions", "exception", [
-                "class"   => get_class($e),
-                "message" => $e->getMessage(),
-            ]);
+            ProcessLog::exception("suggestions", "exception", $e, ["stage_hint" => "ingest"]);
             error_log("[api/suggestions] error: " . $e->getMessage());
             $this->logRespond(500, "error", ["reason" => "ingest_failed"]);
             ProcessLog::finish("suggestions", "error", ["reason" => "ingest_failed"]);
@@ -169,7 +193,7 @@ class ApiController extends Controller
             "confidence"    => $data["confidence"] ?? null,
         ]);
 
-        // Sin monto o con el pago rechazado: no es un egreso. Se responde 200
+        // Pago rechazado o payload vacio: no es un egreso. Se responde 200
         // para que el celular NO reintente.
         if (!empty($result["skipped"])) {
             $this->logRespond(200, "skipped", ["reason" => $result["reason"] ?? null]);
@@ -251,18 +275,41 @@ class ApiController extends Controller
     private function resolveUserId(array $payload): int
     {
         if (!empty($payload["user_id"]) && is_numeric($payload["user_id"])) {
-            return intval($payload["user_id"]);
+            $idUser = intval($payload["user_id"]);
+            ProcessLog::event("suggestions", "user", [
+                "origin"  => "payload_user_id",
+                "user_id" => $idUser,
+            ]);
+            return $idUser;
         }
 
         if (!empty($payload["user_email"]) && is_string($payload["user_email"])) {
             require_once URL_APP . "models/User.php";
             $user = $this->model("user")->get("*", ["email[=]" => trim($payload["user_email"]), "AND"])->array();
             if (!empty($user)) {
-                return (int) $user->id_user;
+                $idUser = (int) $user->id_user;
+                // El email NUNCA se registra: solo el origen y si se encontro.
+                ProcessLog::event("suggestions", "user", [
+                    "origin"  => "payload_email",
+                    "found"   => true,
+                    "user_id" => $idUser,
+                ]);
+                return $idUser;
             }
+
+            ProcessLog::event("suggestions", "user", [
+                "origin" => "payload_email",
+                "found"  => false,
+            ]);
         }
 
-        return defined("SUGGESTION_USER_ID") ? SUGGESTION_USER_ID : 1;
+        $idUser = defined("SUGGESTION_USER_ID") ? SUGGESTION_USER_ID : 1;
+        ProcessLog::event("suggestions", "user", [
+            "origin"  => "default",
+            "user_id" => intval($idUser),
+        ]);
+
+        return $idUser;
     }
 
     private function respond(int $status, array $body)
@@ -272,7 +319,7 @@ class ApiController extends Controller
 
         $json = json_encode($body, JSON_UNESCAPED_UNICODE);
         if ($json === false) {
-            error_log("[api] json_encode failed: " . json_last_error_msg());
+            ProcessLog::event("api", "json_encode_failed", ["detail" => json_last_error_msg()]);
             http_response_code(500);
             $json = json_encode([
                 "error"  => "json_encoding_failed",

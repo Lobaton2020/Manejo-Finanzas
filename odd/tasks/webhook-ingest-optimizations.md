@@ -1,5 +1,12 @@
 # Feature: optimizaciones del webhook de sugerencias
 
+> **ACTUALIZADO**: los filtros 1 ("no tiene monto") y 3 ("ya hay una
+> sugerencia pendiente equivalente") fueron **desactivados** porque dejaban
+> notificaciones validas sin registrar. Ver
+> `odd/tasks/suggestions-ingest-always-create.md`. El filtro 2 ("pago
+> rechazado") sigue activo. El docblock de `SuggestionIngest` es la fuente
+> de verdad del comportamiento actual.
+
 ## Objective
 
 Optimizar `POST /api/suggestions/inbox` para que cada notificacion que llega
