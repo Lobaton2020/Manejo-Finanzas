@@ -88,6 +88,13 @@ un motivo, sin registro de lo que se habia perdido.
 
 ## Progress
 
+Commits en `feature/suggestions-tracing-and-ingest`:
+
+| Commit | Alcance |
+|---|---|
+| `de3cf04` | Traza de `ProcessLog` + etapa de IA (`AiClient`, `AiExtractor`) |
+| `55cefc3` | Traza del endpoint + ingesta que nunca omite (este cambio) |
+
 - [x] **T1** `SuggestionIngest::ingest()`: quitar `no_amount` y
       `duplicate_pending`; `duplicate` -> `existing`; `insert_failed`
       explicito.

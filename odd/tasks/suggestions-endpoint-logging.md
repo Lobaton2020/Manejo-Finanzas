@@ -113,6 +113,15 @@ Puntos ciegos actuales (revisados archivo por archivo):
 - Compatibilidad: `ProcessLog::event()` mantiene su firma actual; todo lo
   nuevo son metodos adicionales.
 
+## Progress
+
+Commits en `feature/suggestions-tracing-and-ingest`:
+
+| Commit | Alcance |
+|---|---|
+| `de3cf04` | `ProcessLog` (level/seq/exception) + etapa de IA |
+| `55cefc3` | Endpoint (`ApiController`), ingesta (`SuggestionIngest`) y modelo (`NotificationSuggestion`) |
+
 ## Tasks
 
 - [x] **T1** `ProcessLog`: `level`, `seq`, `error()`, `exception()`, traza,
