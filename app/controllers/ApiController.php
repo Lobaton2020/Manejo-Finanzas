@@ -70,7 +70,13 @@ class ApiController extends Controller
      */
     public function suggestions($subroute = null)
     {
+        require_once URL_APP . "services/ProcessLog.php";
+
+        ProcessLog::start("suggestions");
+
         if (($_SERVER["REQUEST_METHOD"] ?? "GET") !== "POST") {
+            $this->logRespond(405, "error", ["reason" => "method_not_allowed"]);
+            ProcessLog::finish("suggestions", "error", ["reason" => "method_not_allowed"]);
             return $this->respond(405, [
                 "error"   => "method_not_allowed",
                 "allowed" => "POST",
@@ -78,6 +84,8 @@ class ApiController extends Controller
         }
 
         if ($subroute !== "inbox") {
+            $this->logRespond(404, "error", ["reason" => "subroute_not_found", "subroute" => $subroute]);
+            ProcessLog::finish("suggestions", "error", ["reason" => "subroute_not_found"]);
             return $this->respond(404, [
                 "error"    => "subroute_not_found",
                 "subroute" => $subroute,
@@ -97,6 +105,15 @@ class ApiController extends Controller
         }
 
         $idUser = $this->resolveUserId($payload);
+
+        ProcessLog::event("suggestions", "request", [
+            "method"     => $_SERVER["REQUEST_METHOD"] ?? "",
+            "path"       => $_SERVER["REQUEST_URI"] ?? "",
+            "bytes"      => strlen($rawBody),
+            "ip"         => $_SERVER["REMOTE_ADDR"] ?? "",
+            "user_agent" => $_SERVER["HTTP_USER_AGENT"] ?? "",
+            "user_id"    => $idUser,
+        ]);
 
         try {
             require_once URL_APP . "models/NotificationSuggestion.php";
@@ -118,15 +135,48 @@ class ApiController extends Controller
                 )
             );
 
+            ProcessLog::event("suggestions", "ingest_call", ["user_id" => $idUser]);
             $result = $ingest->ingest($payload, $rawBody, $idUser);
         } catch (Throwable $e) {
+            ProcessLog::event("suggestions", "exception", [
+                "class"   => get_class($e),
+                "message" => $e->getMessage(),
+            ]);
             error_log("[api/suggestions] error: " . $e->getMessage());
+            $this->logRespond(500, "error", ["reason" => "ingest_failed"]);
+            ProcessLog::finish("suggestions", "error", ["reason" => "ingest_failed"]);
             return $this->respond(500, ["error" => "ingest_failed"]);
         }
+
+        $extraction = $result["extraction"] ?? [];
+        $data = $extraction["data"] ?? [];
+
+        if (!empty($result["skipped"])) {
+            $outcome = "skipped";
+        } elseif (!$result["ok"]) {
+            $outcome = "error";
+        } elseif ($result["duplicate"]) {
+            $outcome = "duplicate";
+        } else {
+            $outcome = "created";
+        }
+
+        ProcessLog::event("suggestions", "ingest_result", [
+            "outcome"       => $outcome,
+            "reason"        => $result["reason"] ?? null,
+            "id_suggestion" => $result["id_suggestion"] ?? null,
+            "source"        => $extraction["source"] ?? null,
+            "confidence"    => $data["confidence"] ?? null,
+        ]);
 
         // Sin monto o con el pago rechazado: no es un egreso. Se responde 200
         // para que el celular NO reintente.
         if (!empty($result["skipped"])) {
+            $this->logRespond(200, "skipped", ["reason" => $result["reason"] ?? null]);
+            ProcessLog::finish("suggestions", "skipped", [
+                "reason"        => $result["reason"] ?? null,
+                "id_suggestion" => $result["id_suggestion"] ?? null,
+            ]);
             return $this->respond(200, [
                 "status" => "skipped",
                 "reason" => $result["reason"] ?? null,
@@ -134,18 +184,32 @@ class ApiController extends Controller
         }
 
         if (!$result["ok"]) {
+            $this->logRespond(400, "error", ["reason" => $result["error"] ?? null]);
+            ProcessLog::finish("suggestions", "error", ["reason" => $result["error"] ?? null]);
             return $this->respond(400, ["error" => $result["error"]]);
         }
 
         if ($result["duplicate"]) {
+            $this->logRespond(200, "duplicate", ["id_suggestion" => $result["id_suggestion"]]);
+            ProcessLog::finish("suggestions", "duplicate", [
+                "reason"        => $result["reason"] ?? null,
+                "id_suggestion" => $result["id_suggestion"],
+            ]);
             return $this->respond(200, [
                 "status"        => "duplicate",
                 "id_suggestion" => $result["id_suggestion"],
             ]);
         }
 
-        $extraction = $result["extraction"];
-        $data = $extraction["data"] ?? [];
+        $this->logRespond(200, "created", [
+            "id_suggestion" => $result["id_suggestion"],
+            "source"        => $extraction["source"] ?? null,
+        ]);
+        ProcessLog::finish("suggestions", "created", [
+            "id_suggestion" => $result["id_suggestion"],
+            "source"        => $extraction["source"] ?? null,
+            "confidence"    => $data["confidence"] ?? null,
+        ]);
 
         return $this->respond(200, [
             "status"        => "created",
@@ -163,6 +227,21 @@ class ApiController extends Controller
             "confidence"    => $data["confidence"] ?? null,
             "ids"           => $extraction["ids"] ?? [],
         ]);
+    }
+
+    /**
+     * Logs the response that is about to be sent.
+     *
+     * @param int    $status  HTTP status code.
+     * @param string $outcome Final outcome of the request.
+     * @param array  $data    Extra key/value pairs.
+     */
+    private function logRespond(int $status, string $outcome, array $data = []): void
+    {
+        $data["http"] = $status;
+        $data["outcome"] = $outcome;
+
+        ProcessLog::event("suggestions", "respond", $data);
     }
 
     /**

@@ -1,0 +1,11 @@
+# Contexto de build: nunca copiar secretos ni metadatos del repo.
+# Sin esto, un "podman build ." local se lleva el .env (clave de la BD y
+# keys de las IA) dentro de una capa de la imagen.
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.github
+.codegraph
+.atl

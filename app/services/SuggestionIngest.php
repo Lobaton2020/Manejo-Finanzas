@@ -1,6 +1,7 @@
 <?php
 
 require_once URL_APP . "services/NotificationPayload.php";
+require_once URL_APP . "services/ProcessLog.php";
 
 /**
  * Ingesta de notificaciones crudas (Gmail -> MacroDroid -> webhook).
@@ -55,6 +56,7 @@ class SuggestionIngest
     {
         $text = $this->extractText($payload, $rawBody);
         if ($text === "") {
+            ProcessLog::event("ingest", "skip", ["reason" => "empty_text"]);
             return $this->result(false, "empty_text", false, null, false, null, []);
         }
 
@@ -63,13 +65,28 @@ class SuggestionIngest
         $parsed = NotificationPayload::parse($text);
         $cleanText = $parsed["text"] !== "" ? $parsed["text"] : $text;
 
+        $hasAmount = NotificationPayload::hasAmount($cleanText);
+        $isDeclined = NotificationPayload::isDeclined($cleanText);
+
+        ProcessLog::event("ingest", "parse", [
+            "has_amount" => $hasAmount,
+            "declined"   => $isDeclined,
+            "amount"     => NotificationPayload::parseAmount($cleanText),
+            "timestamp"  => $parsed["timestamp"],
+            "package"    => $parsed["metadata"]["paquete"] ?? null,
+            "channel"    => $parsed["metadata"]["canal"] ?? null,
+            "text"       => ProcessLog::preview($cleanText),
+        ]);
+
         // Sin monto no hay egreso: no se crea el registro ni se llama a la IA.
-        if (!NotificationPayload::hasAmount($cleanText)) {
+        if (!$hasAmount) {
+            ProcessLog::event("ingest", "skip", ["reason" => "no_amount"]);
             return $this->result(false, "no_amount", true, "no_amount", false, null, []);
         }
 
         // Un pago rechazado / declinado tampoco es un egreso.
-        if (NotificationPayload::isDeclined($cleanText)) {
+        if ($isDeclined) {
+            ProcessLog::event("ingest", "skip", ["reason" => "declined"]);
             return $this->result(false, "declined", true, "declined", false, null, []);
         }
 
@@ -90,6 +107,11 @@ class SuggestionIngest
 
         // La compra pudo haber llegado antes por otro canal: si ya hay una
         // sugerencia pendiente equivalente, se devuelve esa.
+        ProcessLog::event("ingest", "dedupe", [
+            "phase"  => "before",
+            "amount" => $amount,
+            "text"   => ProcessLog::preview($description),
+        ]);
         $equivalent = $this->model->pendingEquivalent(
             $idUser,
             $amount,
@@ -98,23 +120,46 @@ class SuggestionIngest
             6,
             [$cleanText]
         );
+        ProcessLog::event("ingest", "dedupe", [
+            "phase"            => "after",
+            "duplicate_pending" => $equivalent !== null,
+            "id_suggestion"    => $equivalent !== null ? (int) $equivalent["id_suggestion"] : null,
+        ]);
         if ($equivalent !== null) {
             return $this->result(true, null, false, "duplicate_pending", true, (int) $equivalent["id_suggestion"], []);
         }
 
         // Los pendientes recientes se le pasan al modelo como contexto.
         $previous = $this->model->pendingSummary($idUser, 5);
+        ProcessLog::event("ingest", "previous", ["count" => count($previous)]);
 
         $ingest = $this->model->ingest($idUser, $source, $sourceRef, $text, $hash);
+        ProcessLog::event("ingest", "insert", [
+            "created"      => (bool) $ingest["created"],
+            "id_suggestion" => $ingest["id_suggestion"],
+            "source_ref"   => $sourceRef !== null ? ProcessLog::preview($sourceRef) : null,
+            "hash"         => substr($hash, 0, 12),
+        ]);
         if (!$ingest["created"]) {
             return $this->result(true, null, false, "duplicate", true, $ingest["id_suggestion"], []);
         }
 
         $idSuggestion = (int) $ingest["id_suggestion"];
         // AiExtractor ya informa `ai_model` segun el proveedor que respondio.
+        $extractStartedAt = microtime(true);
         $extraction = $this->extractor->extract($idUser, $cleanText, $previous);
+        ProcessLog::event("ingest", "extract", [
+            "latency_ms"   => round((microtime(true) - $extractStartedAt) * 1000, 1),
+            "source"       => $extraction["source"] ?? null,
+            "confidence"   => $extraction["data"]["confidence"] ?? null,
+            "needs_review" => $extraction["needs_review"] ?? null,
+            "error"        => $extraction["error"] ?? null,
+            "provider"     => $extraction["provider"] ?? null,
+            "ai_model"     => $extraction["ai_model"] ?? null,
+        ]);
 
         $this->model->applyExtraction($idSuggestion, $extraction);
+        ProcessLog::event("ingest", "apply", ["id_suggestion" => $idSuggestion]);
 
         return $this->result(true, null, false, null, false, $idSuggestion, $extraction);
     }

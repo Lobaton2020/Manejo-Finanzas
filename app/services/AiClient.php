@@ -1,5 +1,7 @@
 <?php
 
+require_once URL_APP . "services/ProcessLog.php";
+
 /**
  * Cliente HTTP de IA con dos proveedores:
  *
@@ -41,6 +43,9 @@ class AiClient
     private $lastProvider = "none";
     /** Modelo que respondio en la ultima llamada. */
     private $lastModel = null;
+
+    /** HTTP status of the last provider call (null when there was no call). */
+    private $lastHttpCode = null;
 
     public function __construct(array $config = [])
     {
@@ -87,6 +92,11 @@ class AiClient
         if ($primary["ok"]) {
             $this->lastProvider = "minimax";
             $this->lastModel = $this->model;
+            ProcessLog::event("ai", "ai_result", [
+                "provider" => "minimax",
+                "model"    => $this->model,
+                "ok"       => true,
+            ]);
             return $primary;
         }
 
@@ -94,19 +104,41 @@ class AiClient
         if (trim((string) $this->geminiKey) === "") {
             $this->lastProvider = "none";
             $this->lastModel = null;
+            ProcessLog::event("ai", "ai_result", [
+                "provider" => "none",
+                "model"    => null,
+                "ok"       => false,
+                "code"     => $primary["code"],
+            ]);
             return $primary;
         }
+
+        ProcessLog::event("ai", "ai_fallback", [
+            "from" => $primary["code"],
+            "to"   => "gemini",
+        ]);
 
         $fallback = $this->chatGemini($messages);
         if ($fallback["ok"]) {
             $fallback["fallback_from"] = $primary["code"];
             $this->lastProvider = "gemini";
             $this->lastModel = $this->geminiModel;
+            ProcessLog::event("ai", "ai_result", [
+                "provider" => "gemini",
+                "model"    => $this->geminiModel,
+                "ok"       => true,
+            ]);
             return $fallback;
         }
 
         $this->lastProvider = "none";
         $this->lastModel = null;
+        ProcessLog::event("ai", "ai_result", [
+            "provider" => "none",
+            "model"    => null,
+            "ok"       => false,
+            "code"     => "all_providers_failed",
+        ]);
         return $this->fail(
             "all_providers_failed",
             "MiniMax: {$primary["error"]} | Gemini: {$fallback["error"]}",
@@ -117,8 +149,58 @@ class AiClient
 
     /**
      * Llamada a MiniMax (endpoint compatible con OpenAI).
+     *
+     * Envuelve la peticion real para medir la latencia y registrar el
+     * intento en el log de proceso.
      */
     private function chatMinimax(array $messages): array
+    {
+        $startedAt = microtime(true);
+        $this->lastHttpCode = null;
+
+        $result = $this->requestMinimax($messages);
+        $result["latency_ms"] = round((microtime(true) - $startedAt) * 1000, 1);
+
+        ProcessLog::event("ai", "ai_attempt", [
+            "provider"   => "minimax",
+            "ok"         => (bool) $result["ok"],
+            "code"       => $result["code"],
+            "http"       => $this->lastHttpCode,
+            "latency_ms" => $result["latency_ms"],
+        ]);
+
+        return $result;
+    }
+
+    /**
+     * Llamada a Gemini (Google Generative Language API).
+     *
+     * Envuelve la peticion real para medir la latencia y registrar el
+     * intento en el log de proceso.
+     */
+    private function chatGemini(array $messages): array
+    {
+        $startedAt = microtime(true);
+        $this->lastHttpCode = null;
+
+        $result = $this->requestGemini($messages);
+        $result["latency_ms"] = round((microtime(true) - $startedAt) * 1000, 1);
+
+        ProcessLog::event("ai", "ai_attempt", [
+            "provider"   => "gemini",
+            "ok"         => (bool) $result["ok"],
+            "code"       => $result["code"],
+            "http"       => $this->lastHttpCode,
+            "latency_ms" => $result["latency_ms"],
+        ]);
+
+        return $result;
+    }
+
+    /**
+     * Llamada real a MiniMax (endpoint compatible con OpenAI).
+     */
+    private function requestMinimax(array $messages): array
     {
         if (trim((string) $this->apiKey) === "") {
             return $this->fail("minimax_api_key_missing", "No hay API key de MiniMax configurada (MINIMAX_API_KEY).");
@@ -158,6 +240,7 @@ class AiClient
         $error = curl_error($ch);
         $httpCode = intval(curl_getinfo($ch, CURLINFO_HTTP_CODE));
         curl_close($ch);
+        $this->lastHttpCode = $httpCode;
 
         if ($response === false || $errno !== 0) {
             return $this->fail("http_error", "cURL error {$errno}: {$error}");
@@ -214,13 +297,14 @@ class AiClient
             "raw"      => $decoded,
             "provider" => "minimax",
             "model"    => $this->model,
+            "latency_ms" => null,
         ];
     }
 
     /**
-     * Llamada a Gemini (Google Generative Language API).
+     * Llamada real a Gemini (Google Generative Language API).
      */
-    private function chatGemini(array $messages): array
+    private function requestGemini(array $messages): array
     {
         // Gemini separa el system prompt de los turnos.
         $systemText = "";
@@ -277,6 +361,7 @@ class AiClient
         $error = curl_error($ch);
         $httpCode = intval(curl_getinfo($ch, CURLINFO_HTTP_CODE));
         curl_close($ch);
+        $this->lastHttpCode = $httpCode;
 
         if ($response === false || $errno !== 0) {
             return $this->fail("http_error", "cURL error {$errno}: {$error}", [], "gemini");
@@ -332,6 +417,7 @@ class AiClient
             "raw"      => $decoded,
             "provider" => "gemini",
             "model"    => $this->geminiModel,
+            "latency_ms" => null,
         ];
     }
 
@@ -349,6 +435,7 @@ class AiClient
             "raw"      => $raw,
             "provider" => $provider,
             "model"    => $provider === "gemini" ? $this->geminiModel : $this->model,
+            "latency_ms" => null,
         ];
     }
 }
