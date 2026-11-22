@@ -47,6 +47,9 @@ class AiClient
     /** HTTP status of the last provider call (null when there was no call). */
     private $lastHttpCode = null;
 
+    /** Bytes of the raw response body of the last provider call. */
+    private $lastResponseBytes = null;
+
     public function __construct(array $config = [])
     {
         $this->apiKey   = $config["api_key"]   ?? (defined("MINIMAX_API_KEY") ? MINIMAX_API_KEY : "");
@@ -157,6 +160,7 @@ class AiClient
     {
         $startedAt = microtime(true);
         $this->lastHttpCode = null;
+        $this->lastResponseBytes = null;
 
         $result = $this->requestMinimax($messages);
         $result["latency_ms"] = round((microtime(true) - $startedAt) * 1000, 1);
@@ -166,6 +170,7 @@ class AiClient
             "ok"         => (bool) $result["ok"],
             "code"       => $result["code"],
             "http"       => $this->lastHttpCode,
+            "bytes"      => $this->lastResponseBytes,
             "latency_ms" => $result["latency_ms"],
         ]);
 
@@ -182,6 +187,7 @@ class AiClient
     {
         $startedAt = microtime(true);
         $this->lastHttpCode = null;
+        $this->lastResponseBytes = null;
 
         $result = $this->requestGemini($messages);
         $result["latency_ms"] = round((microtime(true) - $startedAt) * 1000, 1);
@@ -191,6 +197,7 @@ class AiClient
             "ok"         => (bool) $result["ok"],
             "code"       => $result["code"],
             "http"       => $this->lastHttpCode,
+            "bytes"      => $this->lastResponseBytes,
             "latency_ms" => $result["latency_ms"],
         ]);
 
@@ -222,6 +229,14 @@ class AiClient
             return $this->fail("payload_encode_failed", json_last_error_msg());
         }
 
+        ProcessLog::event("ai", "ai_request", [
+            "provider" => "minimax",
+            "model"    => $this->model,
+            "messages" => count($messages),
+            "bytes"    => strlen($body),
+            "timeout"  => $this->timeout,
+        ]);
+
         $ch = curl_init($this->baseUrl . "/v1/chat/completions");
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
@@ -241,6 +256,7 @@ class AiClient
         $httpCode = intval(curl_getinfo($ch, CURLINFO_HTTP_CODE));
         curl_close($ch);
         $this->lastHttpCode = $httpCode;
+        $this->lastResponseBytes = $response === false ? 0 : strlen((string) $response);
 
         if ($response === false || $errno !== 0) {
             return $this->fail("http_error", "cURL error {$errno}: {$error}");
@@ -341,6 +357,14 @@ class AiClient
             return $this->fail("payload_encode_failed", json_last_error_msg(), [], "gemini");
         }
 
+        ProcessLog::event("ai", "ai_request", [
+            "provider" => "gemini",
+            "model"    => $this->geminiModel,
+            "messages" => count($messages),
+            "bytes"    => strlen($body),
+            "timeout"  => $this->geminiTimeout,
+        ]);
+
         $url = $this->geminiBaseUrl . "/v1beta/models/" . rawurlencode($this->geminiModel) . ":generateContent";
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -362,6 +386,7 @@ class AiClient
         $httpCode = intval(curl_getinfo($ch, CURLINFO_HTTP_CODE));
         curl_close($ch);
         $this->lastHttpCode = $httpCode;
+        $this->lastResponseBytes = $response === false ? 0 : strlen((string) $response);
 
         if ($response === false || $errno !== 0) {
             return $this->fail("http_error", "cURL error {$errno}: {$error}", [], "gemini");
@@ -426,7 +451,11 @@ class AiClient
      */
     private function fail(string $code, string $message, array $raw = [], string $provider = "minimax"): array
     {
-        error_log("[ai/{$provider}] {$code}: {$message}");
+        ProcessLog::error("ai", "ai_error", [
+            "provider" => $provider,
+            "code"     => $code,
+            "message"  => $message,
+        ]);
         return [
             "ok"       => false,
             "content"  => "",

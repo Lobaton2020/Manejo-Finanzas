@@ -1,6 +1,7 @@
 <?php
 
 require_once URL_APP . "services/NotificationPayload.php";
+require_once URL_APP . "services/ProcessLog.php";
 
 /**
  * Extrae datos estructurados de una notificacion bancaria en texto crudo
@@ -160,6 +161,16 @@ class AiExtractor
     {
         $rawText = trim($rawText);
         if ($rawText === "") {
+            ProcessLog::event("ai_extract", "review_reasons", ["reasons" => "force_review", "count" => 1]);
+            ProcessLog::event("ai_extract", "finish", [
+                "source"         => "none",
+                "needs_review"   => true,
+                "amount"         => null,
+                "confidence"     => null,
+                "id_outflow_type" => null,
+                "id_category"     => null,
+                "id_porcent"      => null,
+            ]);
             return $this->result([], [], true, "none", "El texto de la notificacion esta vacio.", "");
         }
 
@@ -171,15 +182,40 @@ class AiExtractor
         }
 
         $catalogue = $this->catalogue($idUser);
+        $categoryCount = 0;
+        foreach ($catalogue["categories"] as $categoriesOfType) {
+            $categoryCount += count($categoriesOfType);
+        }
+        ProcessLog::event("ai_extract", "catalogue", [
+            "outflow_types" => count($catalogue["outflow_types"]),
+            "categories"    => $categoryCount,
+            "deposits"      => count($catalogue["deposits"]),
+        ]);
+
+        $systemPrompt = $this->buildPrompt($catalogue, $previous);
         $messages = [
-            ["role" => "system", "content" => $this->buildPrompt($catalogue, $previous)],
+            ["role" => "system", "content" => $systemPrompt],
             ["role" => "user", "content" => $rawText],
         ];
+        ProcessLog::event("ai_extract", "prompt", [
+            "chars"      => mb_strlen($systemPrompt),
+            "text_chars" => mb_strlen($rawText),
+            "previous"   => count($previous),
+        ]);
 
         $response = $this->client->chat($messages);
         if (!$response["ok"]) {
             // El LLM fallo: fallback determinista para no perder la sugerencia.
+            ProcessLog::error("ai_extract", "ai_failed", [
+                "error" => $response["error"] ?? null,
+                "code"  => $response["code"] ?? null,
+            ]);
             $fallback = $this->fallback($rawText, $catalogue);
+            ProcessLog::event("ai_extract", "heuristics", [
+                "type"     => $fallback["ids"]["id_outflow_type"] !== null,
+                "category" => $fallback["ids"]["id_category"] !== null,
+                "deposit"  => $fallback["ids"]["id_porcent"] !== null,
+            ]);
             return $this->finish(
                 $fallback["data"],
                 $fallback["ids"],
@@ -193,8 +229,21 @@ class AiExtractor
         }
 
         $parsed = $this->parseJson($response["content"]);
+        $parseData = ["ok" => $parsed !== null];
         if ($parsed === null) {
+            $parseData["response"] = ProcessLog::preview($response["content"], 300);
+        }
+        ProcessLog::event("ai_extract", "parse_json", $parseData);
+        if ($parsed === null) {
+            ProcessLog::error("ai_extract", "parse_json_failed", [
+                "response" => ProcessLog::preview($response["content"], 300),
+            ]);
             $fallback = $this->fallback($rawText, $catalogue);
+            ProcessLog::event("ai_extract", "heuristics", [
+                "type"     => $fallback["ids"]["id_outflow_type"] !== null,
+                "category" => $fallback["ids"]["id_category"] !== null,
+                "deposit"  => $fallback["ids"]["id_porcent"] !== null,
+            ]);
             return $this->finish(
                 $fallback["data"],
                 $fallback["ids"],
@@ -210,22 +259,42 @@ class AiExtractor
         $data = $this->normalizeData($parsed);
         $ids = $this->resolveIds($data, $catalogue);
 
+        ProcessLog::event("ai_extract", "resolve_ids", [
+            "outflow_type_name" => $data["outflow_type_name"] ?? null,
+            "category_name"     => $data["category_name"] ?? null,
+            "deposit_name"      => $data["deposit_name"] ?? null,
+            "id_outflow_type"   => $ids["id_outflow_type"] ?? null,
+            "id_category"       => $ids["id_category"] ?? null,
+            "id_porcent"        => $ids["id_porcent"] ?? null,
+        ]);
+
         // Si el modelo no resolvio tipo o categoria, se completan con
         // heuristicas por palabras clave del mensaje: la sugerencia llega con
         // una opcion por defecto en lugar de vacia.
         $heuristic = $this->inferByKeywords($rawText, $catalogue);
+        $heuristicType = false;
+        $heuristicCategory = false;
+        $heuristicDeposit = false;
         if ($ids["id_outflow_type"] === null && $heuristic["id_outflow_type"] !== null) {
             $ids["id_outflow_type"] = $heuristic["id_outflow_type"];
             $data["outflow_type_name"] = $heuristic["outflow_type_name"];
+            $heuristicType = true;
         }
         if ($ids["id_category"] === null && $heuristic["id_category"] !== null) {
             $ids["id_category"] = $heuristic["id_category"];
             $data["category_name"] = $heuristic["category_name"];
+            $heuristicCategory = true;
         }
         if ($ids["id_porcent"] === null && $heuristic["id_porcent"] !== null) {
             $ids["id_porcent"] = $heuristic["id_porcent"];
             $data["deposit_name"] = $heuristic["deposit_name"];
+            $heuristicDeposit = true;
         }
+        ProcessLog::event("ai_extract", "heuristics", [
+            "type"     => $heuristicType,
+            "category" => $heuristicCategory,
+            "deposit"  => $heuristicDeposit,
+        ]);
 
         return $this->finish($data, $ids, false, "ai", null, $response["content"], $catalogue, $rawText);
     }
@@ -279,23 +348,46 @@ class AiExtractor
 
         // Si el modelo no pudo resolver tipo o categoria, la sugerencia queda
         // para revision manual: el usuario los elige en el formulario.
-        $needsReview = $forceReview;
-        if (!$needsReview) {
-            if ($ids["id_outflow_type"] === null || $ids["id_category"] === null) {
-                $needsReview = true;
+        // El booleano final es el mismo de antes; lo que se agrega es el
+        // detalle de POR QUE hay que revisarla.
+        $reviewReasons = [];
+        if ($forceReview) {
+            $reviewReasons[] = "force_review";
+        } else {
+            if ($ids["id_outflow_type"] === null) {
+                $reviewReasons[] = "missing_outflow_type";
+            }
+            if ($ids["id_category"] === null) {
+                $reviewReasons[] = "missing_category";
             }
             if (!empty($data["fields_missing"])) {
-                $needsReview = true;
+                $reviewReasons[] = "missing_fields";
             }
             if ($data["amount"] === null || $data["amount"] <= 0) {
-                $needsReview = true;
+                $reviewReasons[] = "missing_amount";
             }
             // El deposito decide de que plata sale: sin evidencia se presume
             // el deposito por defecto, asi que esto no marca revision.
             if ($ids["id_porcent"] === null) {
-                $needsReview = true;
+                $reviewReasons[] = "missing_deposit";
             }
         }
+        $needsReview = !empty($reviewReasons);
+
+        ProcessLog::event("ai_extract", "review_reasons", [
+            "reasons" => implode(",", $reviewReasons),
+            "count"   => count($reviewReasons),
+        ]);
+
+        ProcessLog::event("ai_extract", "finish", [
+            "source"          => $source,
+            "needs_review"    => $needsReview,
+            "amount"          => $data["amount"] ?? null,
+            "confidence"      => $data["confidence"] ?? null,
+            "id_outflow_type" => $ids["id_outflow_type"] ?? null,
+            "id_category"     => $ids["id_category"] ?? null,
+            "id_porcent"      => $ids["id_porcent"] ?? null,
+        ]);
 
         return $this->result($data, $ids, $needsReview, $source, $error, $rawResponse);
     }
